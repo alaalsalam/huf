@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Info, Loader2 } from 'lucide-react';
+import { Bot, ChartNoAxesCombined, Info, Loader2, ShieldCheck, Workflow } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../components/ui/tooltip';
@@ -215,18 +215,41 @@ function HomePage() {
   return (
     <div className="h-full overflow-auto">
       <div className="p-6 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
-            Monitor your agents, flows, and system performance
-          </p>
+        <div className="trilogy-command-surface overflow-hidden rounded-md border p-5 shadow-sm">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4 min-w-0">
+              <div className="trilogy-brand-mark hidden h-11 w-11 shrink-0 items-center justify-center rounded-md text-white sm:flex">
+                <ChartNoAxesCombined className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">TrilogyAi Command Center</h1>
+                <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                  Monitor agents, conversations, flows, cost, and operational performance from one focused workspace.
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground sm:min-w-[22rem]">
+              <div className="rounded-md border bg-white/70 p-3">
+                <Bot className="mb-2 h-4 w-4 text-primary" />
+                Agents
+              </div>
+              <div className="rounded-md border bg-white/70 p-3">
+                <Workflow className="mb-2 h-4 w-4 text-primary" />
+                Flows
+              </div>
+              <div className="rounded-md border bg-white/70 p-3">
+                <ShieldCheck className="mb-2 h-4 w-4 text-primary" />
+                Control
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Metrics Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <TooltipProvider>
             {metricsData.map((metric) => (
-              <Card key={metric.id}>
+              <Card key={metric.id} className="rounded-md border-slate-200/80 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
                     {metric.title}

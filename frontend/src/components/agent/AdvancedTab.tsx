@@ -284,8 +284,8 @@ export function AdvancedTab({ form, allModels }: AdvancedTabProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Huf UI</CardTitle>
-          <CardDescription>Chat avatar styling in the agent chat interface</CardDescription>
+          <CardTitle>TrilogyAi UI</CardTitle>
+          <CardDescription>Chat avatar styling in the TrilogyAi interface</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 sm:grid-cols-2">
           <FormField

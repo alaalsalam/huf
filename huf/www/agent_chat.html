@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Audio Chat</title>
+	<title>TrilogyAi Audio Chat</title>
 	<link rel="icon" type="image/x-icon" href="/assets/huf/frontend/assets/favicon-DVOKLumH.ico" />
 	<script src="https://cdn.tailwindcss.com"></script>
 	<style>
@@ -21,22 +21,22 @@
 		}
 	</style>
 </head>
-<body class="min-h-screen bg-zinc-50 font-sans antialiased">
+<body class="min-h-screen bg-slate-50 font-sans antialiased">
 	<div class="min-h-screen flex items-center justify-center p-3 sm:p-4 md:p-6">
-		<div class="w-full max-w-3xl bg-white rounded-xl sm:rounded-2xl shadow-lg shadow-zinc-200/50 overflow-hidden flex flex-col h-[85vh] sm:h-[90vh] border border-zinc-200/80">
+		<div class="w-full max-w-3xl bg-white rounded-xl sm:rounded-2xl shadow-lg shadow-cyan-950/10 overflow-hidden flex flex-col h-[85vh] sm:h-[90vh] border border-slate-200/90">
 			<!-- Header -->
 			<header class="flex items-center justify-between gap-3 px-4 sm:px-6 md:px-8 py-4 sm:py-5 border-b border-zinc-200 bg-white/80 backdrop-blur-sm shrink-0">
 				<div class="flex items-center gap-3 sm:gap-4 min-w-0">
-					<a href="/huf" class="shrink-0 flex items-center gap-2" title="Huf">
-						<img src="/assets/huf/Images/huf.png" alt="Huf" class="h-8 w-8 sm:h-9 sm:w-9 rounded-lg object-contain" onerror="this.style.display='none'; var s=this.nextElementSibling; if(s){s.classList.remove('hidden'); s.classList.add('flex');}" />
-						<span class="hidden h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-violet-500 text-white items-center justify-center text-xs font-bold shrink-0">H</span>
+					<a href="/huf" class="shrink-0 flex items-center gap-2" title="TrilogyAi">
+						<img src="/assets/huf/Images/trilogy-ai.svg" alt="TrilogyAi" class="h-8 w-8 sm:h-9 sm:w-9 rounded-lg object-contain" onerror="this.style.display='none'; var s=this.nextElementSibling; if(s){s.classList.remove('hidden'); s.classList.add('flex');}" />
+						<span class="hidden h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-cyan-600 text-white items-center justify-center text-xs font-bold shrink-0">T</span>
 					</a>
 					<div class="min-w-0">
 						<h1 id="agent-title" class="text-base sm:text-lg md:text-xl font-semibold text-zinc-900 truncate">
-							Audio Agent
+							TrilogyAi Agent
 						</h1>
 						<p class="text-[10px] sm:text-[11px] text-zinc-500 font-medium uppercase tracking-wider">
-							Audio Conversation
+							TrilogyAi Conversation
 						</p>
 					</div>
 				</div>
@@ -65,13 +65,13 @@
 			<main id="messages-container" class="flex-1 overflow-y-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 space-y-6 sm:space-y-8 min-h-0"></main>
 
 			<!-- Loading indicator -->
-			<div id="loading-indicator" class="hidden px-4 sm:px-6 md:px-8 pb-2 text-center text-[10px] sm:text-[11px] font-medium text-violet-500 uppercase tracking-widest shrink-0">
+			<div id="loading-indicator" class="hidden px-4 sm:px-6 md:px-8 pb-2 text-center text-[10px] sm:text-[11px] font-medium text-cyan-600 uppercase tracking-widest shrink-0">
 				Imagining a response...
 			</div>
 
 			<!-- Input area -->
 			<footer class="p-4 sm:p-6 md:p-8 bg-white border-t border-zinc-200 shrink-0">
-				<form id="chat-form" class="group flex items-center gap-2 p-2 bg-zinc-50 rounded-xl border border-zinc-200 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-400/20 transition-all duration-200">
+				<form id="chat-form" class="group flex items-center gap-2 p-2 bg-slate-50 rounded-xl border border-zinc-200 focus-within:border-cyan-500 focus-within:ring-2 focus-within:ring-cyan-500/20 transition-all duration-200">
 					<div id="recording-bar" class="hidden flex flex-1 items-center justify-between gap-3 px-4 sm:px-6 py-3 min-w-0">
 						<div class="flex items-center gap-3 sm:gap-4 shrink-0">
 							<div class="relative">
@@ -94,7 +94,7 @@
 					/>
 
 					<div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-						<button id="mic-button" type="button" class="p-2.5 sm:p-3 text-zinc-400 hover:text-violet-600 hover:bg-violet-50 transition-colors rounded-lg active:scale-95" title="Record">
+						<button id="mic-button" type="button" class="p-2.5 sm:p-3 text-zinc-400 hover:text-cyan-700 hover:bg-cyan-50 transition-colors rounded-lg active:scale-95" title="Record">
 							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
 								<path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z" />
 								<path d="M7 11a5 5 0 0 0 10 0h-2a3 3 0 0 1-6 0H7Z" />
@@ -106,7 +106,7 @@
 								<rect x="6" y="6" width="12" height="12" rx="2" />
 							</svg>
 						</button>
-						<button id="send-button" type="submit" class="p-2.5 sm:p-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors active:scale-95" title="Send">
+						<button id="send-button" type="submit" class="p-2.5 sm:p-3 bg-cyan-700 hover:bg-cyan-800 text-white rounded-lg transition-colors active:scale-95" title="Send">
 							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 								<path d="m22 2-7 20-4-9-9-4Z" />
 								<path d="M22 2 11 13" />
@@ -115,7 +115,7 @@
 					</div>
 				</form>
 				<p class="text-center mt-3 sm:mt-4 text-[10px] text-zinc-400 font-medium">
-					Powered by <a href="/huf" class="text-violet-600 hover:text-violet-700 hover:underline">Huf</a>
+					Powered by <a href="/huf" class="text-cyan-700 hover:text-cyan-800 hover:underline">TrilogyAi</a>
 				</p>
 			</footer>
 		</div>
@@ -130,7 +130,7 @@
 		}
 
 		const qs = new URLSearchParams(window.location.search);
-		const agentName = qs.get("agent") || "Audio Agent";
+		const agentName = qs.get("agent") || "TrilogyAi Agent";
 		document.getElementById("agent-title").textContent = agentName;
 
 		const messagesContainer = document.getElementById("messages-container");
@@ -198,14 +198,14 @@
 				row.className = "flex max-w-[90%] sm:max-w-[85%] md:max-w-[80%] " + (isAI ? "flex-row" : "flex-row-reverse") + " items-start gap-3 sm:gap-4";
 
 				const avatar = document.createElement("div");
-				avatar.className = "flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shadow-sm mt-0.5 " + (isAI ? "bg-violet-100 text-violet-600" : "bg-zinc-800 text-white");
+				avatar.className = "flex-shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shadow-sm mt-0.5 " + (isAI ? "bg-cyan-100 text-cyan-700" : "bg-zinc-800 text-white");
 				avatar.textContent = isAI ? "AI" : "U";
 
 				const bubbleCol = document.createElement("div");
 				bubbleCol.className = "flex flex-col " + (isAI ? "items-start" : "items-end") + " min-w-0";
 
 				const bubble = document.createElement("div");
-				bubble.className = "relative px-4 sm:px-5 md:px-6 py-3 sm:py-4 rounded-xl " + (isAI ? "bg-zinc-100 border border-zinc-200 text-zinc-800 rounded-tl-md" : "bg-violet-600 text-white rounded-tr-md shadow-sm");
+				bubble.className = "relative px-4 sm:px-5 md:px-6 py-3 sm:py-4 rounded-xl " + (isAI ? "bg-zinc-100 border border-zinc-200 text-zinc-800 rounded-tl-md" : "bg-cyan-700 text-white rounded-tr-md shadow-sm");
 
 				if (msg.audioUrl) {
 					const player = createAudioPlayer(msg.audioUrl, isAI);
@@ -237,7 +237,7 @@
 
 			const btn = document.createElement("button");
 			btn.type = "button";
-			btn.className = "flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full transition-all active:scale-90 " + (isAI ? "bg-violet-600 text-white" : "bg-white text-violet-600");
+			btn.className = "flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full transition-all active:scale-90 " + (isAI ? "bg-cyan-700 text-white" : "bg-white text-cyan-700");
 
 			const playIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m5 3 14 9-14 9V3Z"/></svg>';
 			const pauseIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
@@ -249,7 +249,7 @@
 			const progressBar = document.createElement("div");
 			progressBar.className = "h-1 w-full bg-zinc-200 rounded-full overflow-hidden";
 			const progressInner = document.createElement("div");
-			progressInner.className = "h-full rounded-full transition-all duration-100 " + (isAI ? "bg-violet-600" : "bg-white/80");
+			progressInner.className = "h-full rounded-full transition-all duration-100 " + (isAI ? "bg-cyan-700" : "bg-white/80");
 			progressInner.style.width = "0%";
 			progressBar.appendChild(progressInner);
 

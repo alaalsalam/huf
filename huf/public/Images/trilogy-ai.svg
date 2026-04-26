@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TrilogyAi">
+  <defs>
+    <linearGradient id="g" x1="10" y1="8" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1E3A5F"/>
+      <stop offset="0.55" stop-color="#0891B2"/>
+      <stop offset="1" stop-color="#34D399"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <path d="M18 18h28v8H36v25h-8V26H18z" fill="white"/>
+  <circle cx="47" cy="45" r="4" fill="#FCD34D"/>
+</svg>

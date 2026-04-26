@@ -42,14 +42,18 @@ import {
 // ---------------------------------------------------------------------------
 
 const ROLE_COLOURS: Record<string, string> = {
-  'Huf Admin': 'bg-red-100 text-red-800',
-  'Huf Manager': 'bg-blue-100 text-blue-800',
-  'Huf User': 'bg-green-100 text-green-800',
-  'Huf Viewer': 'bg-gray-100 text-gray-700',
+  'Huf Admin': 'bg-cyan-100 text-cyan-900',
+  'Huf Manager': 'bg-sky-100 text-sky-900',
+  'Huf User': 'bg-emerald-100 text-emerald-900',
+  'Huf Viewer': 'bg-slate-100 text-slate-700',
 };
 
 function roleBadgeClass(role: string): string {
-  return ROLE_COLOURS[role] ?? 'bg-purple-100 text-purple-800';
+  return ROLE_COLOURS[role] ?? 'bg-cyan-100 text-cyan-900';
+}
+
+function displayRoleName(role: string): string {
+  return role.replace(/^Huf\b/, 'TrilogyAi');
 }
 
 // ---------------------------------------------------------------------------
@@ -128,7 +132,7 @@ function InviteDialog({ open, roles, onClose, onInvited }: InviteDialogProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
-                  {selectedRole || 'Select a role'}
+                  {selectedRole ? displayRoleName(selectedRole) : 'Select a role'}
                   <ChevronDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -230,7 +234,7 @@ export default function UsersPage() {
 
   return (
     <PageLayout
-      subtitle="Manage who has access to Huf and what they can do."
+      subtitle="Manage who has access to TrilogyAi and what they can do."
       toolbar={
         <Button onClick={() => setShowInvite(true)}>
           <UserPlus className="h-4 w-4 mr-2" />
@@ -292,7 +296,7 @@ export default function UsersPage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="ml-auto flex items-center gap-1 hover:opacity-80">
-                          <Badge className={roleBadgeClass(u.huf_role)}>{u.huf_role}</Badge>
+                          <Badge className={roleBadgeClass(u.huf_role)}>{displayRoleName(u.huf_role)}</Badge>
                           <ChevronDown className="h-3 w-3 shrink-0 text-muted-foreground" />
                         </button>
                       </DropdownMenuTrigger>

@@ -962,7 +962,7 @@ export function ToolCreationForm({
           <Button
             type="submit"
             disabled={loading}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="bg-cyan-700 hover:bg-cyan-800 text-white"
           >
             {loading 
               ? (mode === 'edit' ? 'Updating...' : 'Creating...') 

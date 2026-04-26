@@ -1,11 +1,11 @@
 app_name = "huf"
-app_title = "Huf"
+app_title = "TrilogyAi"
 app_publisher = "Tridz Technologies Pvt Ltd"
 app_description = "Build and run smart AI agents with tools, chat, and automation directly in the Frappe ecosystem."
 app_email = "info@tridz.com"
 app_license = "agpl"
 source_link = "https://github.com/tridz-dev/huf.git"
-app_logo_url="/assets/huf/Images/huf.png"
+app_logo_url="/assets/huf/Images/trilogy-ai.svg"
 app_url="/huf"
 # Apps
 # ------------------
@@ -17,7 +17,7 @@ add_to_apps_screen = [
 	{
 		"name": "huf",
 		"logo": app_logo_url,
-		"title": "Huf",
+		"title": "TrilogyAi",
 		"route": app_url,
 		"has_permission": "huf.permissions.check_app_permission"
 	}
@@ -321,7 +321,7 @@ fixtures = [
     {
         "dt": "Custom HTML Block",
         "filters": [
-            ["name", "=", "Huf"]
+            ["name", "=", "TrilogyAi"]
         ]
     }
 ]

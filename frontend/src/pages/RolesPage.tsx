@@ -18,6 +18,10 @@ const CATEGORY_ORDER = [
   { key: 'roles', label: 'Roles' },
 ];
 
+function displayRoleName(role: string): string {
+  return role.replace(/^Huf\b/, 'TrilogyAi');
+}
+
 function groupCapabilities(caps: string[]): Record<string, string[]> {
   const groups: Record<string, string[]> = {};
   for (const cap of caps) {
@@ -39,7 +43,7 @@ function RoleCard({ role }: { role: HufRole }) {
     <div className="border rounded-lg p-4 space-y-3">
       {/* Header */}
       <div className="flex items-center gap-2">
-        <span className="font-semibold text-base">{role.role_name}</span>
+        <span className="font-semibold text-base">{displayRoleName(role.role_name)}</span>
         {role.is_system_role === 1 && (
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
             <Lock className="h-3 w-3" />
@@ -98,7 +102,7 @@ export default function RolesPage() {
             Roles
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            View capability sets granted to each Huf role. System roles cannot be deleted.
+            View capability sets granted to each TrilogyAi role. System roles cannot be deleted.
           </p>
         </div>
 

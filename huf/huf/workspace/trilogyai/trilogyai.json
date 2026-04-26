@@ -1,22 +1,22 @@
 {
  "charts": [],
- "content": "[{\"id\":\"OsSj2RjLVu\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Huf</span>\",\"col\":12}},{\"id\":\"WBFIAvEfIX\",\"type\":\"card\",\"data\":{\"card_name\":\"Get Started\",\"col\":3}},{\"id\":\"bQg_Z1kSdV\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Huf\",\"col\":2}},{\"id\":\"hxcJFCOMcV\",\"type\":\"card\",\"data\":{\"card_name\":\"Interaction\",\"col\":3}},{\"id\":\"RqxcQixz9w\",\"type\":\"card\",\"data\":{\"card_name\":\"Observability & Logs\",\"col\":3}},{\"id\":\"O8D0p7DZyY\",\"type\":\"card\",\"data\":{\"card_name\":\"Agent Insights\",\"col\":4}},{\"id\":\"ZAUsZPDRrx\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"zh-OV2O1d5\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Agent Runs\",\"col\":4}},{\"id\":\"CYiCJMdU9j\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Success Rate\",\"col\":4}},{\"id\":\"mKxGF_NPDz\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Cost\",\"col\":4}},{\"id\":\"9T5qPu72tF\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Average Runtime(Minutes)\",\"col\":4}}]",
+ "content": "[{\"id\":\"OsSj2RjLVu\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">TrilogyAi</span>\",\"col\":12}},{\"id\":\"WBFIAvEfIX\",\"type\":\"card\",\"data\":{\"card_name\":\"Get Started\",\"col\":3}},{\"id\":\"bQg_Z1kSdV\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"TrilogyAi\",\"col\":2}},{\"id\":\"hxcJFCOMcV\",\"type\":\"card\",\"data\":{\"card_name\":\"Interaction\",\"col\":3}},{\"id\":\"RqxcQixz9w\",\"type\":\"card\",\"data\":{\"card_name\":\"Observability & Logs\",\"col\":3}},{\"id\":\"O8D0p7DZyY\",\"type\":\"card\",\"data\":{\"card_name\":\"Agent Insights\",\"col\":4}},{\"id\":\"ZAUsZPDRrx\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"zh-OV2O1d5\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Agent Runs\",\"col\":4}},{\"id\":\"CYiCJMdU9j\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Success Rate\",\"col\":4}},{\"id\":\"mKxGF_NPDz\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Cost\",\"col\":4}},{\"id\":\"Swx8hMTgeh\",\"type\":\"paragraph\",\"data\":{\"text\":\"&nbsp;\",\"col\":12}}]",
  "creation": "2025-11-04 17:24:07.034098",
  "custom_blocks": [
   {
-   "custom_block_name": "Huf",
-   "label": "Huf"
+   "custom_block_name": "TrilogyAi",
+   "label": "TrilogyAi"
   }
  ],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,
- "icon": "header",
+ "icon": "sparkles",
  "idx": 0,
  "indicator_color": "",
- "is_hidden": 0,
- "label": "Huf",
+ "is_hidden": 1,
+ "label": "TrilogyAi",
  "links": [
   {
    "hidden": 0,
@@ -175,10 +175,10 @@
    "type": "Link"
   }
  ],
- "modified": "2026-01-23 18:00:49.398106",
+ "modified": "2026-04-26 21:16:30.654072",
  "modified_by": "Administrator",
  "module": "Huf",
- "name": "Huf",
+ "name": "TrilogyAi",
  "number_cards": [
   {
    "label": "Total Agent Runs",
@@ -200,6 +200,5 @@
  "roles": [],
  "sequence_id": 33.0,
  "shortcuts": [],
- "title": "Huf",
- "type": "Workspace"
+ "title": "TrilogyAi"
 }

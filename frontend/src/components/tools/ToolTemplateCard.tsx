@@ -24,14 +24,14 @@ export function ToolTemplateCard({ template, onClick }: ToolTemplateCardProps) {
       className={cn(
         'cursor-pointer group relative flex flex-col items-start p-5',
         'bg-white border border-gray-200 rounded-xl',
-        'hover:border-purple-500 hover:shadow-md transition-all'
+        'hover:border-cyan-500 hover:shadow-md transition-all'
       )}
     >
       <div
         className={cn(
-          'h-10 w-10 rounded-lg bg-gray-50 text-purple-600',
+          'h-10 w-10 rounded-lg bg-cyan-50 text-cyan-700',
           'flex items-center justify-center mb-4',
-          'group-hover:bg-purple-50 transition-colors'
+          'group-hover:bg-cyan-100 transition-colors'
         )}
       >
         <Icon className="w-6 h-6" aria-hidden="true" />

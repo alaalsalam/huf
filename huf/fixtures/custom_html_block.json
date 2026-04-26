@@ -2,12 +2,12 @@
  {
   "docstatus": 0,
   "doctype": "Custom HTML Block",
-  "html": "<a href=\"/huf\" style=\"display:inline-block\">\n    <img class=\"huflogo\" src=\"/assets/huf/Images/huf.png\">\n    <h5>Huf UI</h5>\n</a>\n",
+  "html": "<a href=\"/huf\" style=\"display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:inherit\">\n    <img class=\"trilogy-ai-logo\" src=\"/assets/huf/Images/trilogy-ai.svg\">\n    <h5>TrilogyAi</h5>\n</a>\n",
   "modified": "2026-01-23 18:03:06.846683",
-  "name": "Huf",
+  "name": "TrilogyAi",
   "private": 0,
   "roles": [],
   "script": null,
-  "style": ".huflogo {\n    height: 37px;\n}"
+  "style": ".trilogy-ai-logo {\n    height: 37px;\n    width: 37px;\n    border-radius: 10px;\n}\n"
  }
 ]

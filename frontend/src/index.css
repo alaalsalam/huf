@@ -4,40 +4,40 @@
 
 @layer base {
   :root {
-    --radius: 0.65rem;
-    --background: 100% 0 0;
-    --foreground: 14.1% 0.005 285.823;
-    --card: 100% 0 0;
-    --card-foreground: 14.1% 0.005 285.823;
-    --popover: 100% 0 0;
-    --popover-foreground: 14.1% 0.005 285.823;
-    --primary: 54.1% 0.281 293.009;
-    --primary-foreground: 96.9% 0.016 293.756;
-    --secondary: 96.7% 0.001 286.375;
-    --secondary-foreground: 21% 0.006 285.885;
-    --muted: 96.7% 0.001 286.375;
-    --muted-foreground: 55.2% 0.016 285.938;
-    --accent: 96.7% 0.001 286.375;
-    --accent-foreground: 21% 0.006 285.885;
+    --radius: 0.55rem;
+    --background: 98.5% 0.008 220;
+    --foreground: 18% 0.025 250;
+    --card: 100% 0.003 220;
+    --card-foreground: 18% 0.025 250;
+    --popover: 100% 0.003 220;
+    --popover-foreground: 18% 0.025 250;
+    --primary: 56% 0.15 205;
+    --primary-foreground: 99% 0.006 210;
+    --secondary: 96% 0.018 215;
+    --secondary-foreground: 24% 0.04 245;
+    --muted: 95.5% 0.014 220;
+    --muted-foreground: 48% 0.035 242;
+    --accent: 94% 0.045 190;
+    --accent-foreground: 22% 0.05 236;
     --destructive: 57.7% 0.245 27.325;
     --destructive-foreground: 96.9% 0.016 293.756;
-    --border: 92% 0.004 286.32;
-    --input: 92% 0.004 286.32;
-    --ring: 70.2% 0.183 293.541;
-    --chart-1: 81.1% 0.111 293.571;
-    --chart-2: 60.6% 0.25 292.717;
-    --chart-3: 54.1% 0.281 293.009;
-    --chart-4: 49.1% 0.27 292.581;
-    --chart-5: 43.2% 0.232 292.759;
+    --border: 89.5% 0.02 225;
+    --input: 89.5% 0.02 225;
+    --ring: 62% 0.14 205;
+    --chart-1: 62% 0.15 205;
+    --chart-2: 70% 0.14 170;
+    --chart-3: 68% 0.16 85;
+    --chart-4: 55% 0.13 255;
+    --chart-5: 64% 0.18 30;
     --sidebar: 98.5% 0 0;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 218 34% 18%;
+    --sidebar-primary: 194 80% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 190 52% 94%;
+    --sidebar-accent-foreground: 218 42% 18%;
+    --sidebar-border: 210 28% 88%;
+    --sidebar-ring: 194 80% 42%;
+    --sidebar-background: 205 45% 98%;
     /* Audio player / media-chrome: resolved colors for high contrast */
     --color-background: oklch(var(--background));
     --color-foreground: oklch(var(--foreground));
@@ -55,8 +55,8 @@
     --card-foreground: 98.5% 0 0;
     --popover: 21% 0.006 285.885;
     --popover-foreground: 98.5% 0 0;
-    --primary: 60.6% 0.25 292.717;
-    --primary-foreground: 96.9% 0.016 293.756;
+    --primary: 66% 0.13 198;
+    --primary-foreground: 99% 0.006 210;
     --secondary: 27.4% 0.006 286.033;
     --secondary-foreground: 98.5% 0 0;
     --muted: 27.4% 0.006 286.033;
@@ -67,21 +67,21 @@
     --destructive-foreground: 96.9% 0.016 293.756;
     --border: 100% 0 0 / 10%;
     --input: 100% 0 0 / 15%;
-    --ring: 38% 0.189 293.745;
-    --chart-1: 81.1% 0.111 293.571;
-    --chart-2: 60.6% 0.25 292.717;
-    --chart-3: 54.1% 0.281 293.009;
-    --chart-4: 49.1% 0.27 292.581;
-    --chart-5: 43.2% 0.232 292.759;
-    --sidebar: 21% 0.006 285.885;
+    --ring: 66% 0.13 198;
+    --chart-1: 62% 0.15 205;
+    --chart-2: 70% 0.14 170;
+    --chart-3: 68% 0.16 85;
+    --chart-4: 55% 0.13 255;
+    --chart-5: 64% 0.18 30;
+    --sidebar: 18% 0.025 250;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent: 206 44% 18%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
-    --sidebar-background: 240 5.9% 10%;
+    --sidebar-border: 207 32% 22%;
+    --sidebar-ring: 194 80% 42%;
+    --sidebar-background: 218 42% 11%;
   }
 
   * {
@@ -90,6 +90,7 @@
   
   html, body {
     @apply bg-background text-foreground;
+    background-image: linear-gradient(180deg, oklch(var(--background)) 0%, oklch(96% 0.018 220) 100%);
     margin: 0;
     padding: 0;
     height: 100%;
@@ -199,5 +200,18 @@
   [data-sonner-toast] [data-close-button] svg {
     width: 1.125rem;
     height: 1.125rem;
+  }
+}
+
+
+@layer components {
+  .trilogy-brand-mark {
+    background: linear-gradient(135deg, oklch(48% 0.12 240), oklch(61% 0.15 198) 56%, oklch(72% 0.13 165));
+    box-shadow: 0 10px 24px -14px oklch(45% 0.14 205 / 0.9);
+  }
+
+  .trilogy-command-surface {
+    background: linear-gradient(135deg, oklch(99% 0.004 220), oklch(96.5% 0.026 205));
+    border-color: oklch(88% 0.035 210);
   }
 }
