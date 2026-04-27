@@ -1,0 +1,145 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2026-04-27 00:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enable_chat_widget",
+  "default_model_provider",
+  "default_agent",
+  "enable_debug",
+  "debug_roles",
+  "enable_rag",
+  "enable_streaming",
+  "max_tokens",
+  "temperature",
+  "daily_cost_limit",
+  "allowed_doctypes",
+  "blocked_doctypes",
+  "allow_full_erp_access_roles",
+  "enable_redaction",
+  "redaction_rules",
+  "require_confirmation_for_sensitive_actions"
+ ],
+ "fields": [
+  {
+   "fieldname": "enable_chat_widget",
+   "fieldtype": "Check",
+   "label": "Enable Chat Widget",
+   "default": "1"
+  },
+  {
+   "fieldname": "default_model_provider",
+   "fieldtype": "Link",
+   "label": "Default Model Provider",
+   "options": "AI Provider"
+  },
+  {
+   "fieldname": "default_agent",
+   "fieldtype": "Link",
+   "label": "Default Agent",
+   "options": "Agent"
+  },
+  {
+   "fieldname": "enable_debug",
+   "fieldtype": "Check",
+   "label": "Enable Debug"
+  },
+  {
+   "fieldname": "debug_roles",
+   "fieldtype": "Small Text",
+   "label": "Debug Roles JSON",
+   "default": "[\"System Manager\", \"HUF Administrator\"]"
+  },
+  {
+   "fieldname": "enable_rag",
+   "fieldtype": "Check",
+   "label": "Enable RAG",
+   "default": "1"
+  },
+  {
+   "fieldname": "enable_streaming",
+   "fieldtype": "Check",
+   "label": "Enable Streaming"
+  },
+  {
+   "fieldname": "max_tokens",
+   "fieldtype": "Int",
+   "label": "Max Tokens",
+   "default": "1200"
+  },
+  {
+   "fieldname": "temperature",
+   "fieldtype": "Float",
+   "label": "Temperature",
+   "default": "0.2"
+  },
+  {
+   "fieldname": "daily_cost_limit",
+   "fieldtype": "Currency",
+   "label": "Daily Cost Limit"
+  },
+  {
+   "fieldname": "allowed_doctypes",
+   "fieldtype": "Small Text",
+   "label": "Allowed DocTypes JSON"
+  },
+  {
+   "fieldname": "blocked_doctypes",
+   "fieldtype": "Small Text",
+   "label": "Blocked DocTypes JSON",
+   "default": "[\"User\", \"Role\", \"Has Role\", \"GL Entry\", \"Salary Slip\"]"
+  },
+  {
+   "fieldname": "allow_full_erp_access_roles",
+   "fieldtype": "Small Text",
+   "label": "Full ERP Access Roles JSON",
+   "default": "[\"System Manager\", \"Accounts Manager\"]"
+  },
+  {
+   "fieldname": "enable_redaction",
+   "fieldtype": "Check",
+   "label": "Enable Redaction",
+   "default": "1"
+  },
+  {
+   "fieldname": "redaction_rules",
+   "fieldtype": "Code",
+   "label": "Redaction Rules JSON",
+   "options": "JSON",
+   "default": "{}"
+  },
+  {
+   "fieldname": "require_confirmation_for_sensitive_actions",
+   "fieldtype": "Check",
+   "label": "Require Confirmation For Sensitive Actions",
+   "default": "1"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-04-27 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Huf",
+ "name": "HUF AI Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

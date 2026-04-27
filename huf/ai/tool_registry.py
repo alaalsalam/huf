@@ -116,10 +116,21 @@ def upsert_tool_doc(d):
         "doctype": TOOL_DOCTYPE,
         "tool_name": d["tool_name"],
         "description": d["description"],
-        "types":"App Provided",
+        "types": d.get("types") or "App Provided",
+        "tool_type": d.get("tool_type") or "ERP Read Only",
         "function_path": d["function_path"],
-        "parameters": [{"param_name": p["name"], "param_type": p["type"], "required": int(p.get("required", False))}
-                       for p in d["parameters"]],
+        "is_read_only": int(d.get("is_read_only", 1)),
+        "required_permission": d.get("required_permission") or "read",
+        "parameters": [
+            {
+                "label": (p.get("label") or p.get("name") or p.get("parameter_name") or "Parameter").replace("_", " ").title(),
+                "fieldname": p.get("name") or p.get("parameter_name"),
+                "type": p["type"],
+                "required": int(p.get("required", False)),
+                "description": p.get("description"),
+            }
+            for p in d["parameters"]
+        ],
     }
     if docname:
         doc = frappe.get_doc(TOOL_DOCTYPE, docname)

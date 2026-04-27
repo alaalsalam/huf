@@ -1,0 +1,436 @@
+#trilogy-ai-desk-widget {
+  --trilogy-primary: #1f6feb;
+  --trilogy-primary-2: #00a3ff;
+  --trilogy-ink: #172033;
+  --trilogy-muted: #66758c;
+  --trilogy-line: #dbe5f3;
+  --trilogy-soft: #f6f8fc;
+  --trilogy-panel: #ffffff;
+  color: var(--trilogy-ink);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+#trilogy-ai-desk-widget * {
+  box-sizing: border-box;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-launcher {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 9998;
+  min-width: 118px;
+  height: 48px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--trilogy-primary), var(--trilogy-primary-2));
+  color: #fff;
+  box-shadow: 0 16px 34px rgba(31, 111, 235, 0.28);
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-launcher span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-launcher span::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #bff7d3;
+  box-shadow: 0 0 0 4px rgba(191, 247, 211, 0.22);
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-panel {
+  position: fixed;
+  right: 22px;
+  bottom: 82px;
+  z-index: 9999;
+  display: none;
+  width: min(520px, calc(100vw - 28px));
+  max-height: min(760px, calc(100vh - 104px));
+  overflow: hidden;
+  border: 1px solid var(--trilogy-line);
+  border-radius: 14px;
+  background: var(--trilogy-panel);
+  box-shadow: 0 28px 76px rgba(22, 34, 58, 0.24);
+}
+
+#trilogy-ai-desk-widget.open .trilogy-ai-panel {
+  display: block;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #16294f;
+  color: #fff;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-header strong,
+#trilogy-ai-desk-widget .trilogy-ai-header span {
+  display: block;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-header strong {
+  font-size: 16px;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-header span {
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-tabs,
+#trilogy-ai-desk-widget .trilogy-command-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  border-bottom: 1px solid var(--trilogy-line);
+  background: var(--trilogy-soft);
+}
+
+#trilogy-ai-desk-widget .trilogy-command-tabs {
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-tabs button,
+#trilogy-ai-desk-widget .trilogy-command-tabs button {
+  flex: 1;
+  min-height: 34px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #53627a;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-tabs button.active,
+#trilogy-ai-desk-widget .trilogy-command-tabs button.active {
+  border-color: #c8d8fb;
+  background: #fff;
+  color: var(--trilogy-primary);
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-body {
+  max-height: 640px;
+  overflow: auto;
+  padding: 14px;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #d7e6fb;
+  border-radius: 12px;
+  background: #f7fbff;
+  padding: 12px;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-hero span {
+  display: block;
+  color: var(--trilogy-primary);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-hero strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-hero a,
+#trilogy-ai-desk-widget .trilogy-result-actions a,
+#trilogy-ai-desk-widget .trilogy-result-actions button {
+  border: 1px solid var(--trilogy-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--trilogy-primary);
+  cursor: pointer;
+  padding: 8px 10px;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+#trilogy-ai-desk-widget textarea {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  border: 1px solid var(--trilogy-line);
+  border-radius: 10px;
+  padding: 11px 12px;
+  outline: none;
+  direction: rtl;
+  color: var(--trilogy-ink);
+  line-height: 1.6;
+}
+
+#trilogy-ai-desk-widget textarea:focus {
+  border-color: var(--trilogy-primary);
+  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.12);
+}
+
+#trilogy-ai-desk-widget .trilogy-command-group {
+  display: none;
+}
+
+#trilogy-ai-desk-widget .trilogy-command-group.active {
+  display: block;
+}
+
+#trilogy-ai-desk-widget .trilogy-command-title {
+  margin: 12px 0 7px;
+  color: var(--trilogy-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+#trilogy-ai-desk-widget .trilogy-command-list {
+  display: grid;
+  gap: 7px;
+}
+
+#trilogy-ai-desk-widget .trilogy-command-list button,
+#trilogy-ai-desk-widget .trilogy-agent-links a {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--trilogy-line);
+  border-radius: 10px;
+  background: #fff;
+  color: #24324a;
+  cursor: pointer;
+  padding: 10px 11px;
+  text-align: right;
+  text-decoration: none;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+#trilogy-ai-desk-widget .trilogy-command-list button:hover,
+#trilogy-ai-desk-widget .trilogy-agent-links a:hover {
+  border-color: #bcd3ff;
+  background: #f8fbff;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-run {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--trilogy-primary);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+#trilogy-ai-desk-widget.is-loading .trilogy-ai-run::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.45);
+  border-top-color: #fff;
+  border-radius: 999px;
+  animation: trilogy-spin 0.8s linear infinite;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-status {
+  min-height: 20px;
+  margin-top: 10px;
+  color: var(--trilogy-muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-status[data-type="error"] {
+  color: #c2410c;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-status[data-type="success"] {
+  color: #087f5b;
+}
+
+#trilogy-ai-desk-widget .trilogy-ai-answer {
+  margin-top: 10px;
+  direction: rtl;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--trilogy-line);
+  border-radius: 11px 11px 0 0;
+  background: var(--trilogy-soft);
+  padding: 10px 12px;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-head strong {
+  color: var(--trilogy-primary);
+  font-size: 22px;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-state {
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-state.ok {
+  background: #e8f8ef;
+  color: #087f5b;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-state.warn {
+  background: #fff3e6;
+  color: #b45309;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-answer {
+  border: 1px solid var(--trilogy-line);
+  border-top: 0;
+  background: #fff;
+  padding: 12px;
+  white-space: pre-wrap;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--trilogy-line);
+  border-top: 0;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-table {
+  width: 100%;
+  border-collapse: collapse;
+  direction: ltr;
+  font-size: 12px;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-table th,
+#trilogy-ai-desk-widget .trilogy-result-table td {
+  border-bottom: 1px solid #edf1f7;
+  padding: 8px;
+  text-align: left;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-table th {
+  background: #f8fafc;
+  color: #53627a;
+  font-weight: 800;
+}
+
+#trilogy-ai-desk-widget .trilogy-result-actions {
+  display: flex;
+  gap: 8px;
+  border: 1px solid var(--trilogy-line);
+  border-top: 0;
+  padding: 10px;
+}
+
+#trilogy-ai-desk-widget .trilogy-sql-details {
+  border: 1px solid var(--trilogy-line);
+  border-top: 0;
+  border-radius: 0 0 11px 11px;
+  background: #fbfcff;
+  padding: 10px 12px;
+}
+
+#trilogy-ai-desk-widget .trilogy-sql-details summary {
+  cursor: pointer;
+  color: var(--trilogy-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+#trilogy-ai-desk-widget pre {
+  margin: 10px 0 0;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  border-radius: 9px;
+  background: #111827;
+  color: #e6edf7;
+  padding: 12px;
+  direction: ltr;
+  text-align: left;
+  font-size: 11px;
+}
+
+#trilogy-ai-desk-widget .trilogy-agent-links {
+  display: grid;
+  gap: 9px;
+}
+
+#trilogy-ai-desk-widget .trilogy-agent-links strong,
+#trilogy-ai-desk-widget .trilogy-agent-links span {
+  display: block;
+}
+
+#trilogy-ai-desk-widget .trilogy-agent-links span {
+  margin-top: 3px;
+  color: var(--trilogy-muted);
+  font-size: 11px;
+}
+
+@keyframes trilogy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  #trilogy-ai-desk-widget .trilogy-ai-launcher {
+    right: 12px;
+    bottom: 14px;
+  }
+
+  #trilogy-ai-desk-widget .trilogy-ai-panel {
+    inset: auto 10px 74px 10px;
+    width: auto;
+    max-height: calc(100vh - 94px);
+  }
+
+  #trilogy-ai-desk-widget .trilogy-result-actions {
+    flex-direction: column;
+  }
+}

@@ -1,3 +1,38 @@
+# Trilogy Ai / HUF Enhanced AI Chat
+
+HUF Enhanced AI Chat adds a Desk-native ERPNext assistant inspired by changAI-style accessibility while preserving HUF's own agent, tool, RAG, trigger, and observability architecture.
+
+## Features
+- Floating Desk chat widget.
+- Full Desk page at `/app/huf-chat`.
+- Unified backend API under `huf.api.chat`.
+- Agent and model selection through HUF configuration.
+- Permission-safe ERP schema retrieval and natural language ERP queries.
+- Audit logging, redaction, feedback, and debug trace for authorized users.
+- Arabic prompts and RTL-friendly UI.
+
+## Installation
+```bash
+bench --site pro.trilogy-erp.com migrate
+bench build --app huf
+bench --site pro.trilogy-erp.com clear-cache
+```
+
+## Settings
+Configure `HUF AI Settings` to enable the widget, RAG, debug roles, allowed/blocked DocTypes, redaction, and confirmation for sensitive actions. Provider keys remain in `AI Provider` password fields.
+
+## Usage
+Open ERPNext Desk and use the floating `Trilogy Ai` button, or visit `/app/huf-chat` for the full page.
+
+## Security
+The API blocks Guest users, respects Frappe permissions, hides debug traces from normal users, and requires confirmation before sensitive actions.
+
+## RAG and Tools
+Schema RAG indexes accessible DocTypes and fields. HUF tools include `huf_search_erp_schema`, `huf_safe_get_list`, `huf_safe_get_doc`, and `huf_natural_language_erp_query`.
+
+
+---
+
 # HUF
 
 **The AI-native engine for building intelligent, action-oriented systems.**

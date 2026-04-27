@@ -15,7 +15,7 @@
  "icon": "sparkles",
  "idx": 0,
  "indicator_color": "",
- "is_hidden": 1,
+ "is_hidden": 0,
  "label": "TrilogyAi",
  "links": [
   {
@@ -175,7 +175,7 @@
    "type": "Link"
   }
  ],
- "modified": "2026-04-26 21:16:30.654072",
+ "modified": "2026-04-26 22:22:39.233896",
  "modified_by": "Administrator",
  "module": "Huf",
  "name": "TrilogyAi",

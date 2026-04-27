@@ -27,8 +27,14 @@ add_to_apps_screen = [
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/huf/css/huf.css"
-# app_include_js = "/assets/huf/js/huf.js"
+app_include_css = [
+    "/assets/huf/css/trilogy_ai_desk_widget.css?v=20260427-ux2",
+    "/assets/huf/css/huf_chat_widget.css?v=20260427-enhanced",
+]
+app_include_js = [
+    "/assets/huf/js/trilogy_ai_desk_widget.js?v=20260427-ux2",
+    "/assets/huf/js/huf_chat_widget.js?v=20260427-enhanced",
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/huf/css/huf.css"
@@ -325,3 +331,9 @@ fixtures = [
         ]
     }
 ]
+
+
+# HUF enhanced ERP-safe AI tools
+from huf.ai.erp_tools import erp_tool_definitions
+
+huf_tools = erp_tool_definitions
