@@ -42,12 +42,18 @@ def _get_default_agent(settings=None):
     settings = settings or get_ai_settings()
     if settings.get("default_agent") and frappe.db.exists("Agent", settings.get("default_agent")):
         return settings.get("default_agent")
-    agent = frappe.db.get_value("Agent", {"is_active": 1}, "name", order_by="modified desc")
-    if not agent:
-        agent = frappe.db.get_value("Agent", {}, "name", order_by="modified desc")
-    if not agent:
+    filters = {}
+    try:
+        if frappe.get_meta("Agent").has_field("is_active"):
+            filters["is_active"] = 1
+    except Exception:
+        filters = {}
+    rows = frappe.get_list("Agent", filters=filters, fields=["name"], order_by="modified desc", limit_page_length=1)
+    if not rows and filters:
+        rows = frappe.get_list("Agent", fields=["name"], order_by="modified desc", limit_page_length=1)
+    if not rows:
         frappe.throw(_("No HUF Agent is configured"))
-    return agent
+    return rows[0].name
 
 
 def _select_agent(agent=None, settings=None):
