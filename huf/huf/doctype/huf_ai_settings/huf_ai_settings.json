@@ -15,6 +15,10 @@
   "enable_safe_erp_tools",
   "safe_tool_record_limit",
   "safe_tool_display_limit",
+  "safe_tool_max_scan_records",
+  "preferred_agent_model",
+  "default_reasoning_effort",
+  "default_text_verbosity",
   "expose_tool_errors_to_user",
   "enable_debug",
   "debug_roles",
@@ -90,6 +94,32 @@
    "fieldtype": "Int",
    "label": "Safe Tool Display Limit",
    "default": "20"
+  },
+  {
+   "fieldname": "safe_tool_max_scan_records",
+   "fieldtype": "Int",
+   "label": "Safe Tool Max Scan Records",
+   "default": "5000"
+  },
+  {
+   "fieldname": "preferred_agent_model",
+   "fieldtype": "Link",
+   "label": "Preferred Agent Model",
+   "options": "AI Model"
+  },
+  {
+   "fieldname": "default_reasoning_effort",
+   "fieldtype": "Select",
+   "label": "Default Reasoning Effort",
+   "options": "\nlow\nmedium\nhigh",
+   "default": "medium"
+  },
+  {
+   "fieldname": "default_text_verbosity",
+   "fieldtype": "Select",
+   "label": "Default Text Verbosity",
+   "options": "\nlow\nmedium\nhigh",
+   "default": "low"
   },
   {
    "fieldname": "expose_tool_errors_to_user",

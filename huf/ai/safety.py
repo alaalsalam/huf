@@ -28,6 +28,22 @@ SENSITIVE_DOCTYPES = {
     "Integration Request", "DocPerm", "Custom DocPerm",
 }
 
+READ_ONLY_ARABIC_HINTS = {
+    "اعطني", "أعطني", "اعرض", "وريني", "وين", "لماذا", "ليش", "ما ",
+    "من ", "لخص", "ملخص", "تقرير", "قائمة", "القائمة", "اهم", "أهم",
+}
+COMPLAINT_HINTS = {
+    "لقد ارسل لي", "لقد أرسل لي", "ارسلت لي", "أرسلت لي", "ارسل لي عميل",
+    "أرسل لي عميل", "وين قائمه", "وين قائمة", "وين القائمة", "عميل واحد",
+}
+EXPLICIT_SEND_HINTS = {
+    "ارسل بريد", "أرسل بريد", "إرسال بريد", "ارسال بريد",
+    "ارسل ايميل", "أرسل ايميل", "أرسل إيميل", "send email", "email customer",
+}
+EXPLICIT_CREATE_HINTS = {
+    "انشئ", "أنشئ", "اضف", "أضف", "create", "add",
+}
+
 
 def _settings_enabled():
     try:
@@ -43,6 +59,15 @@ def classify_action_sensitivity(action, doctype=None):
     action_text = (action or "").lower()
     if doctype in SENSITIVE_DOCTYPES:
         return "high"
+    if any(hint in action_text for hint in COMPLAINT_HINTS):
+        return "normal"
+    if any(hint in action_text for hint in EXPLICIT_SEND_HINTS):
+        return "high"
+    if any(hint in action_text for hint in EXPLICIT_CREATE_HINTS):
+        return "high"
+    if any(hint in action_text for hint in READ_ONLY_ARABIC_HINTS):
+        if not any(word in action_text for word in {"احذف", "حذف", "اعتمد", "الغ", "إلغاء", "الغاء", "عدل", "تعديل", "دفع", "سداد"}):
+            return "normal"
     if any(word in action_text for word in SENSITIVE_ACTION_WORDS):
         return "high"
     if any(word in action_text for word in SENSITIVE_ARABIC_DOCTYPE_WORDS) and any(word in action_text for word in {"آخر", "اخر", "كل", "جميع"}):

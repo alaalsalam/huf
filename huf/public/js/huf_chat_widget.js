@@ -19,6 +19,7 @@
     lastAssistantMeta: null,
     lastFailedText: "",
     routeWatcher: null,
+    selectedAgent: null,
   };
 
   function isDesk() {
@@ -41,6 +42,16 @@
 
   function label(key, fallback) {
     return state.config?.labels?.[key] || fallback;
+  }
+
+  function agentOptions(config) {
+    const agents = Array.isArray(config?.agents) ? config.agents : [];
+    if (!agents.length) return "";
+    return agents.map((agent) => `<option value="${escapeAttr(agent.name)}" ${agent.is_default ? "selected" : ""}>${escapeHtml(agent.title || agent.name)}</option>`).join("");
+  }
+
+  function selectedAgentArg() {
+    return state.selectedAgent ? { agent: state.selectedAgent } : {};
   }
 
   function call(method, args) {
@@ -239,7 +250,7 @@
 
   async function startNew(root) {
     try {
-      const res = await call("new_session", { title: state.config?.default_title || "HUF Assistant" });
+      const res = await call("new_session", { title: state.config?.default_title || "HUF Assistant", ...selectedAgentArg() });
       state.sessionId = res.session_id || res.name || null;
       root.querySelector("[data-chat-list]").innerHTML = "";
       state.lastAssistantMeta = null;
@@ -262,7 +273,7 @@
     setSending(root, true);
     const typing = addTyping(root);
     try {
-      const res = await call("send_message", { message: text, session_id: state.sessionId });
+      const res = await call("send_message", { message: text, session_id: state.sessionId, ...selectedAgentArg() });
       state.sessionId = res.session_id || state.sessionId;
       state.lastAssistantMeta = res;
       typing.remove();
@@ -341,6 +352,13 @@
             <button type="button" data-close title="${escapeAttr(label("close", "إغلاق"))}">×</button>
           </div>
         </header>
+        ${config.can_select_agent && Array.isArray(config.agents) && config.agents.length ? `
+          <section class="huf-chat-agent-strip">
+            <label>${escapeHtml(label("agent", "الوكيل"))}</label>
+            <select data-agent-selector aria-label="${escapeAttr(label("agent", "الوكيل"))}">
+              ${agentOptions(config)}
+            </select>
+          </section>` : ""}
         <main class="huf-chat-messages" data-chat-list></main>
         <section class="huf-chat-debug" data-debug-panel hidden>
           <div class="huf-chat-debug-head">${escapeHtml(label("details", "التفاصيل"))}</div>
@@ -364,6 +382,21 @@
 
   function bind(root) {
     const composer = root.querySelector("[data-composer]");
+    const agentSelector = root.querySelector("[data-agent-selector]");
+    if (agentSelector) {
+      state.selectedAgent = agentSelector.value || state.config?.default_agent || null;
+      agentSelector.addEventListener("change", () => {
+        state.selectedAgent = agentSelector.value || null;
+        state.sessionId = null;
+        state.messagesLoaded = true;
+        root.querySelector("[data-chat-list]").innerHTML = "";
+        state.lastAssistantMeta = null;
+        ensureEmptyState(root);
+        root.querySelector("[data-composer]")?.focus();
+      });
+    } else {
+      state.selectedAgent = state.config?.default_agent || null;
+    }
     root.querySelector(".huf-chat-launch").addEventListener("click", () => setOpen(root, !state.open));
     root.querySelector("[data-close]").addEventListener("click", () => setOpen(root, false));
     root.querySelector("[data-new-chat]").addEventListener("click", () => startNew(root));
@@ -480,6 +513,7 @@
     if (!isDesk() || document.getElementById(WIDGET_ID) || !window.frappe) return;
     try {
       state.config = await call("get_ui_config", {});
+      state.selectedAgent = state.config?.default_agent || null;
     } catch (err) {
       console.warn("HUF chat config unavailable", err);
       return;

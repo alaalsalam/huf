@@ -127,6 +127,8 @@ def after_migrate():
 		create_flow_tools()
 		from huf.ai.safe_erp_tools import setup_safe_erp_tools
 		setup_safe_erp_tools()
+		from huf.ai.agent_role_optimizer import sync_default_agent_roles
+		sync_default_agent_roles(dry_run=0)
 		from huf.ai.tool_registry import sync_discovered_tools
 		result = sync_discovered_tools()  # Full scan (apps_to_scan=None)
 		frappe.log_error(

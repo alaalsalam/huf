@@ -21,6 +21,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
     sending: false,
     lastAssistantMeta: null,
     lastFailedText: "",
+    selectedAgent: null,
   };
 
   const $root = $(page.body).addClass("huf-chat-workspace-page");
@@ -59,6 +60,16 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
 
   function label(key, fallback) {
     return state.config?.labels?.[key] || fallback;
+  }
+
+  function agentOptions(config) {
+    const agents = Array.isArray(config?.agents) ? config.agents : [];
+    const selected = state.selectedAgent || config?.default_agent || "";
+    return agents.map((agent) => `<option value="${escapeAttr(agent.name)}" ${agent.name === selected || (!selected && agent.is_default) ? "selected" : ""}>${escapeHtml(agent.title || agent.name)}</option>`).join("");
+  }
+
+  function selectedAgentArg() {
+    return state.selectedAgent ? { agent: state.selectedAgent } : {};
   }
 
   function inlineMarkdown(text) {
@@ -250,7 +261,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
 
   async function newSession() {
     try {
-      const res = await call("new_session", { title: state.config?.default_title || "HUF Assistant" });
+      const res = await call("new_session", { title: state.config?.default_title || "HUF Assistant", ...selectedAgentArg() });
       state.sessionId = res.session_id || res.name;
       $root.find("[data-message-list]").empty();
       ensureEmptyState();
@@ -291,7 +302,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
     setSending(true);
     addTyping();
     try {
-      const res = await call("send_message", { message: clean, session_id: state.sessionId });
+      const res = await call("send_message", { message: clean, session_id: state.sessionId, ...selectedAgentArg() });
       state.sessionId = res.session_id || state.sessionId;
       state.lastAssistantMeta = res;
       removeTyping();
@@ -369,6 +380,13 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
               <button type="button" data-delete-session>${escapeHtml(label("clear", "مسح"))}</button>
             </div>
           </header>
+          ${state.config?.can_select_agent && Array.isArray(state.config.agents) && state.config.agents.length ? `
+            <section class="huf-page-agent-strip">
+              <label>${escapeHtml(label("agent", "الوكيل"))}</label>
+              <select data-agent-selector aria-label="${escapeAttr(label("agent", "الوكيل"))}">
+                ${agentOptions(state.config)}
+              </select>
+            </section>` : ""}
           <section class="huf-page-message-list" data-message-list></section>
           <footer class="huf-page-composer">
             <textarea rows="1" data-composer placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>
@@ -385,6 +403,21 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
   }
 
   function bind() {
+    const $agentSelector = $root.find("[data-agent-selector]");
+    if ($agentSelector.length) {
+      state.selectedAgent = $agentSelector.val() || state.config?.default_agent || null;
+      $root.on("change", "[data-agent-selector]", function () {
+        state.selectedAgent = this.value || null;
+        state.sessionId = null;
+        state.lastAssistantMeta = null;
+        $root.find("[data-message-list]").empty();
+        ensureEmptyState();
+        renderSessions();
+        $root.find("[data-composer]").trigger("focus");
+      });
+    } else {
+      state.selectedAgent = state.config?.default_agent || null;
+    }
     $root.on("click", "[data-new-chat]", () => newSession());
     $root.on("click", "[data-session]", function () {
       loadSession(this.dataset.session);
@@ -421,6 +454,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
       .huf-page-sidebar{display:flex;flex-direction:column;padding:12px}.huf-page-new{height:38px;border:0;border-radius:10px;background:var(--huf-chat-primary);color:#fff;font-weight:800}.huf-page-search{margin:10px 0}.huf-page-search input{width:100%;height:36px;border:1px solid var(--huf-chat-border);border-radius:10px;padding:0 10px}
       .huf-page-session-list{overflow:auto}.huf-page-session{display:block;width:100%;margin:0 0 8px;border:1px solid var(--huf-chat-border);border-radius:11px;background:#fff;padding:10px;text-align:inherit;cursor:pointer}.huf-page-session.active{border-color:#aac5fa;background:var(--huf-chat-primary-soft)}.huf-page-session strong,.huf-page-session span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.huf-page-session strong{font-size:13px}.huf-page-session span,.huf-page-sidebar-empty{margin-top:4px;color:var(--huf-chat-muted);font-size:11px}
       .huf-page-main{display:flex;flex-direction:column}.huf-page-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid var(--huf-chat-border)}.huf-page-header strong,.huf-page-header span{display:block}.huf-page-header strong{font-size:16px}.huf-page-header span{margin-top:3px;color:var(--huf-chat-muted);font-size:12px}.huf-page-header-actions{display:flex;align-items:center;gap:8px}.huf-page-header-actions button,.huf-page-header-actions summary{border:1px solid var(--huf-chat-border);border-radius:9px;background:#fff;color:#42516a;cursor:pointer;padding:7px 10px;font-size:12px;font-weight:800}.huf-page-header-actions details{position:relative}.huf-page-header-actions details p{position:absolute;z-index:4;inset-inline-end:0;width:260px;margin:8px 0 0;border:1px solid var(--huf-chat-border);border-radius:10px;background:#fff;padding:10px;color:var(--huf-chat-muted);font-size:12px;box-shadow:var(--huf-chat-shadow)}
+      .huf-page-agent-strip{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:10px 16px;border-bottom:1px solid var(--huf-chat-border);background:#fbfdff}.huf-page-agent-strip label{margin:0;color:var(--huf-chat-muted);font-size:12px;font-weight:800}.huf-page-agent-strip select{min-width:190px;height:34px;border:1px solid var(--huf-chat-border);border-radius:9px;background:#fff;color:var(--huf-chat-text);padding:0 10px;font-size:12px;font-weight:700}
       .huf-page-message-list{flex:1;overflow:auto;padding:20px;background:var(--huf-chat-bg)}.huf-page-empty{display:grid;align-content:center;min-height:100%;text-align:center}.huf-page-empty-icon{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 14px;border-radius:20px;background:var(--huf-chat-primary-soft);color:var(--huf-chat-primary);font-weight:900}.huf-page-empty h2{margin:0;font-size:24px}.huf-page-empty p{max-width:420px;margin:10px auto 18px;color:var(--huf-chat-muted);line-height:1.8}.huf-page-suggestions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}.huf-page-suggestions button{border:1px solid var(--huf-chat-border);border-radius:999px;background:#fff;color:#27354d;cursor:pointer;padding:8px 12px;font-size:12px}
       .huf-page-msg{display:flex;margin:12px 0}.huf-page-shell[dir=rtl] .huf-page-msg.user,.huf-page-shell[dir=ltr] .huf-page-msg.assistant{justify-content:flex-start}.huf-page-shell[dir=rtl] .huf-page-msg.assistant,.huf-page-shell[dir=ltr] .huf-page-msg.user{justify-content:flex-end}.huf-page-bubble{max-width:min(760px,86%);overflow:hidden;border:1px solid var(--huf-chat-border);border-radius:15px;background:#fff;padding:12px 14px;box-shadow:0 4px 16px rgba(16,24,40,.04);font-size:13px;line-height:1.75}.huf-page-msg.user .huf-page-bubble{border-color:#c4d8ff;background:var(--huf-chat-primary);color:#fff}.huf-page-content p{margin:0 0 9px}.huf-page-content p:last-child,.huf-page-content ul:last-child,.huf-page-content ol:last-child{margin-bottom:0}.huf-page-content ul,.huf-page-content ol{margin:0 0 10px;padding-inline-start:20px}.huf-page-content a{color:var(--huf-chat-primary);font-weight:700;text-decoration:none}.huf-page-content code{border-radius:5px;background:rgba(15,23,42,.07);padding:1px 5px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}.huf-page-content pre{overflow:auto;border-radius:10px;background:#101828;color:#fff;padding:10px;direction:ltr;text-align:left}
       .huf-page-table-wrap{max-width:100%;overflow-x:auto;margin:8px 0;border:1px solid var(--huf-chat-border);border-radius:10px;background:#fff}.huf-page-table-wrap table{width:100%;min-width:460px;border-collapse:collapse;font-size:12px}.huf-page-table-wrap th,.huf-page-table-wrap td{border-bottom:1px solid var(--huf-chat-border);padding:8px 9px;text-align:inherit;white-space:nowrap}.huf-page-table-wrap th{background:#f8fafc;color:#4b5870;font-weight:800}
@@ -435,6 +469,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
     injectStyles();
     try {
       state.config = await call("get_ui_config", {});
+      state.selectedAgent = state.config?.default_agent || null;
     } catch (err) {
       console.error(err);
       state.config = {
@@ -442,6 +477,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
         labels: {},
         suggested_prompts: DEFAULT_PROMPTS,
       };
+      state.selectedAgent = null;
     }
     render();
     bind();

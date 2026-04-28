@@ -1,4 +1,5 @@
 import json
+import re
 import time
 import frappe
 from frappe import _
@@ -15,6 +16,13 @@ INVENTORY_SUGGESTIONS = [
     "اعرض الأصناف منخفضة الكمية في مستودع محدد",
     "اعرض أعلى 10 أصناف حسب قيمة المخزون",
 ]
+SAFE_DEFAULT_AGENT_NAMES = {
+    "HUF Home Assistant",
+    "HUF Sales Analyst",
+    "HUF Stock Analyst",
+    "HUF Receivables Assistant",
+    "HUF Task Assistant",
+}
 FRIENDLY_TOOL_ERROR = "لم أتمكن من جلب هذه البيانات الآن بسبب قيود الصلاحيات أو طريقة الاستعلام. يمكنني المحاولة بطريقة أبسط، مثل تحديد الفترة أو المستودع."
 PERMISSION_ERROR_MESSAGE = "لا أملك صلاحية كافية لعرض هذه البيانات حسب صلاحيات حسابك."
 TECHNICAL_ERROR_MARKERS = [
@@ -83,6 +91,8 @@ def _get_default_agent(settings=None):
     for key in ("default_home_agent", "default_agent"):
         if settings.get(key) and frappe.db.exists("Agent", settings.get(key)):
             return settings.get(key)
+    if frappe.db.exists("Agent", "HUF Home Assistant"):
+        return "HUF Home Assistant"
     filters = {}
     try:
         if frappe.get_meta("Agent").has_field("is_active"):
@@ -104,7 +114,91 @@ def _select_agent(agent=None, settings=None):
     agent_doc = frappe.get_doc("Agent", agent_name)
     if not _is_user_allowed(agent_doc, frappe.session.user):
         frappe.throw(_("You are not authorized to use this agent."), frappe.PermissionError)
+    if not _is_admin_or_debug(settings or get_ai_settings()) and agent_doc.name not in SAFE_DEFAULT_AGENT_NAMES:
+        frappe.throw(_("You are not authorized to use this agent."), frappe.PermissionError)
     return agent_doc
+
+
+def _agent_category(agent_doc):
+    exact = {
+        "HUF Home Assistant": "General",
+        "HUF Sales Analyst": "Sales",
+        "HUF Stock Analyst": "Stock",
+        "HUF Receivables Assistant": "Finance",
+        "HUF Task Assistant": "Support",
+    }
+    if agent_doc.name in exact:
+        return exact[agent_doc.name]
+    text = " ".join(str(x or "").lower() for x in [agent_doc.name, agent_doc.agent_name, agent_doc.description])
+    if "stock" in text or "مخزون" in text:
+        return "Stock"
+    if "sales" in text or "مبيعات" in text or "customer" in text or "عملاء" in text:
+        return "Sales"
+    if "receivable" in text or "متأخر" in text or "finance" in text:
+        return "Finance"
+    if "task" in text or "مهام" in text:
+        return "Support"
+    if "admin" in text or "database" in text or "sql" in text:
+        return "Admin"
+    return "General"
+
+
+def _agent_title(agent_doc):
+    titles = {
+        "HUF Home Assistant": "مساعد HUF",
+        "HUF Sales Analyst": "محلل المبيعات",
+        "HUF Stock Analyst": "محلل المخزون",
+        "HUF Receivables Assistant": "مساعد المتأخرات",
+        "HUF Task Assistant": "مساعد المهام",
+    }
+    return titles.get(agent_doc.name) or titles.get(agent_doc.agent_name) or agent_doc.agent_name or agent_doc.name
+
+
+@frappe.whitelist()
+def get_available_agents():
+    _require_login()
+    settings = get_ai_settings()
+    default_agent = _get_default_agent(settings)
+    # Agent names/descriptions are UI configuration, not ERP business data.
+    # Read minimally with system access, then filter through _is_user_allowed
+    # and the safe default-agent allowlist for normal users.
+    rows = frappe.get_all(
+        "Agent",
+        filters={"allow_chat": 1, "disabled": 0},
+        fields=["name", "agent_name", "description", "modified"],
+        order_by="modified desc",
+        limit_page_length=100,
+    )
+    agents = []
+    for row in rows:
+        try:
+            doc = frappe.get_doc("Agent", row.name)
+            if not _is_user_allowed(doc, frappe.session.user):
+                continue
+            if not _is_admin_or_debug(settings) and doc.name not in SAFE_DEFAULT_AGENT_NAMES:
+                continue
+            if not _is_admin_or_debug(settings) and _agent_category(doc) == "Admin":
+                continue
+            agents.append({
+                "name": doc.name,
+                "title": _agent_title(doc),
+                "description": doc.description or "",
+                "category": _agent_category(doc),
+                "is_default": doc.name == default_agent,
+            })
+        except Exception:
+            continue
+    agents.sort(key=lambda item: (0 if item["is_default"] else 1, item["category"], item["title"]))
+    return {"default_agent": default_agent, "agents": agents}
+
+
+@frappe.whitelist()
+def optimize_agent_roles(dry_run=1):
+    _require_login()
+    if not _is_admin_or_debug(get_ai_settings()):
+        frappe.throw(_("Not permitted"), frappe.PermissionError)
+    from huf.ai.agent_role_optimizer import sync_default_agent_roles
+    return sync_default_agent_roles(dry_run=dry_run)
 
 
 def _owns_conversation(session_id):
@@ -148,14 +242,53 @@ def _latest_assistant_message(conversation):
     return rows[0] if rows else None
 
 
-def _context(message, doctype=None, docname=None, metadata=None, settings=None):
+def _recent_context(session_id):
+    if not session_id or not frappe.db.exists("Agent Conversation", session_id):
+        return {}
+    rows = frappe.get_list(
+        "Agent Message",
+        filters={"conversation": session_id},
+        fields=["role", "content", "creation"],
+        order_by="creation desc",
+        limit_page_length=6,
+    )
+    recent = list(reversed(rows))
+    last_user = next((row.content for row in reversed(recent) if row.role == "user"), "")
+    last_assistant = next((row.content for row in reversed(recent) if row.role in ("agent", "assistant")), "")
+    return {
+        "last_user_message": last_user[:1200],
+        "last_assistant_message": last_assistant[:1200],
+        "recent_messages": [{"role": row.role, "content": (row.content or "")[:600]} for row in recent],
+    }
+
+
+def _detect_intent(message, recent=None):
+    text = str(message or "").lower()
+    combined = " ".join([text, str((recent or {}).get("last_user_message") or "").lower(), str((recent or {}).get("last_assistant_message") or "").lower()])
+    intent = {}
+    if any(term in combined for term in ["اهم 10 عملاء", "أفضل 10 عملاء", "افضل 10 عملاء", "top customers", "top 10 customers"]):
+        intent["last_intent"] = "top_customers"
+        intent["last_requested_limit"] = 10
+    year_match = re.search(r"(20\d{2})", text)
+    if year_match:
+        intent["period_text"] = message
+        intent["year"] = year_match.group(1)
+    if any(term in text for term in ["هذا الشهر", "الشهر الحالي", "السنة الحالية", "آخر سنة", "اخر سنة"]):
+        intent["period_text"] = message
+    return intent
+
+
+def _context(message, session_id=None, doctype=None, docname=None, metadata=None, settings=None):
     settings = settings or get_ai_settings()
+    recent = _recent_context(session_id)
     ctx = {
         "current_user": frappe.session.user,
         "roles": frappe.get_roles(frappe.session.user),
         "allowed_doctypes": settings.get("allowed_doctypes"),
         "blocked_doctypes": settings.get("blocked_doctypes"),
         "schema_matches": search_schema(message, limit=6) if settings.get("enable_rag") else [],
+        "conversation_context": recent,
+        "detected_intent": _detect_intent(message, recent),
         "metadata": metadata or {},
     }
     if doctype and docname:
@@ -178,6 +311,11 @@ def _format_prompt(message, ctx, settings=None):
     return f"""أجب بإيجاز ووضوح وبالعربية إذا كان سؤال المستخدم عربياً. لا تخترع أرقاماً أو سجلات. استخدم مسار HUF Agent الأصلي وأدواته الآمنة فقط عند الحاجة.
 وضع التنفيذ الحالي: {mode}.
 {advanced_note}
+
+تعامل مع الرسائل كسياق مستمر. إذا كانت الرسالة الحالية فترة مثل "خلال سنة 2026" وكانت الرسالة السابقة عن أفضل العملاء، أكمل طلب أفضل العملاء بهذه الفترة.
+لا تعتبر الشكاوى أو التصحيحات مثل "وين القائمة" أو "أرسلت لي عميل واحد" أو "ليش ظهر عميل واحد" أوامر حساسة.
+لا تقترح تصدير Excel أو إرسال بريد أو إنشاء مهمة إلا عندما تكون الأداة متاحة ومع التأكيد عند الحاجة.
+إذا طلب المستخدم 10 نتائج ووجدت أقل، قل العدد الحقيقي وسبب الاحتمال: لا توجد بيانات كافية، الصلاحيات تحد النتائج، أو حد الفحص الآمن.
 
 سياق النظام الآمن:
 {safe_ctx[:6000] if isinstance(safe_ctx, str) else json.dumps(safe_ctx, ensure_ascii=False, default=str)[:6000]}
@@ -207,6 +345,17 @@ def _sanitize_assistant_content(content, user_message=None, settings=None, techn
     expose = bool(settings.get("expose_tool_errors_to_user")) and _debug_allowed(settings)
     if expose:
         return redact_sensitive_data(text, settings)
+    friendly_replacements = {
+        "الأداة أشارت": "النتيجة تشير",
+        "الأداة أعادت": "النتيجة تعرض",
+        "الأداة رجعت": "النتيجة تعرض",
+        "استخدمت الأداة": "راجعت البيانات",
+        "الأداة": "النظام",
+        "tool call": "التحقق",
+        "tool": "النظام",
+    }
+    for old, new in friendly_replacements.items():
+        text = text.replace(old, new)
     lowered = text.lower()
     permission = any(marker.lower() in lowered for marker in ["permission_denied", "permissionerror", "no read permission", "not permitted", "لا تملك صلاحية"])
     if technical_detail:
@@ -244,6 +393,8 @@ def get_ui_config():
         "close": "إغلاق" if rtl else "Close",
         "expand": "فتح الصفحة الكاملة" if rtl else "Open full page",
         "advanced": "خيارات متقدمة" if rtl else "Advanced Options",
+        "agent": "الوكيل" if rtl else "Agent",
+        "default_agent_label": "مساعد HUF" if rtl else "HUF Assistant",
         "advanced_hint": "سيتم استخدام الوكيل والنموذج الافتراضيين ما لم يتم تحديد غير ذلك من الإعدادات." if rtl else "The default agent and model will be used unless configured otherwise.",
         "show_details": "إظهار التفاصيل" if rtl else "Show Details",
         "hide_details": "إخفاء التفاصيل" if rtl else "Hide Details",
@@ -284,6 +435,7 @@ def get_ui_config():
         }
     settings = get_ai_settings()
     admin_or_debug = _is_admin_or_debug(settings)
+    available_agents = get_available_agents()
     return {
         "enabled": bool(settings.get("enable_chat_widget", True)),
         "enable_chat_widget": bool(settings.get("enable_chat_widget", True)),
@@ -292,8 +444,10 @@ def get_ui_config():
         "rtl": rtl,
         "language": language,
         "suggested_prompts": prompts,
-        "can_select_agent": admin_or_debug,
+        "can_select_agent": len(available_agents.get("agents", [])) > 1,
         "can_select_model": admin_or_debug,
+        "default_agent": available_agents.get("default_agent"),
+        "agents": available_agents.get("agents", []),
         "default_title": labels["title"],
         "execution_mode": _execution_mode(settings),
         "labels": labels,
@@ -350,7 +504,7 @@ def send_message(message, session_id=None, agent=None, model=None, doctype=None,
     agent_doc = _select_agent(agent, settings)
     if session_id and not _owns_conversation(session_id):
         frappe.throw(_("Not permitted"), frappe.PermissionError)
-    ctx = _context(message, doctype=doctype, docname=docname, metadata=metadata, settings=settings)
+    ctx = _context(message, session_id=session_id, doctype=doctype, docname=docname, metadata=metadata, settings=settings)
     execution_mode = _execution_mode(settings)
     try:
         result = run_agent_sync(agent_name=agent_doc.name, prompt=_format_prompt(message, ctx, settings), provider=agent_doc.provider, model=model or agent_doc.model, channel_id="Desk Chat", external_id=frappe.session.user, conversation_id=session_id)

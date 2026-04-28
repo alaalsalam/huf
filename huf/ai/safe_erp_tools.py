@@ -1,6 +1,7 @@
 import json
 from collections import defaultdict
 from datetime import timedelta
+import re
 
 import frappe
 from frappe.utils import flt, getdate, nowdate
@@ -37,6 +38,11 @@ def _record_limit(limit=None):
     return max(1, min(requested, configured, 1000))
 
 
+def _max_scan_records():
+    configured = int(_settings().get("safe_tool_max_scan_records") or 5000)
+    return max(500, min(configured, 20000))
+
+
 def _display_limit(limit=None):
     configured = int(_settings().get("safe_tool_display_limit") or 20)
     requested = int(limit or configured)
@@ -48,12 +54,70 @@ def _month_range(from_date=None, to_date=None):
         return str(getdate(from_date)), str(getdate(to_date))
     current = getdate(nowdate())
     start = current.replace(day=1)
-    if start.month == 12:
-        next_month = start.replace(year=start.year + 1, month=1)
-    else:
-        next_month = start.replace(month=start.month + 1)
-    end = next_month - timedelta(days=1)
+    end = current
     return str(start), str(end)
+
+
+def _current_year_range():
+    current = getdate(nowdate())
+    return str(current.replace(month=1, day=1)), str(current)
+
+
+def _last_12_months_range():
+    current = getdate(nowdate())
+    return str(current - timedelta(days=365)), str(current)
+
+
+def _parse_period(period=None, from_date=None, to_date=None):
+    if from_date and to_date:
+        return str(getdate(from_date)), str(getdate(to_date)), "explicit"
+    text = str(period or "").strip().lower()
+    current = getdate(nowdate())
+    year_match = re.search(r"(20\d{2})", text)
+    if year_match:
+        year = int(year_match.group(1))
+        start = current.replace(year=year, month=1, day=1)
+        if any(term in text for term in ["كامل", "كاملة", "full", "entire"]):
+            end = current.replace(year=year, month=12, day=31)
+        elif year == current.year:
+            end = current
+        else:
+            end = current.replace(year=year, month=12, day=31)
+        return str(start), str(end), f"year:{year}"
+    if any(term in text for term in ["السنة الحالية", "هذا العام", "هذه السنة", "current year"]):
+        start, end = _current_year_range()
+        return start, end, "current_year"
+    if any(term in text for term in ["آخر سنة", "اخر سنة", "last year", "last 12"]):
+        start, end = _last_12_months_range()
+        return start, end, "last_12_months"
+    if any(term in text for term in ["هذا الشهر", "الشهر الحالي", "current month"]):
+        start, end = _month_range()
+        return start, end, "current_month"
+    start, end = _month_range()
+    return start, end, "default_current_month"
+
+
+def _paged_get_list(doctype, filters, fields, order_by=None, max_records=None):
+    max_records = max_records or _max_scan_records()
+    page_size = min(500, max_records)
+    rows = []
+    start = 0
+    while len(rows) < max_records:
+        batch = frappe.get_list(
+            doctype,
+            filters=filters,
+            fields=fields,
+            order_by=order_by,
+            limit_start=start,
+            limit_page_length=min(page_size, max_records - len(rows)),
+        )
+        if not batch:
+            break
+        rows.extend(batch)
+        if len(batch) < page_size:
+            break
+        start += len(batch)
+    return rows, len(rows) >= max_records
 
 
 def _safe_fields(doctype, fields):
@@ -261,33 +325,54 @@ def huf_low_stock_items(warehouse=None, limit=20):
 
 
 @frappe.whitelist()
-def huf_top_customers(from_date=None, to_date=None, limit=10):
+def huf_top_customers(from_date=None, to_date=None, period=None, limit=10):
     """Rank customers by submitted Sales Invoice grand total in the selected period."""
     if not _enabled():
         return _disabled_response()
     if not _can_read("Sales Invoice"):
         return _permission_response("Sales Invoice")
     try:
-        from_date, to_date = _month_range(from_date, to_date)
-        rows = frappe.get_list(
+        from_date, to_date, period_source = _parse_period(period, from_date, to_date)
+        requested_limit = _display_limit(limit or 10)
+        fields = _safe_fields("Sales Invoice", ["customer", "grand_total", "outstanding_amount", "currency", "posting_date"])
+        rows, capped = _paged_get_list(
             "Sales Invoice",
             filters={"docstatus": 1, "posting_date": ["between", [from_date, to_date]]},
-            fields=_safe_fields("Sales Invoice", ["customer", "grand_total", "outstanding_amount", "currency"]),
+            fields=fields,
             order_by="posting_date desc",
-            limit_page_length=_record_limit(),
+            max_records=_max_scan_records(),
         )
         totals = defaultdict(lambda: {"customer": "", "grand_total": 0.0, "outstanding_amount": 0.0, "invoice_count": 0})
+        currencies = set()
         for row in rows:
             customer = row.get("customer") or "غير محدد"
             totals[customer]["customer"] = customer
             totals[customer]["grand_total"] += flt(row.get("grand_total"))
             totals[customer]["outstanding_amount"] += flt(row.get("outstanding_amount"))
             totals[customer]["invoice_count"] += 1
-        ranked = sorted(totals.values(), key=lambda row: row["grand_total"], reverse=True)[: _display_limit(limit)]
+            if row.get("currency"):
+                currencies.add(row.get("currency"))
+        ranked = sorted(totals.values(), key=lambda row: row["grand_total"], reverse=True)[:requested_limit]
+        if len(ranked) == 1:
+            answer = "وجدت عميلاً واحدًا فقط ضمن الفترة والصلاحيات الحالية."
+        elif ranked:
+            answer = f"تم عرض {len(ranked)} عملاء من أصل {len(totals)} عميل ضمن الفترة والصلاحيات الحالية."
+        else:
+            answer = "لم أجد عملاء لديهم مبيعات معتمدة ضمن الفترة والصلاحيات الحالية."
+        if capped:
+            answer += " النتائج مبنية على عدد السجلات الممسوحة فقط وقد لا تشمل كل البيانات."
         return {
             "success": True,
-            "answer": "أفضل العملاء حسب إجمالي فواتير المبيعات المعتمدة ضمن الفترة المحددة.",
-            "period": {"from_date": from_date, "to_date": to_date},
+            "answer": answer,
+            "period": {"from_date": from_date, "to_date": to_date, "source": period_source},
+            "summary": {
+                "customers_found": len(totals),
+                "customers_returned": len(ranked),
+                "requested_limit": requested_limit,
+                "records_scanned": len(rows),
+                "scan_capped": capped,
+                "currencies": sorted(currencies),
+            },
             "columns": ["customer", "grand_total", "outstanding_amount", "invoice_count"],
             "rows": ranked,
         }
@@ -361,7 +446,8 @@ SAFE_TOOL_DEFINITIONS = [
         "parameters": [
             {"name": "from_date", "type": "string", "description": "Optional start date."},
             {"name": "to_date", "type": "string", "description": "Optional end date."},
-            {"name": "limit", "type": "integer", "description": "Display limit."},
+            {"name": "period", "type": "string", "description": "Optional Arabic or English period, e.g. خلال سنة 2026, هذا الشهر, آخر سنة."},
+            {"name": "limit", "type": "integer", "description": "Display limit, default 10."},
         ],
     },
     {
@@ -493,6 +579,8 @@ def _update_settings(agent_name):
         settings.safe_tool_record_limit = 500
     if hasattr(settings, "safe_tool_display_limit") and not settings.safe_tool_display_limit:
         settings.safe_tool_display_limit = 20
+    if hasattr(settings, "safe_tool_max_scan_records") and not settings.safe_tool_max_scan_records:
+        settings.safe_tool_max_scan_records = 5000
     if hasattr(settings, "chat_execution_mode") and not settings.chat_execution_mode:
         settings.chat_execution_mode = "Native Agent"
     if hasattr(settings, "enable_advanced_erp_query"):
