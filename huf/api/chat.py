@@ -16,6 +16,13 @@ INVENTORY_SUGGESTIONS = [
     "اعرض الأصناف منخفضة الكمية في مستودع محدد",
     "اعرض أعلى 10 أصناف حسب قيمة المخزون",
 ]
+SUGGESTED_PROMPT_GROUPS = [
+    {"key": "sales", "label": "المبيعات", "prompts": ["اعرض مبيعات هذا الشهر", "من هم أفضل العملاء هذا الشهر؟", "قارن مبيعات هذا الشهر بالشهر السابق"]},
+    {"key": "inventory", "label": "المخزون", "prompts": ["لخص حالة المخزون", "ما الأصناف منخفضة الكمية؟", "اعرض أعلى الأصناف حسب قيمة المخزون"]},
+    {"key": "receivables", "label": "المستحقات", "prompts": ["ما الفواتير المتأخرة؟", "اعرض العملاء الأعلى مديونية", "ما الفواتير المستحقة هذا الأسبوع؟"]},
+    {"key": "tasks", "label": "المهام", "prompts": ["أنشئ مهمة متابعة للعميل", "لخص المهام المفتوحة", "ما المهام المتأخرة؟"]},
+    {"key": "general", "label": "عام", "prompts": ["ماذا أستطيع أن أسأل؟", "ساعدني في تحليل أداء الشركة اليوم"]},
+]
 SAFE_DEFAULT_AGENT_NAMES = {
     "HUF Home Assistant",
     "HUF Sales Analyst",
@@ -23,6 +30,7 @@ SAFE_DEFAULT_AGENT_NAMES = {
     "HUF Receivables Assistant",
     "HUF Task Assistant",
 }
+SMART_MODEL_AGENT_NAMES = {"HUF Home Assistant", "HUF Sales Analyst", "HUF Stock Analyst"}
 FRIENDLY_TOOL_ERROR = "لم أتمكن من جلب هذه البيانات الآن بسبب قيود الصلاحيات أو طريقة الاستعلام. يمكنني المحاولة بطريقة أبسط، مثل تحديد الفترة أو المستودع."
 PERMISSION_ERROR_MESSAGE = "لا أملك صلاحية كافية لعرض هذه البيانات حسب صلاحيات حسابك."
 TECHNICAL_ERROR_MARKERS = [
@@ -45,6 +53,17 @@ TECHNICAL_ERROR_MARKERS = [
     "permission_denied",
     "No read permission",
     "not permitted",
+]
+MODEL_ERROR_MARKERS = [
+    "LiteLLM",
+    "OpenAI",
+    "BadRequestError",
+    "APIConnectionError",
+    "AuthenticationError",
+    "RateLimitError",
+    "model_not_found",
+    "unsupported model",
+    "invalid model",
 ]
 
 
@@ -105,6 +124,41 @@ def _get_default_agent(settings=None):
     if not rows:
         frappe.throw(_("No HUF Agent is configured"))
     return rows[0].name
+
+
+def _field_supported(doctype, fieldname):
+    try:
+        return frappe.get_meta(doctype).has_field(fieldname)
+    except Exception:
+        return False
+
+
+def _model_exists(model_name):
+    return bool(model_name and frappe.db.exists("AI Model", model_name))
+
+
+def _select_model_for_agent(agent_doc, explicit_model=None, settings=None):
+    settings = settings or get_ai_settings()
+    if explicit_model and _model_exists(explicit_model):
+        return explicit_model
+    if (
+        agent_doc.name in SMART_MODEL_AGENT_NAMES
+        and settings.get("use_smart_model_for_analytics", True)
+        and _model_exists(settings.get("preferred_smart_model"))
+    ):
+        return settings.get("preferred_smart_model")
+    for key in ("preferred_fast_model", "preferred_agent_model"):
+        if _model_exists(settings.get(key)):
+            return settings.get(key)
+    return agent_doc.model
+
+
+def _fallback_model_for_agent(agent_doc, settings=None):
+    settings = settings or get_ai_settings()
+    for key in ("preferred_fast_model", "preferred_agent_model"):
+        if _model_exists(settings.get(key)):
+            return settings.get(key)
+    return agent_doc.model
 
 
 def _select_agent(agent=None, settings=None):
@@ -303,14 +357,32 @@ def _format_prompt(message, ctx, settings=None):
     safe_ctx = redact_sensitive_data(ctx, settings or {"enable_redaction": True})
     safe_message = redact_sensitive_data(message, settings or {"enable_redaction": True})
     mode = _execution_mode(settings)
+    verbosity = (settings or {}).get("answer_verbosity") or "مختصر"
     advanced_note = ""
     if mode != "Advanced ERP Query":
         advanced_note = """
 لا تستخدم SQL خام ولا تطلب من أي أداة توليد SQL. استخدم أدوات HUF الأصلية الآمنة فقط إن كانت متاحة، وإن لم تتوفر البيانات فاطلب تحديد الفترة أو المستودع أو نوع المستند.
 """
-    return f"""أجب بإيجاز ووضوح وبالعربية إذا كان سؤال المستخدم عربياً. لا تخترع أرقاماً أو سجلات. استخدم مسار HUF Agent الأصلي وأدواته الآمنة فقط عند الحاجة.
+    return f"""أجب كمسؤول ERP ذكي ومختصر. إذا كان سؤال المستخدم عربياً فأجب بعربية أعمال طبيعية. لا تخترع أرقاماً أو سجلات. استخدم مسار HUF Agent الأصلي وأدواته الآمنة فقط عند الحاجة.
 وضع التنفيذ الحالي: {mode}.
+مستوى التفصيل المطلوب افتراضياً: {verbosity}.
 {advanced_note}
+
+عقد جودة الإجابة:
+- ابدأ بالنتيجة مباشرة، وليس بشرح أنك ستفحص البيانات.
+- اذكر النطاق بوضوح: الفترة، الفلاتر، وحدود الصلاحيات أو حد الفحص إن وجد.
+- الرد الافتراضي مختصر: ملخص قصير + جدول واحد عند الحاجة + 3 ملاحظات كحد أقصى + 3 خطوات تالية كحد أقصى.
+- لا تستخدم عبارات حشو مثل "بالتأكيد" أو "سأقوم الآن" أو مقدمات طويلة.
+- لا تقترح Excel أو بريد أو إنشاء مهمة أو إجراء غير مدعوم. لا تذكر أسماء أدوات داخلية أو أخطاء تقنية للمستخدم.
+- إذا رجعت الأداة بيانات منظمة، استخدم حقول period وsummary وrows وrequested_limit وreturned_count وscanned_count وcap_reached لصياغة جواب دقيق.
+- إذا طلب المستخدم 10 ووجدت أقل، قل: "طلبت 10، ووجدت N فقط ضمن الفترة والصلاحيات الحالية." ولا تسمّها قائمة أفضل 10.
+- إن كان السؤال ناقصاً، اسأل سؤالاً توضيحياً واحداً فقط.
+
+قوالب مختصرة:
+- ملخص المبيعات: الفترة، إجمالي المبيعات، عدد الفواتير، المستحقات، ثم جدول مؤشرات.
+- ملخص المخزون: التاريخ/الفلاتر، الكمية الفعلية، الكمية المتوقعة، قيمة المخزون، ثم جدول مختصر.
+- أفضل العملاء: الفترة، العدد المطلوب، العدد الموجود، جدول العميل/المبيعات/المستحق/عدد الفواتير.
+- الفواتير المتأخرة: العدد، إجمالي المستحق، جدول مختصر بالفواتير وتواريخ الاستحقاق.
 
 تعامل مع الرسائل كسياق مستمر. إذا كانت الرسالة الحالية فترة مثل "خلال سنة 2026" وكانت الرسالة السابقة عن أفضل العملاء، أكمل طلب أفضل العملاء بهذه الفترة.
 لا تعتبر الشكاوى أو التصحيحات مثل "وين القائمة" أو "أرسلت لي عميل واحد" أو "ليش ظهر عميل واحد" أوامر حساسة.
@@ -366,6 +438,11 @@ def _sanitize_assistant_content(content, user_message=None, settings=None, techn
     return redact_sensitive_data(text, settings)
 
 
+def _looks_model_error(content):
+    lowered = str(content or "").lower()
+    return any(marker.lower() in lowered for marker in MODEL_ERROR_MARKERS)
+
+
 @frappe.whitelist()
 def new_session(agent=None, model=None, title=None):
     _require_login()
@@ -402,6 +479,11 @@ def get_ui_config():
         "thinking": "جاري التفكير..." if rtl else "Thinking...",
         "feedback_saved": "تم تسجيل ملاحظتك" if rtl else "Feedback saved",
         "placeholder": "اكتب سؤالك هنا…" if rtl else "Ask HUF Assistant…",
+        "composer_hint": "مثال: اعرض مبيعات هذا الشهر أو لخص حالة المخزون" if rtl else "Example: show this month's sales or summarize inventory",
+        "more_prompts": "عرض المزيد" if rtl else "Show more",
+        "less_prompts": "عرض أقل" if rtl else "Show less",
+        "agent_changed": "تم بدء محادثة جديدة مع" if rtl else "Started a new chat with",
+        "agent_default_description": "مساعد عام لأسئلة ERPNext اليومية" if rtl else "General assistant for daily ERPNext questions",
         "retry": "إعادة المحاولة" if rtl else "Retry",
         "loading": "جاري التحميل..." if rtl else "Loading...",
         "error": "تعذر الحصول على رد الآن. حاول مرة أخرى أو تواصل مع المسؤول." if rtl else "Unable to get a response now. Try again or contact your administrator.",
@@ -428,6 +510,7 @@ def get_ui_config():
             "rtl": rtl,
             "language": language,
             "suggested_prompts": prompts,
+            "suggested_prompt_groups": SUGGESTED_PROMPT_GROUPS if rtl else [],
             "can_select_agent": False,
             "can_select_model": False,
             "default_title": labels["title"],
@@ -444,6 +527,7 @@ def get_ui_config():
         "rtl": rtl,
         "language": language,
         "suggested_prompts": prompts,
+        "suggested_prompt_groups": SUGGESTED_PROMPT_GROUPS if rtl else [],
         "can_select_agent": len(available_agents.get("agents", [])) > 1,
         "can_select_model": admin_or_debug,
         "default_agent": available_agents.get("default_agent"),
@@ -506,25 +590,52 @@ def send_message(message, session_id=None, agent=None, model=None, doctype=None,
         frappe.throw(_("Not permitted"), frappe.PermissionError)
     ctx = _context(message, session_id=session_id, doctype=doctype, docname=docname, metadata=metadata, settings=settings)
     execution_mode = _execution_mode(settings)
+    selected_model = _select_model_for_agent(agent_doc, explicit_model=model, settings=settings)
     try:
-        result = run_agent_sync(agent_name=agent_doc.name, prompt=_format_prompt(message, ctx, settings), provider=agent_doc.provider, model=model or agent_doc.model, channel_id="Desk Chat", external_id=frappe.session.user, conversation_id=session_id)
+        result = run_agent_sync(agent_name=agent_doc.name, prompt=_format_prompt(message, ctx, settings), provider=agent_doc.provider, model=selected_model, channel_id="Desk Chat", external_id=frappe.session.user, conversation_id=session_id)
     except Exception as exc:
-        latency_ms = int((time.time() - start) * 1000)
-        technical = frappe.get_traceback()
-        frappe.log_error(technical, "HUF Desk Chat Error")
-        _audit("send_message", status="Failed", session=session_id, input_summary=message, output_summary=str(exc), metadata={"agent": agent_doc.name, "execution_mode": execution_mode, "technical_error": str(exc)}, latency_ms=latency_ms)
-        content = _sanitize_assistant_content("", message, settings, technical_detail=str(exc))
-        return {"session_id": session_id, "message_id": None, "content": content, "rendered_content": content, "debug_available": _debug_allowed(settings), "requires_confirmation": False, "confirmation": None, "metadata": {"agent": agent_doc.name, "execution_mode": execution_mode, "latency_ms": latency_ms}}
+        primary_error = str(exc)
+        fallback_model = _fallback_model_for_agent(agent_doc, settings)
+        if fallback_model and fallback_model != selected_model:
+            try:
+                result = run_agent_sync(agent_name=agent_doc.name, prompt=_format_prompt(message, ctx, settings), provider=agent_doc.provider, model=fallback_model, channel_id="Desk Chat", external_id=frappe.session.user, conversation_id=session_id)
+                _audit("send_message", status="Success", session=session_id, input_summary=message, metadata={"agent": agent_doc.name, "primary_model": selected_model, "fallback_model": fallback_model, "execution_mode": execution_mode, "primary_error": primary_error[:500]})
+                selected_model = fallback_model
+            except Exception as fallback_exc:
+                latency_ms = int((time.time() - start) * 1000)
+                technical = frappe.get_traceback()
+                frappe.log_error(technical, "HUF Desk Chat Error")
+                _audit("send_message", status="Failed", session=session_id, input_summary=message, output_summary=str(fallback_exc), metadata={"agent": agent_doc.name, "model": selected_model, "fallback_model": fallback_model, "execution_mode": execution_mode, "technical_error": str(fallback_exc), "primary_error": primary_error}, latency_ms=latency_ms)
+                content = _sanitize_assistant_content("", message, settings, technical_detail=str(fallback_exc))
+                return {"session_id": session_id, "message_id": None, "content": content, "rendered_content": content, "debug_available": _debug_allowed(settings), "requires_confirmation": False, "confirmation": None, "metadata": {"agent": agent_doc.name, "model": fallback_model, "primary_model": selected_model, "model_fallback": True, "execution_mode": execution_mode, "latency_ms": latency_ms}}
+        else:
+            latency_ms = int((time.time() - start) * 1000)
+            technical = frappe.get_traceback()
+            frappe.log_error(technical, "HUF Desk Chat Error")
+            _audit("send_message", status="Failed", session=session_id, input_summary=message, output_summary=str(exc), metadata={"agent": agent_doc.name, "model": selected_model, "execution_mode": execution_mode, "technical_error": str(exc)}, latency_ms=latency_ms)
+            content = _sanitize_assistant_content("", message, settings, technical_detail=str(exc))
+            return {"session_id": session_id, "message_id": None, "content": content, "rendered_content": content, "debug_available": _debug_allowed(settings), "requires_confirmation": False, "confirmation": None, "metadata": {"agent": agent_doc.name, "model": selected_model, "execution_mode": execution_mode, "latency_ms": latency_ms}}
     conversation_id = result.get("conversation_id") or session_id
     assistant = _latest_assistant_message(conversation_id) if conversation_id else None
     content = result.get("response") or result.get("content") or (assistant.content if assistant else "تم تنفيذ الطلب، لكن لم يتم توليد نص واضح.")
     raw_content = content
+    fallback_model = _fallback_model_for_agent(agent_doc, settings)
+    if _looks_model_error(raw_content) and fallback_model and fallback_model != selected_model:
+        try:
+            result = run_agent_sync(agent_name=agent_doc.name, prompt=_format_prompt(message, ctx, settings), provider=agent_doc.provider, model=fallback_model, channel_id="Desk Chat", external_id=frappe.session.user, conversation_id=conversation_id)
+            selected_model = fallback_model
+            conversation_id = result.get("conversation_id") or conversation_id
+            assistant = _latest_assistant_message(conversation_id) if conversation_id else None
+            content = result.get("response") or result.get("content") or (assistant.content if assistant else "تم تنفيذ الطلب، لكن لم يتم توليد نص واضح.")
+            raw_content = content
+        except Exception as fallback_exc:
+            _audit("send_message", status="Failed", session=conversation_id, input_summary=message, output_summary=str(fallback_exc), metadata={"agent": agent_doc.name, "primary_model": selected_model, "fallback_model": fallback_model, "technical_error": str(fallback_exc)})
     content = _sanitize_assistant_content(content, message, settings)
     latency_ms = int((time.time() - start) * 1000)
     message_id = assistant.name if assistant else None
     run_id = result.get("agent_run_id") or result.get("run_id")
-    _audit("send_message", session=conversation_id, message=message_id, input_summary=message, output_summary=content, metadata={"run_id": run_id, "context_summary": redact_sensitive_data(ctx, settings)[:2000], "agent": agent_doc.name, "execution_mode": execution_mode, "raw_response_preview": str(raw_content)[:1000]}, latency_ms=latency_ms)
-    return {"session_id": conversation_id, "message_id": message_id, "content": content, "rendered_content": content, "debug_available": _debug_allowed(settings), "requires_confirmation": False, "confirmation": None, "metadata": {"run_id": run_id, "agent": agent_doc.name, "model": model or agent_doc.model, "execution_mode": execution_mode, "latency_ms": latency_ms}}
+    _audit("send_message", session=conversation_id, message=message_id, input_summary=message, output_summary=content, metadata={"run_id": run_id, "context_summary": redact_sensitive_data(ctx, settings)[:2000], "agent": agent_doc.name, "model": selected_model, "execution_mode": execution_mode, "raw_response_preview": str(raw_content)[:1000]}, latency_ms=latency_ms)
+    return {"session_id": conversation_id, "message_id": message_id, "content": content, "rendered_content": content, "debug_available": _debug_allowed(settings), "requires_confirmation": False, "confirmation": None, "metadata": {"run_id": run_id, "agent": agent_doc.name, "model": selected_model, "execution_mode": execution_mode, "latency_ms": latency_ms}}
 
 
 @frappe.whitelist()

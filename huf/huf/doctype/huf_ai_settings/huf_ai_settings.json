@@ -17,6 +17,10 @@
   "safe_tool_display_limit",
   "safe_tool_max_scan_records",
   "preferred_agent_model",
+  "preferred_smart_model",
+  "preferred_fast_model",
+  "use_smart_model_for_analytics",
+  "answer_verbosity",
   "default_reasoning_effort",
   "default_text_verbosity",
   "expose_tool_errors_to_user",
@@ -106,6 +110,31 @@
    "fieldtype": "Link",
    "label": "Preferred Agent Model",
    "options": "AI Model"
+  },
+  {
+   "fieldname": "preferred_smart_model",
+   "fieldtype": "Link",
+   "label": "Preferred Smart Model",
+   "options": "AI Model"
+  },
+  {
+   "fieldname": "preferred_fast_model",
+   "fieldtype": "Link",
+   "label": "Preferred Fast Model",
+   "options": "AI Model"
+  },
+  {
+   "fieldname": "use_smart_model_for_analytics",
+   "fieldtype": "Check",
+   "label": "Use Smart Model For Analytics",
+   "default": "1"
+  },
+  {
+   "fieldname": "answer_verbosity",
+   "fieldtype": "Select",
+   "label": "Answer Verbosity",
+   "options": "\nمختصر\nمتوازن\nمفصل",
+   "default": "مختصر"
   },
   {
    "fieldname": "default_reasoning_effort",

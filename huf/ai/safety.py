@@ -36,6 +36,13 @@ COMPLAINT_HINTS = {
     "لقد ارسل لي", "لقد أرسل لي", "ارسلت لي", "أرسلت لي", "ارسل لي عميل",
     "أرسل لي عميل", "وين قائمه", "وين قائمة", "وين القائمة", "عميل واحد",
 }
+NORMAL_FOLLOWUP_HINTS = {
+    "وين قائمة العشرة", "وين قائمه العشرة", "وين قائمه ال10", "وين قائمة ال10",
+    "لماذا النتيجة ناقصة", "ليش النتيجة ناقصة", "أعد المحاولة", "اعد المحاولة",
+    "اعرض التفاصيل", "عرض التفاصيل", "غير الفترة", "غيّر الفترة",
+    "إلى الشهر الماضي", "الى الشهر الماضي", "اعطني تقرير", "أعطني تقرير",
+    "لخص حالة المخزون", "اعرض مبيعات هذا الشهر",
+}
 EXPLICIT_SEND_HINTS = {
     "ارسل بريد", "أرسل بريد", "إرسال بريد", "ارسال بريد",
     "ارسل ايميل", "أرسل ايميل", "أرسل إيميل", "send email", "email customer",
@@ -60,6 +67,8 @@ def classify_action_sensitivity(action, doctype=None):
     if doctype in SENSITIVE_DOCTYPES:
         return "high"
     if any(hint in action_text for hint in COMPLAINT_HINTS):
+        return "normal"
+    if any(hint in action_text for hint in NORMAL_FOLLOWUP_HINTS):
         return "normal"
     if any(hint in action_text for hint in EXPLICIT_SEND_HINTS):
         return "high"

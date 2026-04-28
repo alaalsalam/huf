@@ -3,6 +3,10 @@ import frappe
 from huf.ai.safe_erp_tools import SAFE_TOOL_DEFINITIONS, setup_safe_erp_tools
 
 
+SMART_AGENT_NAMES = {"HUF Home Assistant", "HUF Sales Analyst", "HUF Stock Analyst"}
+FAST_AGENT_NAMES = {"HUF Receivables Assistant", "HUF Task Assistant"}
+
+
 SAFE_AGENT_DEFINITIONS = [
     {
         "name": "HUF Home Assistant",
@@ -51,6 +55,18 @@ SAFE_AGENT_DEFINITIONS = [
 
 BASE_PROMPT = """
 أنت {title} داخل Trilogy Ai / HUF على ERPNext.
+
+عقد جودة الإجابة:
+- ابدأ بالنتيجة مباشرة. لا تبدأ بعبارات مثل "بالتأكيد" أو "سأقوم الآن".
+- اذكر النطاق المستخدم بوضوح: الفترة، الفلاتر، وحدود الصلاحيات أو حد الفحص إن وجد.
+- اجعل الرد الافتراضي مختصراً: ملخص قصير، جدول واحد عند الحاجة، 3 ملاحظات كحد أقصى، و3 خطوات تالية كحد أقصى.
+- لا تكرر التحذيرات أو تشرح طريقة عمل النظام إلا إذا سأل المستخدم.
+- لا تقترح تصدير Excel أو إرسال بريد أو إنشاء مهمة إلا إذا كانت الأداة مدعومة ومع التأكيد عند الحاجة.
+- لا تعرض أسماء الأدوات الداخلية، أو LiteLLM/OpenAI، أو stack traces، أو أخطاء SQL.
+- استخدم metadata الراجعة من الأدوات بدقة: period، filters، requested_limit، returned_count، scanned_count، scan_limit، cap_reached، summary، rows.
+- إذا cap_reached=True قل: "النتيجة مبنية على أول X سجل مسموح فحصه."
+- إذا طلب المستخدم 10 ووجدت أقل، قل: "طلبت 10، ووجدت N فقط ضمن الفترة والصلاحيات الحالية."
+- لا تقل "أفضل 10" إذا وجدت عميلاً واحداً فقط.
 
 قواعد الذكاء وتجربة المستخدم:
 - إذا كتب المستخدم بالعربية، أجب بالعربية. وإذا كتب بالإنجليزية، أجب بالإنجليزية.
@@ -107,13 +123,30 @@ def _ensure_gpt55_model():
     return {"configured": True, "model": doc.name, "created": True}
 
 
-def _pick_provider_model(settings=None):
+def _model_exists(name):
+    return bool(name and frappe.db.exists("AI Model", name))
+
+
+def _pick_provider_models(settings=None):
     provider = frappe.db.exists("AI Provider", "OpenAI") or frappe.db.get_value("AI Provider", {}, "name")
     current_agent = frappe.db.exists("Agent", "HUF Home Assistant")
     current_model = frappe.db.get_value("Agent", current_agent, "model") if current_agent else None
+    smart = getattr(settings, "preferred_smart_model", None) if settings else None
+    fast = getattr(settings, "preferred_fast_model", None) if settings else None
     preferred = getattr(settings, "preferred_agent_model", None) if settings else None
-    model = preferred or current_model or (frappe.db.exists("AI Model", "gpt-5-mini") or frappe.db.get_value("AI Model", {"provider": provider}, "name"))
-    return provider, model
+    smart = smart if _model_exists(smart) else (frappe.db.exists("AI Model", "gpt-5.5") or None)
+    fast = fast if _model_exists(fast) else (frappe.db.exists("AI Model", "gpt-5-mini") or None)
+    fallback = preferred if _model_exists(preferred) else (current_model or fast or frappe.db.get_value("AI Model", {"provider": provider}, "name"))
+    return provider, {"smart": smart or fallback, "fast": fast or fallback, "fallback": fallback}
+
+
+def _model_for_agent(definition, models, settings=None):
+    use_smart = True if settings is None else bool(getattr(settings, "use_smart_model_for_analytics", 1))
+    if use_smart and definition["name"] in SMART_AGENT_NAMES and models.get("smart"):
+        return models["smart"]
+    if definition["name"] in FAST_AGENT_NAMES and models.get("fast"):
+        return models["fast"]
+    return models.get("fallback") or models.get("fast") or models.get("smart")
 
 
 def _tool_doc_names():
@@ -129,7 +162,7 @@ def _upsert_agent(definition, tool_names, provider, model, dry_run=False):
     docname = frappe.db.exists("Agent", definition["name"]) or frappe.db.get_value("Agent", {"agent_name": definition["name"]}, "name")
     action = "update" if docname else "create"
     if dry_run:
-        return {"agent": definition["name"], "action": action, "tools": definition["tools"]}
+        return {"agent": definition["name"], "action": action, "model": model, "tools": definition["tools"]}
     payload = {
         "agent_name": definition["name"],
         "provider": provider,
@@ -155,7 +188,7 @@ def _upsert_agent(definition, tool_names, provider, model, dry_run=False):
         if tool_name in tool_names:
             doc.append("agent_tool", {"tool": tool_names[tool_name]})
     doc.save(ignore_permissions=True) if docname else doc.insert(ignore_permissions=True)
-    return {"agent": doc.name, "action": action, "tools": definition["tools"]}
+    return {"agent": doc.name, "action": action, "model": model, "tools": definition["tools"]}
 
 
 def sync_default_agent_roles(dry_run=1):
@@ -166,18 +199,26 @@ def sync_default_agent_roles(dry_run=1):
     if not dry_run:
         setup_safe_erp_tools()
     settings = frappe.get_single("HUF AI Settings") if frappe.db.exists("DocType", "HUF AI Settings") else None
-    provider, model = _pick_provider_model(settings)
-    report["model"] = {"provider": provider, "selected_model": model, "gpt_5_5_available": bool(frappe.db.exists("AI Model", "gpt-5.5"))}
+    provider, models = _pick_provider_models(settings)
+    report["model"] = {"provider": provider, **models, "gpt_5_5_available": bool(frappe.db.exists("AI Model", "gpt-5.5"))}
     tool_names = _tool_doc_names()
     for definition in SAFE_AGENT_DEFINITIONS:
-        report["agents"].append(_upsert_agent(definition, tool_names, provider, model, dry_run=dry_run))
+        report["agents"].append(_upsert_agent(definition, tool_names, provider, _model_for_agent(definition, models, settings), dry_run=dry_run))
     if settings and not dry_run:
         settings.default_home_agent = "HUF Home Assistant"
         if _meta_has("HUF AI Settings", "safe_tool_max_scan_records") and not settings.safe_tool_max_scan_records:
             settings.safe_tool_max_scan_records = 5000
         if _meta_has("HUF AI Settings", "preferred_agent_model") and not settings.preferred_agent_model:
             # Keep current tested model as fallback; gpt-5.5 is registered but not forced.
-            settings.preferred_agent_model = model
+            settings.preferred_agent_model = models.get("fallback")
+        if _meta_has("HUF AI Settings", "preferred_smart_model") and not settings.preferred_smart_model and models.get("smart"):
+            settings.preferred_smart_model = models.get("smart")
+        if _meta_has("HUF AI Settings", "preferred_fast_model") and not settings.preferred_fast_model and models.get("fast"):
+            settings.preferred_fast_model = models.get("fast")
+        if _meta_has("HUF AI Settings", "use_smart_model_for_analytics"):
+            settings.use_smart_model_for_analytics = 1
+        if _meta_has("HUF AI Settings", "answer_verbosity") and not settings.answer_verbosity:
+            settings.answer_verbosity = "مختصر"
         if _meta_has("HUF AI Settings", "default_reasoning_effort") and not settings.default_reasoning_effort:
             settings.default_reasoning_effort = "medium"
         if _meta_has("HUF AI Settings", "default_text_verbosity") and not settings.default_text_verbosity:

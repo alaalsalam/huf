@@ -159,6 +159,21 @@ def _permission_response(doctype):
     }
 
 
+def _result_metadata(result_type, filters=None, requested_limit=None, returned_count=0, scanned_count=0, scan_limit=None, cap_reached=False, permission_limited=False, period=None, currency=None):
+    return {
+        "tool_result_type": result_type,
+        "filters": filters or {},
+        "period": period,
+        "requested_limit": requested_limit,
+        "returned_count": returned_count,
+        "scanned_count": scanned_count,
+        "scan_limit": scan_limit,
+        "cap_reached": bool(cap_reached),
+        "permission_limited": bool(permission_limited),
+        "currency": currency,
+    }
+
+
 @frappe.whitelist()
 def huf_sales_summary(from_date=None, to_date=None, customer=None, limit=None):
     """Summarize submitted Sales Invoices using permission-aware Frappe reads only."""
@@ -175,18 +190,30 @@ def huf_sales_summary(from_date=None, to_date=None, customer=None, limit=None):
         if customer:
             filters["customer"] = customer
         fields = _safe_fields("Sales Invoice", ["name", "customer", "posting_date", "grand_total", "outstanding_amount", "status", "currency"])
+        source_limit = _record_limit(limit)
         rows = frappe.get_list(
             "Sales Invoice",
             filters=filters,
             fields=fields,
             order_by="posting_date desc, modified desc",
-            limit_page_length=_record_limit(limit),
+            limit_page_length=source_limit,
         )
         total = sum(flt(row.get("grand_total")) for row in rows)
         outstanding = sum(flt(row.get("outstanding_amount")) for row in rows)
         display = rows[:_display_limit(limit)]
         return {
             "success": True,
+            **_result_metadata(
+                "sales_summary",
+                filters={"customer": customer} if customer else {},
+                requested_limit=source_limit,
+                returned_count=len(display),
+                scanned_count=len(rows),
+                scan_limit=source_limit,
+                cap_reached=len(rows) >= source_limit,
+                period={"from_date": from_date, "to_date": to_date},
+                currency=", ".join(sorted({row.get("currency") for row in rows if row.get("currency")})) or None,
+            ),
             "answer": "تم جلب ملخص المبيعات من فواتير المبيعات المعتمدة ضمن الفترة المحددة.",
             "period": {"from_date": from_date, "to_date": to_date},
             "summary": {
@@ -197,7 +224,8 @@ def huf_sales_summary(from_date=None, to_date=None, customer=None, limit=None):
             },
             "columns": fields,
             "rows": display,
-            "capped": len(rows) >= _record_limit(limit),
+            "capped": len(rows) >= source_limit,
+            "cap_reached": len(rows) >= source_limit,
         }
     except Exception as exc:
         return _friendly_failure(exc, "HUF Safe ERP Sales Summary")
@@ -229,6 +257,17 @@ def huf_overdue_invoices(customer=None, limit=20):
         total = sum(flt(row.get("outstanding_amount")) for row in rows)
         return {
             "success": True,
+            **_result_metadata(
+                "overdue_invoices",
+                filters={"customer": customer} if customer else {},
+                requested_limit=_display_limit(limit),
+                returned_count=len(rows),
+                scanned_count=len(rows),
+                scan_limit=_display_limit(limit),
+                cap_reached=len(rows) >= _display_limit(limit),
+                period={"to_date": nowdate()},
+                currency=", ".join(sorted({row.get("currency") for row in rows if row.get("currency")})) or None,
+            ),
             "answer": "هذه الفواتير المتأخرة حسب صلاحيات حسابك.",
             "summary": {"invoice_count": len(rows), "outstanding_amount": total},
             "columns": fields,
@@ -275,6 +314,16 @@ def huf_stock_summary(warehouse=None, limit=None):
         needs_filter = not warehouse and len(rows) >= source_limit
         return {
             "success": True,
+            **_result_metadata(
+                "stock_summary",
+                filters={"warehouse": warehouse} if warehouse else {},
+                requested_limit=source_limit,
+                returned_count=len(warehouse_rows),
+                scanned_count=len(rows),
+                scan_limit=source_limit,
+                cap_reached=len(rows) >= source_limit,
+                period={"as_of": nowdate()},
+            ),
             "answer": "هذا ملخص المخزون حسب السجلات المتاحة لصلاحياتك." if not needs_filter else "تم عرض ملخص محدود. هل تريد الملخص لكل المستودعات أم لمستودع محدد؟",
             "summary": {
                 "bin_count": len(rows),
@@ -285,6 +334,7 @@ def huf_stock_summary(warehouse=None, limit=None):
             "columns": ["warehouse", "actual_qty", "projected_qty", "stock_value", "rows"],
             "rows": warehouse_rows,
             "needs_clarification": needs_filter,
+            "cap_reached": len(rows) >= source_limit,
         }
     except Exception as exc:
         return _friendly_failure(exc, "HUF Safe ERP Stock Summary")
@@ -315,6 +365,16 @@ def huf_low_stock_items(warehouse=None, limit=20):
         ][: _display_limit(limit)]
         return {
             "success": True,
+            **_result_metadata(
+                "low_stock_items",
+                filters={"warehouse": warehouse} if warehouse else {},
+                requested_limit=_display_limit(limit),
+                returned_count=len(low_rows),
+                scanned_count=len(rows),
+                scan_limit=_record_limit(),
+                cap_reached=len(rows) >= _record_limit(),
+                period={"as_of": nowdate()},
+            ),
             "answer": "تم اعتبار الصنف منخفضًا عندما تكون الكمية الفعلية أو المتوقعة صفرًا أو أقل، بدون افتراض مستويات إعادة طلب غير موجودة.",
             "method": "actual_qty <= 0 OR projected_qty <= 0",
             "columns": fields,
@@ -363,6 +423,17 @@ def huf_top_customers(from_date=None, to_date=None, period=None, limit=10):
             answer += " النتائج مبنية على عدد السجلات الممسوحة فقط وقد لا تشمل كل البيانات."
         return {
             "success": True,
+            **_result_metadata(
+                "top_customers",
+                filters={},
+                requested_limit=requested_limit,
+                returned_count=len(ranked),
+                scanned_count=len(rows),
+                scan_limit=_max_scan_records(),
+                cap_reached=capped,
+                period={"from_date": from_date, "to_date": to_date, "source": period_source},
+                currency=", ".join(sorted(currencies)) or None,
+            ),
             "answer": answer,
             "period": {"from_date": from_date, "to_date": to_date, "source": period_source},
             "summary": {
@@ -371,10 +442,12 @@ def huf_top_customers(from_date=None, to_date=None, period=None, limit=10):
                 "requested_limit": requested_limit,
                 "records_scanned": len(rows),
                 "scan_capped": capped,
+                "scan_limit": _max_scan_records(),
                 "currencies": sorted(currencies),
             },
             "columns": ["customer", "grand_total", "outstanding_amount", "invoice_count"],
             "rows": ranked,
+            "cap_reached": capped,
         }
     except Exception as exc:
         return _friendly_failure(exc, "HUF Safe ERP Top Customers")
@@ -466,6 +539,14 @@ SAFE_TOOL_DEFINITIONS = [
 
 HOME_ASSISTANT_INSTRUCTIONS = """
 أنت مساعد HUF الذكي داخل ERPNext باسم Trilogy Ai.
+
+عقد جودة الإجابة:
+- ابدأ بالنتيجة مباشرة، ثم اذكر الفترة والفلاتر وحدود الصلاحيات أو حد الفحص.
+- اجعل الرد الافتراضي قصيراً: ملخص، جدول واحد عند الحاجة، 3 ملاحظات كحد أقصى، و3 خطوات تالية كحد أقصى.
+- لا تقترح Excel أو بريد أو إنشاء مهمة إلا إذا كانت الأداة مدعومة ومع التأكيد عند الحاجة.
+- لا تعرض أسماء الأدوات الداخلية أو الأخطاء التقنية للمستخدم.
+- استخدم metadata الراجعة من الأدوات: tool_result_type، period، requested_limit، returned_count، scanned_count، scan_limit، cap_reached، summary، rows.
+- إذا طلب المستخدم 10 ووجدت أقل، قل العدد الحقيقي ولا تسمّها "أفضل 10".
 
 قواعد الإجابة:
 - إذا كان السؤال بالعربية فأجب بالعربية، وإذا كان بالإنجليزية فأجب بالإنجليزية.

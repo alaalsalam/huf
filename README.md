@@ -26,6 +26,13 @@ Open ERPNext Desk and use the floating **HUF Assistant / مساعد HUF** button
 
 For a larger workspace, visit `/app/huf-chat`. The full page includes a session sidebar, searchable previous conversations, the same chat composer, and an optional debug panel for authorized users only.
 
+### UX and Answer Style
+- Suggested questions are clickable business chips. Clicking a chip sends the question immediately; generated follow-up suggestions can also be edited before sending when the edit option appears.
+- Users can choose a focused safe agent: مساعد HUF، محلل المبيعات، محلل المخزون، مساعد المتأخرات، أو مساعد المهام. Changing the agent starts a clean context.
+- Answers start with the result, mention the period/filters used, stay concise by default, and avoid unsupported suggestions such as export or email unless a safe flow exists.
+- Results are permission-aware and never fabricate missing ERP numbers. Sensitive actions require explicit confirmation.
+- Smart model routing is configurable in `HUF AI Settings` with `preferred_smart_model`, `preferred_fast_model`, and `use_smart_model_for_analytics`; credentials remain only in provider settings.
+
 ## Security
 The API blocks Guest users, respects Frappe permissions, hides debug traces from normal users, and requires confirmation before sensitive actions.
 

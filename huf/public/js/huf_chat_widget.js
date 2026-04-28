@@ -8,6 +8,13 @@
     "أنشئ مهمة متابعة للعميل",
     "اقترح تحسينات على التدفق النقدي",
   ];
+  const PROMPT_GROUPS = [
+    { key: "sales", label: "المبيعات", prompts: ["اعرض مبيعات هذا الشهر", "من هم أفضل العملاء هذا الشهر؟", "قارن مبيعات هذا الشهر بالشهر السابق"] },
+    { key: "inventory", label: "المخزون", prompts: ["لخص حالة المخزون", "ما الأصناف منخفضة الكمية؟", "اعرض أعلى الأصناف حسب قيمة المخزون"] },
+    { key: "receivables", label: "المستحقات", prompts: ["ما الفواتير المتأخرة؟", "اعرض العملاء الأعلى مديونية", "ما الفواتير المستحقة هذا الأسبوع؟"] },
+    { key: "tasks", label: "المهام", prompts: ["أنشئ مهمة متابعة للعميل", "لخص المهام المفتوحة", "ما المهام المتأخرة؟"] },
+    { key: "general", label: "عام", prompts: ["ماذا أستطيع أن أسأل؟", "ساعدني في تحليل أداء الشركة اليوم"] },
+  ];
 
   const state = {
     config: null,
@@ -20,6 +27,8 @@
     lastFailedText: "",
     routeWatcher: null,
     selectedAgent: null,
+    showAllSuggestions: false,
+    homeShowAllSuggestions: false,
   };
 
   function isDesk() {
@@ -52,6 +61,57 @@
 
   function selectedAgentArg() {
     return state.selectedAgent ? { agent: state.selectedAgent } : {};
+  }
+
+  function allSuggestedPrompts() {
+    const fromConfig = state.config?.suggested_prompt_groups;
+    if (Array.isArray(fromConfig) && fromConfig.length) return fromConfig;
+    return PROMPT_GROUPS;
+  }
+
+  function flatSuggestedPrompts() {
+    return allSuggestedPrompts().flatMap((group) => Array.isArray(group.prompts) ? group.prompts : []);
+  }
+
+  function selectedAgentInfo() {
+    const agents = Array.isArray(state.config?.agents) ? state.config.agents : [];
+    return agents.find((agent) => agent.name === state.selectedAgent) || agents.find((agent) => agent.is_default) || null;
+  }
+
+  function agentDescription() {
+    const agent = selectedAgentInfo();
+    return agent?.description || label("agent_default_description", "مساعد عام لأسئلة ERPNext اليومية");
+  }
+
+  function renderPromptButtons(expanded, attrName) {
+    const limit = expanded ? 30 : 8;
+    const prompts = flatSuggestedPrompts();
+    const visible = prompts.slice(0, limit);
+    const grouped = expanded;
+    if (grouped) {
+      return `
+        <div class="huf-chat-suggestion-groups">
+          ${allSuggestedPrompts().map((group) => `
+            <div class="huf-chat-suggestion-group">
+              <span>${escapeHtml(group.label || "")}</span>
+              <div>
+                ${(group.prompts || []).map((prompt) => `<button type="button" class="huf-chat-chip" ${attrName}="${escapeAttr(prompt)}">${escapeHtml(prompt)}</button>`).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>`;
+    }
+    return visible.map((prompt) => `<button type="button" class="huf-chat-chip" ${attrName}="${escapeAttr(prompt)}">${escapeHtml(prompt)}</button>`).join("");
+  }
+
+  function renderSuggestionArea(expanded, attrName, toggleAttr) {
+    const prompts = flatSuggestedPrompts();
+    return `
+      <div class="huf-chat-suggestions">
+        ${renderPromptButtons(expanded, attrName)}
+      </div>
+      ${prompts.length > 8 ? `<button type="button" class="huf-chat-more-prompts" ${toggleAttr}>${escapeHtml(expanded ? label("less_prompts", "عرض أقل") : label("more_prompts", "عرض المزيد"))}</button>` : ""}
+    `;
   }
 
   function call(method, args) {
@@ -197,15 +257,12 @@
   function ensureEmptyState(root) {
     const list = root.querySelector("[data-chat-list]");
     if (!list || list.querySelector(".huf-chat-msg") || list.querySelector("[data-empty-state]")) return;
-    const prompts = state.config?.suggested_prompts?.length ? state.config.suggested_prompts : DEFAULT_PROMPTS;
     list.insertAdjacentHTML("beforeend", `
       <section class="huf-chat-empty" data-empty-state>
         <div class="huf-chat-empty-icon" aria-hidden="true">AI</div>
         <h3>${escapeHtml(label("empty_title", "كيف أستطيع مساعدتك؟"))}</h3>
         <p>${escapeHtml(label("empty_text", "اسألني عن بيانات ERPNext أو اطلب تلخيصًا أو إجراءً آمنًا."))}</p>
-        <div class="huf-chat-suggestions">
-          ${prompts.map((prompt) => `<button type="button" data-prompt="${escapeAttr(prompt)}">${escapeHtml(prompt)}</button>`).join("")}
-        </div>
+        ${renderSuggestionArea(state.showAllSuggestions, "data-prompt", "data-more-prompts")}
       </section>
     `);
   }
@@ -384,7 +441,10 @@
         </header>
         ${config.can_select_agent && Array.isArray(config.agents) && config.agents.length ? `
           <section class="huf-chat-agent-strip">
-            <label>${escapeHtml(label("agent", "الوكيل"))}</label>
+            <div class="huf-chat-agent-copy">
+              <label>${escapeHtml(label("agent", "الوكيل"))}</label>
+              <small data-agent-description>${escapeHtml(agentDescription())}</small>
+            </div>
             <select data-agent-selector aria-label="${escapeAttr(label("agent", "الوكيل"))}">
               ${agentOptions(config)}
             </select>
@@ -400,8 +460,11 @@
             <p>${escapeHtml(label("advanced_hint", "سيتم استخدام الوكيل والنموذج الافتراضيين ما لم يتم تحديد غير ذلك من الإعدادات."))}</p>
           </details>` : ""}
         <footer class="huf-chat-composer">
-          <textarea data-composer rows="1" placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>
-          <button type="button" data-send disabled title="${escapeAttr(label("send", "إرسال"))}" aria-label="${escapeAttr(label("send", "إرسال"))}">➤</button>
+          <div class="huf-chat-composer-row">
+            <textarea data-composer rows="1" placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>
+            <button type="button" data-send disabled title="${escapeAttr(label("send", "إرسال"))}" aria-label="${escapeAttr(label("send", "إرسال"))}">➤</button>
+          </div>
+          <div class="huf-chat-composer-hint">${escapeHtml(label("composer_hint", "مثال: اعرض مبيعات هذا الشهر أو لخص حالة المخزون"))}</div>
         </footer>
       </aside>
     `;
@@ -421,8 +484,11 @@
         state.messagesLoaded = true;
         root.querySelector("[data-chat-list]").innerHTML = "";
         state.lastAssistantMeta = null;
+        const description = root.querySelector("[data-agent-description]");
+        if (description) description.textContent = agentDescription();
         ensureEmptyState(root);
         root.querySelector("[data-composer]")?.focus();
+        window.frappe?.show_alert?.({ message: `${label("agent_changed", "تم بدء محادثة جديدة مع")} ${agentSelector.options[agentSelector.selectedIndex]?.text || ""}`, indicator: "blue" }, 4);
       });
     } else {
       state.selectedAgent = state.config?.default_agent || null;
@@ -457,6 +523,12 @@
       }
       const prompt = event.target.closest("[data-prompt]");
       if (prompt) send(root, prompt.dataset.prompt);
+      if (event.target.closest("[data-more-prompts]")) {
+        state.showAllSuggestions = !state.showAllSuggestions;
+        root.querySelector("[data-empty-state]")?.remove();
+        ensureEmptyState(root);
+        return;
+      }
       const feedback = event.target.closest("[data-feedback]");
       if (feedback) submitFeedback(root, feedback);
       if (event.target.closest("[data-debug-trigger]")) toggleDebug(root);
@@ -484,7 +556,6 @@
     const target = findHomeTarget();
     if (!target) return;
     const rtl = isArabic(state.config);
-    const prompts = state.config?.suggested_prompts?.length ? state.config.suggested_prompts : DEFAULT_PROMPTS;
     const card = document.createElement("section");
     card.id = "huf-home-chat-card";
     card.dir = rtl ? "rtl" : "ltr";
@@ -500,9 +571,7 @@
         <textarea rows="2" data-home-input placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>
         <button type="button" data-home-send>${escapeHtml(label("send", "إرسال"))}</button>
       </div>
-      <div class="huf-home-card-prompts">
-        ${prompts.map((prompt) => `<button type="button" data-home-prompt="${escapeAttr(prompt)}">${escapeHtml(prompt)}</button>`).join("")}
-      </div>
+      ${renderSuggestionArea(state.homeShowAllSuggestions, "data-home-prompt", "data-home-more-prompts")}
     `;
     target.prepend(card);
     card.addEventListener("click", (event) => {
@@ -510,6 +579,12 @@
       if (prompt) {
         setOpen(root, true);
         send(root, prompt.dataset.homePrompt);
+        return;
+      }
+      if (event.target.closest("[data-home-more-prompts]")) {
+        state.homeShowAllSuggestions = !state.homeShowAllSuggestions;
+        removeHomeCard();
+        ensureHomeCard(root);
         return;
       }
       if (event.target.closest("[data-home-send]")) {
