@@ -4,7 +4,7 @@ import frappe
 
 DEFAULT_PATTERNS = [
     (re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+"), "[redacted-email]"),
-    (re.compile(r"\b(?:\+?\d[\d\s\-()]{7,}\d)\b"), "[redacted-phone]"),
+    (re.compile(r"(?<![\w-])(?!(?:\d{2}[-/]\d{2}[-/]\d{4})(?![\w-]))(?:\+\d{1,3}[\d\s\-()]{7,}\d|0\d[\d\s\-()]{7,}\d)(?![\w-])"), "[redacted-phone]"),
     (re.compile(r"\b\d{12,19}\b"), "[redacted-number]"),
     (re.compile(r"(?i)(api[_-]?key|api[_-]?secret|access[_-]?token|refresh[_-]?token|password|private[_-]?key|secret)\s*[:=]\s*['\"]?[^'\"\s,}]+"), r"\1=[redacted-secret]"),
     (re.compile(r"sk-[A-Za-z0-9_-]{12,}"), "[redacted-openai-key]"),

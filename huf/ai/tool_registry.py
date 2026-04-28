@@ -44,6 +44,16 @@ class PermissionAwareToolRegistry:
         "sql",
     }
 
+    SAFE_ERP_TOOL_MARKERS = {
+        "huf_sales_summary",
+        "huf_overdue_invoices",
+        "huf_stock_summary",
+        "huf_low_stock_items",
+        "huf_top_customers",
+        "huf_create_followup_task_request",
+        "safe_erp_tools",
+    }
+
     @classmethod
     def get_allowed_tools(cls, agent_doc, user: str) -> list:
         """Return only tools the user has permission to use"""
@@ -87,6 +97,16 @@ class PermissionAwareToolRegistry:
             except Exception:
                 advanced_enabled = False
             if not advanced_enabled:
+                return False
+
+        if any(marker in tool_identity for marker in cls.SAFE_ERP_TOOL_MARKERS):
+            try:
+                from huf.ai.erp_schema_retrieval import get_ai_settings
+                settings = get_ai_settings()
+                safe_tools_enabled = bool(settings.get("enable_safe_erp_tools", True))
+            except Exception:
+                safe_tools_enabled = True
+            if not safe_tools_enabled:
                 return False
         
         # Read Only restriction

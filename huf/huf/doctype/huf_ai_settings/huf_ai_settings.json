@@ -12,6 +12,9 @@
   "default_home_agent",
   "chat_execution_mode",
   "enable_advanced_erp_query",
+  "enable_safe_erp_tools",
+  "safe_tool_record_limit",
+  "safe_tool_display_limit",
   "expose_tool_errors_to_user",
   "enable_debug",
   "debug_roles",
@@ -69,6 +72,24 @@
    "fieldname": "enable_advanced_erp_query",
    "fieldtype": "Check",
    "label": "Enable Advanced ERP Query"
+  },
+  {
+   "fieldname": "enable_safe_erp_tools",
+   "fieldtype": "Check",
+   "label": "Enable Safe ERP Tools",
+   "default": "1"
+  },
+  {
+   "fieldname": "safe_tool_record_limit",
+   "fieldtype": "Int",
+   "label": "Safe Tool Record Limit",
+   "default": "500"
+  },
+  {
+   "fieldname": "safe_tool_display_limit",
+   "fieldtype": "Int",
+   "label": "Safe Tool Display Limit",
+   "default": "20"
   },
   {
    "fieldname": "expose_tool_errors_to_user",
