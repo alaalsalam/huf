@@ -79,6 +79,32 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, title, url) => `<a href="${safeUrl(url)}" target="_blank" rel="noopener noreferrer">${title}</a>`);
   }
 
+  function cleanSuggestedPrompt(line) {
+    return String(line || "")
+      .replace(/^\s*[-*]\s+/, "")
+      .replace(/^\s*\d+\.\s+/, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isSuggestionHeading(block) {
+    const text = String(block || "").toLowerCase();
+    return /اقتراح|جرّب|جرب|اختر|متابعة|أسئلة|اسئلة|try|next|suggest/.test(text);
+  }
+
+  function renderSuggestedPrompts(lines) {
+    const prompts = lines.map(cleanSuggestedPrompt).filter(Boolean).slice(0, 6);
+    if (!prompts.length) return "";
+    return `<div class="huf-page-followups" aria-label="أسئلة مقترحة">
+      ${prompts.map((prompt) => `
+        <div class="huf-page-followup">
+          <button type="button" class="huf-page-followup-send" data-suggested-prompt="${escapeAttr(prompt)}">${inlineMarkdown(prompt)}</button>
+          <button type="button" class="huf-page-followup-edit" data-edit-prompt="${escapeAttr(prompt)}" title="تعديل السؤال">تعديل</button>
+        </div>
+      `).join("")}
+    </div>`;
+  }
+
   function renderTable(lines) {
     const rows = lines
       .filter((line) => line.includes("|"))
@@ -89,15 +115,17 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
     return `<div class="huf-page-table-wrap"><table><thead><tr>${header.map((cell) => `<th>${cell}</th>`).join("")}</tr></thead><tbody>${body.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
   }
 
-  function renderMarkdownBlock(block) {
+  function renderMarkdownBlock(block, previousBlock) {
     const lines = block.split("\n");
     if (lines.length > 1 && lines[0].includes("|") && lines[1].includes("|")) {
       return renderTable(lines);
     }
     if (lines.every((line) => /^\s*[-*]\s+/.test(line))) {
+      if (isSuggestionHeading(previousBlock)) return renderSuggestedPrompts(lines);
       return `<ul>${lines.map((line) => `<li>${inlineMarkdown(line.replace(/^\s*[-*]\s+/, ""))}</li>`).join("")}</ul>`;
     }
     if (lines.every((line) => /^\s*\d+\.\s+/.test(line))) {
+      if (isSuggestionHeading(previousBlock)) return renderSuggestedPrompts(lines);
       return `<ol>${lines.map((line) => `<li>${inlineMarkdown(line.replace(/^\s*\d+\.\s+/, ""))}</li>`).join("")}</ol>`;
     }
     return `<p>${lines.map(inlineMarkdown).join("<br>")}</p>`;
@@ -111,9 +139,13 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
         html.push(`<pre><code>${escapeHtml(part.replace(/^```[a-zA-Z0-9_-]*\n?/, "").replace(/```$/, ""))}</code></pre>`);
         return;
       }
+      let previousBlock = "";
       part.split(/\n{2,}/).forEach((block) => {
         const clean = block.trim();
-        if (clean) html.push(renderMarkdownBlock(clean));
+        if (clean) {
+          html.push(renderMarkdownBlock(clean, previousBlock));
+          previousBlock = clean;
+        }
       });
     });
     return html.join("") || "<p></p>";
@@ -427,6 +459,16 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
     $root.on("click", "[data-send]", () => send($root.find("[data-composer]").val()));
     $root.on("click", "[data-prompt]", function () {
       send(this.dataset.prompt);
+    });
+    $root.on("click", "[data-suggested-prompt]", function () {
+      send(this.dataset.suggestedPrompt);
+    });
+    $root.on("click", "[data-edit-prompt]", function () {
+      const composer = $root.find("[data-composer]").get(0);
+      composer.value = this.dataset.editPrompt || "";
+      autoGrow(composer);
+      setSending(state.sending);
+      composer.focus();
     });
     $root.on("click", "[data-retry]", () => send(state.lastFailedText));
     $root.on("click", "[data-feedback]", function () {

@@ -97,6 +97,32 @@
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, title, url) => `<a href="${safeUrl(url)}" target="_blank" rel="noopener noreferrer">${title}</a>`);
   }
 
+  function cleanSuggestedPrompt(line) {
+    return String(line || "")
+      .replace(/^\s*[-*]\s+/, "")
+      .replace(/^\s*\d+\.\s+/, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function isSuggestionHeading(block) {
+    const text = String(block || "").toLowerCase();
+    return /اقتراح|جرّب|جرب|اختر|متابعة|أسئلة|اسئلة|try|next|suggest/.test(text);
+  }
+
+  function renderSuggestedPrompts(lines) {
+    const prompts = lines.map(cleanSuggestedPrompt).filter(Boolean).slice(0, 6);
+    if (!prompts.length) return "";
+    return `<div class="huf-chat-followups" aria-label="أسئلة مقترحة">
+      ${prompts.map((prompt) => `
+        <div class="huf-chat-followup">
+          <button type="button" class="huf-chat-followup-send" data-suggested-prompt="${escapeAttr(prompt)}">${inlineMarkdown(prompt)}</button>
+          <button type="button" class="huf-chat-followup-edit" data-edit-prompt="${escapeAttr(prompt)}" title="تعديل السؤال">تعديل</button>
+        </div>
+      `).join("")}
+    </div>`;
+  }
+
   function renderTable(lines) {
     const rows = lines
       .filter((line) => line.includes("|"))
@@ -107,15 +133,17 @@
     return `<div class="huf-chat-table-wrap"><table><thead><tr>${header.map((cell) => `<th>${cell}</th>`).join("")}</tr></thead><tbody>${body.map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
   }
 
-  function renderMarkdownBlock(block) {
+  function renderMarkdownBlock(block, previousBlock) {
     const lines = block.split("\n");
     if (lines.length > 1 && lines[0].includes("|") && lines[1].includes("|")) {
       return renderTable(lines);
     }
     if (lines.every((line) => /^\s*[-*]\s+/.test(line))) {
+      if (isSuggestionHeading(previousBlock)) return renderSuggestedPrompts(lines);
       return `<ul>${lines.map((line) => `<li>${inlineMarkdown(line.replace(/^\s*[-*]\s+/, ""))}</li>`).join("")}</ul>`;
     }
     if (lines.every((line) => /^\s*\d+\.\s+/.test(line))) {
+      if (isSuggestionHeading(previousBlock)) return renderSuggestedPrompts(lines);
       return `<ol>${lines.map((line) => `<li>${inlineMarkdown(line.replace(/^\s*\d+\.\s+/, ""))}</li>`).join("")}</ol>`;
     }
     return `<p>${lines.map(inlineMarkdown).join("<br>")}</p>`;
@@ -132,10 +160,12 @@
         return;
       }
       const chunks = part.split(/\n{2,}/);
+      let previousBlock = "";
       for (let i = 0; i < chunks.length; i += 1) {
-      const block = chunks[i].trim();
-      if (!block) continue;
-        html.push(renderMarkdownBlock(block));
+        const block = chunks[i].trim();
+        if (!block) continue;
+        html.push(renderMarkdownBlock(block, previousBlock));
+        previousBlock = block;
       }
     });
     return html.join("") || "<p></p>";
@@ -412,6 +442,19 @@
       }
     });
     root.addEventListener("click", (event) => {
+      const editPrompt = event.target.closest("[data-edit-prompt]");
+      if (editPrompt) {
+        composer.value = editPrompt.dataset.editPrompt || "";
+        autoGrow(composer);
+        root.querySelector("[data-send]").disabled = state.sending || !composer.value.trim();
+        composer.focus();
+        return;
+      }
+      const suggestedPrompt = event.target.closest("[data-suggested-prompt]");
+      if (suggestedPrompt) {
+        send(root, suggestedPrompt.dataset.suggestedPrompt);
+        return;
+      }
       const prompt = event.target.closest("[data-prompt]");
       if (prompt) send(root, prompt.dataset.prompt);
       const feedback = event.target.closest("[data-feedback]");
