@@ -152,12 +152,69 @@ def new_session(agent=None, model=None, title=None):
 
 @frappe.whitelist()
 def get_ui_config():
-    _require_login()
+    language = getattr(frappe.local, "lang", None) or "en"
+    rtl = str(language).startswith("ar")
+    labels = {
+        "title": "مساعد HUF الذكي" if rtl else "HUF Assistant",
+        "subtitle": "اسأل عن المبيعات، المخزون، الفواتير، أو المهام" if rtl else "Ask about sales, stock, invoices, or tasks",
+        "empty_title": "كيف أستطيع مساعدتك؟" if rtl else "How can I help?",
+        "empty_text": "اسألني عن بيانات ERPNext أو اطلب تلخيصًا أو إجراءً آمنًا." if rtl else "Ask about ERPNext data, summaries, or safe actions.",
+        "new_chat": "محادثة جديدة" if rtl else "New Chat",
+        "clear": "مسح" if rtl else "Clear",
+        "send": "إرسال" if rtl else "Send",
+        "close": "إغلاق" if rtl else "Close",
+        "expand": "فتح الصفحة الكاملة" if rtl else "Open full page",
+        "advanced": "خيارات متقدمة" if rtl else "Advanced Options",
+        "advanced_hint": "سيتم استخدام الوكيل والنموذج الافتراضيين ما لم يتم تحديد غير ذلك من الإعدادات." if rtl else "The default agent and model will be used unless configured otherwise.",
+        "show_details": "إظهار التفاصيل" if rtl else "Show Details",
+        "hide_details": "إخفاء التفاصيل" if rtl else "Hide Details",
+        "details": "التفاصيل" if rtl else "Details",
+        "thinking": "جاري التفكير..." if rtl else "Thinking...",
+        "feedback_saved": "تم تسجيل ملاحظتك" if rtl else "Feedback saved",
+        "placeholder": "اكتب سؤالك هنا…" if rtl else "Ask HUF Assistant…",
+        "retry": "إعادة المحاولة" if rtl else "Retry",
+        "loading": "جاري التحميل..." if rtl else "Loading...",
+        "error": "تعذر الحصول على رد الآن. حاول مرة أخرى أو تواصل مع المسؤول." if rtl else "Unable to get a response now. Try again or contact your administrator.",
+    }
+    prompts = [
+        "اعرض مبيعات هذا الشهر",
+        "لخص حالة المخزون",
+        "ما الفواتير المتأخرة؟",
+        "أنشئ مهمة متابعة للعميل",
+        "اقترح تحسينات على التدفق النقدي",
+    ] if rtl else [
+        "Show this month's sales",
+        "Summarize inventory status",
+        "Which invoices are overdue?",
+        "Create a customer follow-up task",
+        "Suggest cash-flow improvements",
+    ]
+    if frappe.session.user == "Guest":
+        return {
+            "enabled": False,
+            "enable_chat_widget": False,
+            "debug_available": False,
+            "rtl": rtl,
+            "language": language,
+            "suggested_prompts": prompts,
+            "can_select_agent": False,
+            "can_select_model": False,
+            "default_title": labels["title"],
+            "labels": labels,
+        }
     settings = get_ai_settings()
+    admin_or_debug = _is_admin_or_debug(settings)
     return {
+        "enabled": bool(settings.get("enable_chat_widget", True)),
         "enable_chat_widget": bool(settings.get("enable_chat_widget", True)),
         "debug_available": _debug_allowed(settings),
-        "rtl": (frappe.local.lang or "").startswith("ar"),
+        "rtl": rtl,
+        "language": language,
+        "suggested_prompts": prompts,
+        "can_select_agent": admin_or_debug,
+        "can_select_model": admin_or_debug,
+        "default_title": labels["title"],
+        "labels": labels,
     }
 
 

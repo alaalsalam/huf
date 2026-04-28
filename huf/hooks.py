@@ -29,11 +29,11 @@ add_to_apps_screen = [
 # include js, css files in header of desk.html
 app_include_css = [
     "/assets/huf/css/trilogy_ai_desk_widget.css?v=20260427-ux2",
-    "/assets/huf/css/huf_chat_widget.css?v=20260427-enhanced",
+    "/assets/huf/css/huf_chat_widget.css?v=20260428-ux-polish",
 ]
 app_include_js = [
     "/assets/huf/js/trilogy_ai_desk_widget.js?v=20260427-ux2",
-    "/assets/huf/js/huf_chat_widget.js?v=20260427-enhanced",
+    "/assets/huf/js/huf_chat_widget.js?v=20260428-ux-polish",
 ]
 
 # include js, css files in header of web template

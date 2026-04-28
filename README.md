@@ -22,7 +22,9 @@ bench --site pro.trilogy-erp.com clear-cache
 Configure `HUF AI Settings` to enable the widget, RAG, debug roles, allowed/blocked DocTypes, redaction, and confirmation for sensitive actions. Provider keys remain in `AI Provider` password fields.
 
 ## Usage
-Open ERPNext Desk and use the floating `Trilogy Ai` button, or visit `/app/huf-chat` for the full page.
+Open ERPNext Desk and use the floating **HUF Assistant / مساعد HUF** button. The widget opens as a polished side drawer on desktop and a bottom sheet on mobile, with Arabic suggestions, Markdown tables, feedback buttons, and safe confirmation prompts for sensitive actions.
+
+For a larger workspace, visit `/app/huf-chat`. The full page includes a session sidebar, searchable previous conversations, the same chat composer, and an optional debug panel for authorized users only.
 
 ## Security
 The API blocks Guest users, respects Frappe permissions, hides debug traces from normal users, and requires confirmation before sensitive actions.
