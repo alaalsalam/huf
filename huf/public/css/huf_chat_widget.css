@@ -36,6 +36,132 @@
   transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
+#huf-home-chat-card {
+  --huf-chat-bg: #f6f8fb;
+  --huf-chat-surface: #ffffff;
+  --huf-chat-border: #dce4ef;
+  --huf-chat-text: #172033;
+  --huf-chat-muted: #66758c;
+  --huf-chat-primary: #1f6feb;
+  --huf-chat-primary-soft: #eaf2ff;
+  --huf-chat-radius: 16px;
+  width: min(920px, 100%);
+  margin: 0 0 18px;
+  border: 1px solid var(--huf-chat-border);
+  border-radius: var(--huf-chat-radius);
+  background: var(--huf-chat-surface);
+  box-shadow: 0 14px 34px rgba(16, 24, 40, 0.08);
+  color: var(--huf-chat-text);
+  padding: 16px;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+}
+
+#huf-home-chat-card * {
+  box-sizing: border-box;
+  letter-spacing: 0;
+}
+
+#huf-home-chat-card .huf-home-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+#huf-home-chat-card .huf-home-card-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--huf-chat-primary-soft);
+  color: var(--huf-chat-primary);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+#huf-home-chat-card strong,
+#huf-home-chat-card p {
+  display: block;
+  margin: 0;
+}
+
+#huf-home-chat-card strong {
+  font-size: 17px;
+  font-weight: 850;
+}
+
+#huf-home-chat-card p {
+  margin-top: 3px;
+  color: var(--huf-chat-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+#huf-home-chat-card .huf-home-card-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  border: 1px solid var(--huf-chat-border);
+  border-radius: 14px;
+  background: var(--huf-chat-bg);
+  padding: 10px;
+}
+
+#huf-home-chat-card textarea {
+  flex: 1;
+  min-height: 48px;
+  max-height: 116px;
+  resize: none;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--huf-chat-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#huf-home-chat-card [data-home-send] {
+  flex: 0 0 auto;
+  min-width: 84px;
+  height: 40px;
+  border: 0;
+  border-radius: 11px;
+  background: var(--huf-chat-primary);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+#huf-home-chat-card [data-home-send]:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+#huf-home-chat-card .huf-home-card-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+#huf-home-chat-card .huf-home-card-prompts button {
+  border: 1px solid var(--huf-chat-border);
+  border-radius: 999px;
+  background: #fff;
+  color: #27354d;
+  cursor: pointer;
+  padding: 8px 11px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+#huf-home-chat-card .huf-home-card-prompts button:hover {
+  border-color: #bcd0f5;
+  color: var(--huf-chat-primary);
+}
+
 #huf-enhanced-chat-widget[dir="rtl"] .huf-chat-launch {
   right: auto;
   left: 24px;
@@ -523,6 +649,21 @@
 }
 
 @media (max-width: 640px) {
+  #huf-home-chat-card {
+    margin: 0 0 12px;
+    padding: 13px;
+    border-radius: 14px;
+  }
+
+  #huf-home-chat-card .huf-home-card-composer {
+    display: block;
+  }
+
+  #huf-home-chat-card [data-home-send] {
+    width: 100%;
+    margin-top: 8px;
+  }
+
   #huf-enhanced-chat-widget .huf-chat-launch {
     right: 16px;
     bottom: 16px;

@@ -6,7 +6,18 @@ SENSITIVE_ACTION_WORDS = {
     "delete", "remove", "trash", "submit", "cancel", "email", "send_email",
     "payment", "pay", "salary", "journal", "ledger", "role", "permission", "user",
     "create", "update", "set_value", "write", "send email", "mail", "submit document", "cancel document",
-    "حذف", "اعتمد", "اعتماد", "إلغاء", "الغاء", "دفع", "راتب", "أرسل", "ارسل",
+    "حذف", "احذف", "إحذف", "امسح", "مسح", "ازل", "أزل", "حط في السلة",
+    "اعتمد", "اعتماد", "رحل", "ترحيل", "قدم", "تقديم",
+    "إلغاء", "الغاء", "الغِ", "الغ", "إلغ",
+    "دفع", "سداد", "صرف", "راتب", "رواتب",
+    "أرسل", "ارسل", "إرسال", "ارسال", "بريد", "ايميل",
+    "انشئ", "أنشئ", "اضف", "أضف", "عدل", "تعديل", "غير", "غيّر",
+}
+SENSITIVE_ARABIC_DOCTYPE_WORDS = {
+    "فاتورة مبيعات", "فواتير مبيعات", "فاتورة مشتريات", "فواتير مشتريات",
+    "قيد يومية", "قيود يومية", "سند دفع", "سند قبض", "دفعة", "دفعات",
+    "مستخدم", "مستخدمين", "دور", "أدوار", "صلاحية", "صلاحيات",
+    "راتب", "رواتب", "موظف", "موظفين", "حساب", "حسابات",
 }
 SENSITIVE_DOCTYPES = {
     "Payment Entry", "Salary Slip", "Employee", "User", "Role", "Has Role",
@@ -21,7 +32,8 @@ SENSITIVE_DOCTYPES = {
 def _settings_enabled():
     try:
         if frappe.db.exists("DocType", "HUF AI Settings"):
-            return bool(frappe.get_single("HUF AI Settings").require_confirmation_for_sensitive_actions)
+            value = frappe.get_single("HUF AI Settings").require_confirmation_for_sensitive_actions
+            return True if value in (None, "") else bool(value)
     except Exception:
         pass
     return True
@@ -32,6 +44,8 @@ def classify_action_sensitivity(action, doctype=None):
     if doctype in SENSITIVE_DOCTYPES:
         return "high"
     if any(word in action_text for word in SENSITIVE_ACTION_WORDS):
+        return "high"
+    if any(word in action_text for word in SENSITIVE_ARABIC_DOCTYPE_WORDS) and any(word in action_text for word in {"آخر", "اخر", "كل", "جميع"}):
         return "high"
     return "normal"
 

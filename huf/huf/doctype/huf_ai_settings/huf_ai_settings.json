@@ -6,8 +6,13 @@
  "engine": "InnoDB",
  "field_order": [
   "enable_chat_widget",
+  "show_home_chat",
   "default_model_provider",
   "default_agent",
+  "default_home_agent",
+  "chat_execution_mode",
+  "enable_advanced_erp_query",
+  "expose_tool_errors_to_user",
   "enable_debug",
   "debug_roles",
   "enable_rag",
@@ -30,6 +35,12 @@
    "default": "1"
   },
   {
+   "fieldname": "show_home_chat",
+   "fieldtype": "Check",
+   "label": "Show Home Chat",
+   "default": "1"
+  },
+  {
    "fieldname": "default_model_provider",
    "fieldtype": "Link",
    "label": "Default Model Provider",
@@ -40,6 +51,29 @@
    "fieldtype": "Link",
    "label": "Default Agent",
    "options": "Agent"
+  },
+  {
+   "fieldname": "default_home_agent",
+   "fieldtype": "Link",
+   "label": "Default Home Agent",
+   "options": "Agent"
+  },
+  {
+   "fieldname": "chat_execution_mode",
+   "fieldtype": "Select",
+   "label": "Chat Execution Mode",
+   "options": "Native Agent\nSafe ERP Tools\nAdvanced ERP Query",
+   "default": "Native Agent"
+  },
+  {
+   "fieldname": "enable_advanced_erp_query",
+   "fieldtype": "Check",
+   "label": "Enable Advanced ERP Query"
+  },
+  {
+   "fieldname": "expose_tool_errors_to_user",
+   "fieldtype": "Check",
+   "label": "Expose Tool Errors To User"
   },
   {
    "fieldname": "enable_debug",

@@ -18,11 +18,20 @@
     messagesLoaded: false,
     lastAssistantMeta: null,
     lastFailedText: "",
+    routeWatcher: null,
   };
 
   function isDesk() {
     const path = window.location.pathname || "";
     return path.startsWith("/app") && !path.includes("/login") && !path.includes("/website");
+  }
+
+  function isHomeRoute() {
+    const path = window.location.pathname || "";
+    if (path === "/app" || path === "/app/" || path === "/app/home") return true;
+    const route = window.frappe?.get_route ? window.frappe.get_route() : [];
+    const first = String(route?.[0] || "").toLowerCase();
+    return ["", "home", "workspaces", "workspace"].includes(first);
   }
 
   function isArabic(config) {
@@ -379,6 +388,94 @@
     });
   }
 
+  function findHomeTarget() {
+    return document.querySelector(".layout-main-section") ||
+      document.querySelector(".page-body .container") ||
+      document.querySelector(".desk-page") ||
+      document.querySelector(".page-container");
+  }
+
+  function removeHomeCard() {
+    document.getElementById("huf-home-chat-card")?.remove();
+  }
+
+  function ensureHomeCard(root) {
+    if (!state.config?.show_home_chat || !state.config?.enable_chat_widget || !isHomeRoute()) {
+      removeHomeCard();
+      return;
+    }
+    if (document.getElementById("huf-home-chat-card")) return;
+    const target = findHomeTarget();
+    if (!target) return;
+    const rtl = isArabic(state.config);
+    const prompts = state.config?.suggested_prompts?.length ? state.config.suggested_prompts : DEFAULT_PROMPTS;
+    const card = document.createElement("section");
+    card.id = "huf-home-chat-card";
+    card.dir = rtl ? "rtl" : "ltr";
+    card.innerHTML = `
+      <div class="huf-home-card-head">
+        <span class="huf-home-card-icon" aria-hidden="true">AI</span>
+        <div>
+          <strong>${escapeHtml(label("title", "مساعد HUF الذكي"))}</strong>
+          <p>${escapeHtml(label("subtitle", "اسأل عن المبيعات، المخزون، الفواتير، العملاء، أو المهام"))}</p>
+        </div>
+      </div>
+      <div class="huf-home-card-composer">
+        <textarea rows="2" data-home-input placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>
+        <button type="button" data-home-send>${escapeHtml(label("send", "إرسال"))}</button>
+      </div>
+      <div class="huf-home-card-prompts">
+        ${prompts.map((prompt) => `<button type="button" data-home-prompt="${escapeAttr(prompt)}">${escapeHtml(prompt)}</button>`).join("")}
+      </div>
+    `;
+    target.prepend(card);
+    card.addEventListener("click", (event) => {
+      const prompt = event.target.closest("[data-home-prompt]");
+      if (prompt) {
+        setOpen(root, true);
+        send(root, prompt.dataset.homePrompt);
+        return;
+      }
+      if (event.target.closest("[data-home-send]")) {
+        const input = card.querySelector("[data-home-input]");
+        setOpen(root, true);
+        send(root, input.value);
+        input.value = "";
+      }
+    });
+    const input = card.querySelector("[data-home-input]");
+    input.addEventListener("input", () => {
+      input.style.height = "auto";
+      input.style.height = `${Math.min(input.scrollHeight, 116)}px`;
+      card.querySelector("[data-home-send]").disabled = !input.value.trim();
+    });
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        setOpen(root, true);
+        send(root, input.value);
+        input.value = "";
+        input.style.height = "";
+      }
+    });
+    card.querySelector("[data-home-send]").disabled = true;
+  }
+
+  function watchHomeCard(root) {
+    ensureHomeCard(root);
+    if (state.routeWatcher) window.clearInterval(state.routeWatcher);
+    let lastPath = `${location.pathname}${location.hash}`;
+    state.routeWatcher = window.setInterval(() => {
+      const current = `${location.pathname}${location.hash}`;
+      if (current !== lastPath) {
+        lastPath = current;
+        window.setTimeout(() => ensureHomeCard(root), 250);
+      }
+    }, 8000);
+    window.addEventListener("hashchange", () => window.setTimeout(() => ensureHomeCard(root), 250));
+    window.addEventListener("popstate", () => window.setTimeout(() => ensureHomeCard(root), 250));
+  }
+
   async function init() {
     if (!isDesk() || document.getElementById(WIDGET_ID) || !window.frappe) return;
     try {
@@ -391,6 +488,7 @@
     if (!state.config?.enable_chat_widget) return;
     const root = renderShell(state.config);
     bind(root);
+    watchHomeCard(root);
   }
 
   if (document.readyState === "loading") {

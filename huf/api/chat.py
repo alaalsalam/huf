@@ -10,6 +10,31 @@ from huf.ai.redaction import redact_sensitive_data
 from huf.ai.safety import requires_confirmation, create_pending_confirmation, confirm_pending_action
 
 
+INVENTORY_SUGGESTIONS = [
+    "لخص حالة المخزون حسب المستودع",
+    "اعرض الأصناف منخفضة الكمية في مستودع محدد",
+    "اعرض أعلى 10 أصناف حسب قيمة المخزون",
+]
+FRIENDLY_TOOL_ERROR = "لم أتمكن من جلب هذه البيانات الآن بسبب قيود الصلاحيات أو طريقة الاستعلام. يمكنني المحاولة بطريقة أبسط، مثل تحديد الفترة أو المستودع."
+PERMISSION_ERROR_MESSAGE = "لا أملك صلاحية كافية لعرض هذه البيانات حسب صلاحيات حسابك."
+TECHNICAL_ERROR_MARKERS = [
+    "Blocked SQL keyword detected",
+    "SQL keyword blocked",
+    "trilogy_erp_database_analyst",
+    "TrilogyAi ERP Analytics",
+    "Traceback",
+    "frappe.exceptions",
+    "pymysql",
+    "mariadb",
+    "OperationalError",
+    "ProgrammingError",
+    "PermissionError",
+    "permission_denied",
+    "No read permission",
+    "not permitted",
+]
+
+
 def _require_login():
     if frappe.session.user == "Guest":
         frappe.throw(_("Login required"), frappe.PermissionError)
@@ -38,10 +63,21 @@ def _debug_allowed(settings=None):
     return bool(settings.get("enable_debug")) and _is_admin_or_debug(settings)
 
 
+def _execution_mode(settings=None):
+    settings = settings or get_ai_settings()
+    mode = settings.get("chat_execution_mode") or "Native Agent"
+    if mode not in ("Native Agent", "Safe ERP Tools", "Advanced ERP Query"):
+        return "Native Agent"
+    if mode == "Advanced ERP Query" and not settings.get("enable_advanced_erp_query"):
+        return "Native Agent"
+    return mode
+
+
 def _get_default_agent(settings=None):
     settings = settings or get_ai_settings()
-    if settings.get("default_agent") and frappe.db.exists("Agent", settings.get("default_agent")):
-        return settings.get("default_agent")
+    for key in ("default_home_agent", "default_agent"):
+        if settings.get(key) and frappe.db.exists("Agent", settings.get(key)):
+            return settings.get(key)
     filters = {}
     try:
         if frappe.get_meta("Agent").has_field("is_active"):
@@ -128,7 +164,15 @@ def _context(message, doctype=None, docname=None, metadata=None, settings=None):
 def _format_prompt(message, ctx, settings=None):
     safe_ctx = redact_sensitive_data(ctx, settings or {"enable_redaction": True})
     safe_message = redact_sensitive_data(message, settings or {"enable_redaction": True})
-    return f"""أجب بإيجاز ووضوح وبالعربية إذا كان سؤال المستخدم عربياً. لا تخترع أرقاماً أو سجلات. استخدم أدوات HUF الآمنة عند الحاجة لقراءة ERP.
+    mode = _execution_mode(settings)
+    advanced_note = ""
+    if mode != "Advanced ERP Query":
+        advanced_note = """
+لا تستخدم SQL خام ولا تطلب من أي أداة توليد SQL. استخدم أدوات HUF الأصلية الآمنة فقط إن كانت متاحة، وإن لم تتوفر البيانات فاطلب تحديد الفترة أو المستودع أو نوع المستند.
+"""
+    return f"""أجب بإيجاز ووضوح وبالعربية إذا كان سؤال المستخدم عربياً. لا تخترع أرقاماً أو سجلات. استخدم مسار HUF Agent الأصلي وأدواته الآمنة فقط عند الحاجة.
+وضع التنفيذ الحالي: {mode}.
+{advanced_note}
 
 سياق النظام الآمن:
 {safe_ctx[:6000] if isinstance(safe_ctx, str) else json.dumps(safe_ctx, ensure_ascii=False, default=str)[:6000]}
@@ -136,6 +180,36 @@ def _format_prompt(message, ctx, settings=None):
 سؤال المستخدم:
 {safe_message}
 """
+
+
+def _looks_inventory_question(message):
+    text = (message or "").lower()
+    return any(term in text for term in ["مخزون", "المخزون", "الأصناف", "صنف", "item", "stock", "warehouse", "inventory"])
+
+
+def _friendly_error(message=None, permission=False):
+    if permission:
+        return PERMISSION_ERROR_MESSAGE
+    content = FRIENDLY_TOOL_ERROR
+    if _looks_inventory_question(message):
+        content += "\n\nجرّب أحد هذه الأسئلة:\n" + "\n".join(f"- {item}" for item in INVENTORY_SUGGESTIONS)
+    return content
+
+
+def _sanitize_assistant_content(content, user_message=None, settings=None, technical_detail=None):
+    settings = settings or get_ai_settings()
+    text = str(content or "")
+    expose = bool(settings.get("expose_tool_errors_to_user")) and _debug_allowed(settings)
+    if expose:
+        return redact_sensitive_data(text, settings)
+    lowered = text.lower()
+    permission = any(marker.lower() in lowered for marker in ["permission_denied", "permissionerror", "no read permission", "not permitted", "لا تملك صلاحية"])
+    if technical_detail:
+        lowered_detail = str(technical_detail).lower()
+        permission = permission or any(marker.lower() in lowered_detail for marker in ["permission_denied", "permissionerror", "no read permission", "not permitted"])
+    if any(marker.lower() in lowered for marker in TECHNICAL_ERROR_MARKERS) or technical_detail:
+        return _friendly_error(user_message, permission=permission)
+    return redact_sensitive_data(text, settings)
 
 
 @frappe.whitelist()
@@ -147,7 +221,7 @@ def new_session(agent=None, model=None, title=None):
     if model:
         frappe.db.set_value("Agent Conversation", conv.name, "model", model)
     _audit("new_session", session=conv.name, input_summary=title or "")
-    return {"session_id": conv.name, "title": conv.title, "agent": conv.agent, "model": model or conv.model}
+    return {"session_id": conv.name, "title": conv.title, "agent": conv.agent, "model": model or conv.model, "execution_mode": _execution_mode(get_ai_settings())}
 
 
 @frappe.whitelist()
@@ -193,6 +267,7 @@ def get_ui_config():
         return {
             "enabled": False,
             "enable_chat_widget": False,
+            "show_home_chat": False,
             "debug_available": False,
             "rtl": rtl,
             "language": language,
@@ -207,6 +282,7 @@ def get_ui_config():
     return {
         "enabled": bool(settings.get("enable_chat_widget", True)),
         "enable_chat_widget": bool(settings.get("enable_chat_widget", True)),
+        "show_home_chat": bool(settings.get("show_home_chat", True)),
         "debug_available": _debug_allowed(settings),
         "rtl": rtl,
         "language": language,
@@ -214,6 +290,7 @@ def get_ui_config():
         "can_select_agent": admin_or_debug,
         "can_select_model": admin_or_debug,
         "default_title": labels["title"],
+        "execution_mode": _execution_mode(settings),
         "labels": labels,
     }
 
@@ -269,16 +346,26 @@ def send_message(message, session_id=None, agent=None, model=None, doctype=None,
     if session_id and not _owns_conversation(session_id):
         frappe.throw(_("Not permitted"), frappe.PermissionError)
     ctx = _context(message, doctype=doctype, docname=docname, metadata=metadata, settings=settings)
-    result = run_agent_sync(agent_name=agent_doc.name, prompt=_format_prompt(message, ctx, settings), provider=agent_doc.provider, model=model or agent_doc.model, channel_id="Desk Chat", external_id=frappe.session.user, conversation_id=session_id)
+    execution_mode = _execution_mode(settings)
+    try:
+        result = run_agent_sync(agent_name=agent_doc.name, prompt=_format_prompt(message, ctx, settings), provider=agent_doc.provider, model=model or agent_doc.model, channel_id="Desk Chat", external_id=frappe.session.user, conversation_id=session_id)
+    except Exception as exc:
+        latency_ms = int((time.time() - start) * 1000)
+        technical = frappe.get_traceback()
+        frappe.log_error(technical, "HUF Desk Chat Error")
+        _audit("send_message", status="Failed", session=session_id, input_summary=message, output_summary=str(exc), metadata={"agent": agent_doc.name, "execution_mode": execution_mode, "technical_error": str(exc)}, latency_ms=latency_ms)
+        content = _sanitize_assistant_content("", message, settings, technical_detail=str(exc))
+        return {"session_id": session_id, "message_id": None, "content": content, "rendered_content": content, "debug_available": _debug_allowed(settings), "requires_confirmation": False, "confirmation": None, "metadata": {"agent": agent_doc.name, "execution_mode": execution_mode, "latency_ms": latency_ms}}
     conversation_id = result.get("conversation_id") or session_id
     assistant = _latest_assistant_message(conversation_id) if conversation_id else None
     content = result.get("response") or result.get("content") or (assistant.content if assistant else "تم تنفيذ الطلب، لكن لم يتم توليد نص واضح.")
-    content = redact_sensitive_data(content, settings)
+    raw_content = content
+    content = _sanitize_assistant_content(content, message, settings)
     latency_ms = int((time.time() - start) * 1000)
     message_id = assistant.name if assistant else None
     run_id = result.get("agent_run_id") or result.get("run_id")
-    _audit("send_message", session=conversation_id, message=message_id, input_summary=message, output_summary=content, metadata={"run_id": run_id, "context_summary": redact_sensitive_data(ctx, settings)[:2000]}, latency_ms=latency_ms)
-    return {"session_id": conversation_id, "message_id": message_id, "content": content, "rendered_content": content, "debug_available": _debug_allowed(settings), "requires_confirmation": False, "confirmation": None, "metadata": {"run_id": run_id, "agent": agent_doc.name, "model": model or agent_doc.model, "latency_ms": latency_ms}}
+    _audit("send_message", session=conversation_id, message=message_id, input_summary=message, output_summary=content, metadata={"run_id": run_id, "context_summary": redact_sensitive_data(ctx, settings)[:2000], "agent": agent_doc.name, "execution_mode": execution_mode, "raw_response_preview": str(raw_content)[:1000]}, latency_ms=latency_ms)
+    return {"session_id": conversation_id, "message_id": message_id, "content": content, "rendered_content": content, "debug_available": _debug_allowed(settings), "requires_confirmation": False, "confirmation": None, "metadata": {"run_id": run_id, "agent": agent_doc.name, "model": model or agent_doc.model, "execution_mode": execution_mode, "latency_ms": latency_ms}}
 
 
 @frappe.whitelist()

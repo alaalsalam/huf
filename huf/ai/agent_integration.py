@@ -24,6 +24,32 @@ from .run import RunProvider
 from huf.ai.knowledge.context_builder import build_knowledge_context, inject_knowledge_context
 
 
+ADVANCED_PROMPT_MARKERS = [
+    "TRILOGY_ERP_ANALYTICS_ENGINE_V2",
+    "TRILOGY_CHANGAI_ANALYTICS_BRIDGE_V1",
+]
+
+
+def _advanced_erp_query_enabled() -> bool:
+    try:
+        from huf.ai.erp_schema_retrieval import get_ai_settings
+        settings = get_ai_settings()
+        return bool(settings.get("enable_advanced_erp_query")) and settings.get("chat_execution_mode") == "Advanced ERP Query"
+    except Exception:
+        return False
+
+
+def _strip_advanced_analytics_prompt(instructions: str) -> str:
+    if _advanced_erp_query_enabled():
+        return instructions or ""
+    cleaned = instructions or ""
+    for marker in ADVANCED_PROMPT_MARKERS:
+        token = f"[{marker}]"
+        if token in cleaned:
+            cleaned = cleaned.split(token)[0].rstrip()
+    return cleaned
+
+
 class AgentManager:
     """Manages the creation and execution of agents."""
     def __init__(self, agent_name, file_handler=None):
@@ -217,7 +243,7 @@ class AgentManager:
             frappe.throw(_("Agent model is not configured"))
 
         from huf.ai.prompt_resolver import resolve_prompt
-        instructions = resolve_prompt(self.agent_doc) or ""
+        instructions = _strip_advanced_analytics_prompt(resolve_prompt(self.agent_doc) or "")
 
         # Enhance instructions with tool descriptions
         if self.tools:

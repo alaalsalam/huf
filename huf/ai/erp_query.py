@@ -5,6 +5,7 @@ from huf.ai.erp_schema_retrieval import get_ai_settings, search_schema
 
 DEFAULT_LIMIT = 20
 MAX_LIMIT = 100
+FRIENDLY_ADVANCED_DISABLED = "الاستعلام المتقدم غير مفعّل حاليًا. يمكنني المحاولة بطريقة أبسط إذا حددت نوع البيانات أو الفترة أو المستودع."
 
 
 def _json(value, fallback=None):
@@ -107,6 +108,13 @@ def _infer_doctype(user_query):
 
 
 def natural_language_erp_query(user_query, context=None):
+    settings = get_ai_settings()
+    if not (settings.get("enable_advanced_erp_query") and settings.get("chat_execution_mode") == "Advanced ERP Query"):
+        return {
+            "success": False,
+            "answer": FRIENDLY_ADVANCED_DISABLED,
+            "advanced_query_disabled": True,
+        }
     context = context or {}
     doctype = context.get("doctype")
     hits = []

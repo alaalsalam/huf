@@ -35,6 +35,15 @@ class PermissionAwareToolRegistry:
         "Attach File to Document"
     }
 
+    ADVANCED_ERP_TOOL_MARKERS = {
+        "trilogy_erp_database_analyst",
+        "trilogy_erp_analytics",
+        "huf_natural_language_erp_query",
+        "natural_language_erp_query",
+        "database_analyst",
+        "sql",
+    }
+
     @classmethod
     def get_allowed_tools(cls, agent_doc, user: str) -> list:
         """Return only tools the user has permission to use"""
@@ -59,6 +68,26 @@ class PermissionAwareToolRegistry:
     def _can_use_tool(cls, tool_doc, user: str) -> bool:
         """Check if user has permission for this tool"""
         tool_type = tool_doc.types
+
+        tool_identity = " ".join(
+            str(x or "").lower()
+            for x in [
+                tool_doc.name,
+                tool_doc.tool_name,
+                tool_doc.description,
+                tool_doc.function_path,
+                tool_doc.tool_type,
+            ]
+        )
+        if any(marker in tool_identity for marker in cls.ADVANCED_ERP_TOOL_MARKERS):
+            try:
+                from huf.ai.erp_schema_retrieval import get_ai_settings
+                settings = get_ai_settings()
+                advanced_enabled = bool(settings.get("enable_advanced_erp_query")) and settings.get("chat_execution_mode") == "Advanced ERP Query"
+            except Exception:
+                advanced_enabled = False
+            if not advanced_enabled:
+                return False
         
         # Read Only restriction
         if tool_doc.is_read_only and tool_type in cls.MUTATING_TOOL_TYPES:

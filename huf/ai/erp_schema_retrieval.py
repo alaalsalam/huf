@@ -24,6 +24,10 @@ def _json_list(value):
 def get_ai_settings():
     defaults = {
         "enable_chat_widget": True,
+        "show_home_chat": True,
+        "chat_execution_mode": "Native Agent",
+        "enable_advanced_erp_query": False,
+        "expose_tool_errors_to_user": False,
         "enable_debug": False,
         "debug_roles": ["System Manager", "HUF Administrator"],
         "enable_rag": True,
@@ -38,8 +42,13 @@ def get_ai_settings():
             doc = frappe.get_single("HUF AI Settings")
             defaults.update({
                 "enable_chat_widget": bool(doc.enable_chat_widget),
+                "show_home_chat": bool(getattr(doc, "show_home_chat", 1)),
                 "default_agent": doc.default_agent,
+                "default_home_agent": getattr(doc, "default_home_agent", None),
                 "default_model_provider": doc.default_model_provider,
+                "chat_execution_mode": getattr(doc, "chat_execution_mode", None) or "Native Agent",
+                "enable_advanced_erp_query": bool(getattr(doc, "enable_advanced_erp_query", 0)),
+                "expose_tool_errors_to_user": bool(getattr(doc, "expose_tool_errors_to_user", 0)),
                 "enable_debug": bool(doc.enable_debug),
                 "debug_roles": _json_list(doc.debug_roles),
                 "enable_rag": bool(doc.enable_rag),

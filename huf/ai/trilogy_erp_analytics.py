@@ -11,6 +11,10 @@ TOOL_TYPE = "ERP Deep Analytics"
 TOOL_NAME = "trilogy_erp_database_analyst"
 PROMPT_MARKER = "TRILOGY_ERP_ANALYTICS_ENGINE_V2"
 OPENAI_MODEL = "gpt-5-mini"
+FRIENDLY_ADVANCED_DISABLED = (
+    "التحليل المتقدم غير مفعّل لهذه المحادثة. يمكنني المحاولة بطريقة أبسط، "
+    "مثل تحديد الفترة أو المستودع أو نوع المستند المطلوب."
+)
 
 CORE_DOCTYPES = [
     "Customer", "Supplier", "Item", "Lead", "Opportunity",
@@ -208,6 +212,31 @@ def analyze_erp_question(question: str, chat_id: str | None = None, request_id: 
     """Run native read-only ERP analytics inside HUF without external analytics apps."""
     if frappe.session.user == "Guest":
         frappe.throw(_("Please log in to use TrilogyAi ERP analytics."))
+
+    try:
+        from huf.ai.erp_schema_retrieval import get_ai_settings
+        settings = get_ai_settings()
+        if not (settings.get("enable_advanced_erp_query") and settings.get("chat_execution_mode") == "Advanced ERP Query"):
+            return {
+                "ok": False,
+                "engine": "TrilogyAi ERP Analytics",
+                "question": question,
+                "answer": FRIENDLY_ADVANCED_DISABLED,
+                "result": [],
+                "validation": {"ok": False, "advanced_query_disabled": True},
+                "error": "Advanced ERP Query is disabled",
+            }
+    except Exception:
+        frappe.log_error("Unable to read HUF AI Settings for TrilogyAi analytics", "TrilogyAi ERP Analytics")
+        return {
+            "ok": False,
+            "engine": "TrilogyAi ERP Analytics",
+            "question": question,
+            "answer": FRIENDLY_ADVANCED_DISABLED,
+            "result": [],
+            "validation": {"ok": False, "advanced_query_disabled": True},
+            "error": "Advanced ERP Query is disabled",
+        }
 
     question = (question or "").strip()
     if not question:
