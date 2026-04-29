@@ -380,6 +380,107 @@
   color: var(--huf-chat-primary);
 }
 
+#huf-enhanced-chat-widget .huf-chat-session-dock {
+  display: none;
+  padding: 10px 14px 12px;
+  border-bottom: 1px solid var(--huf-chat-border);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+#huf-enhanced-chat-widget.show-sessions .huf-chat-session-dock {
+  display: block;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-dock-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-dock-head strong {
+  color: var(--huf-chat-text);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-dock-head button {
+  border: 1px solid #c7d8f5;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--huf-chat-primary);
+  cursor: pointer;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-list {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-item {
+  position: relative;
+  display: grid;
+  gap: 3px;
+  flex: 0 0 172px;
+  min-height: 58px;
+  border: 1px solid var(--huf-chat-border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--huf-chat-text);
+  cursor: pointer;
+  padding: 8px 10px;
+  text-align: start;
+  box-shadow: 0 4px 14px rgba(16, 24, 40, 0.035);
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-item:hover,
+#huf-enhanced-chat-widget .huf-chat-session-item.active {
+  border-color: #a9c5f5;
+  background: #f7faff;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-item strong {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-item span {
+  color: var(--huf-chat-muted);
+  font-size: 10.5px;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-item em {
+  position: absolute;
+  top: 7px;
+  inset-inline-end: 8px;
+  border-radius: 999px;
+  background: var(--huf-chat-primary-soft);
+  color: var(--huf-chat-primary);
+  padding: 1px 6px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+#huf-enhanced-chat-widget .huf-chat-session-empty,
+#huf-enhanced-chat-widget .huf-chat-loading-inline {
+  width: 100%;
+  color: var(--huf-chat-muted);
+  font-size: 12px;
+  padding: 9px 2px;
+  text-align: center;
+}
+
 #huf-enhanced-chat-widget .huf-chat-messages {
   flex: 1;
   overflow: auto;
@@ -519,6 +620,7 @@
   box-shadow: 0 4px 16px rgba(16, 24, 40, 0.04);
   font-size: 13px;
   line-height: 1.7;
+  text-align: start;
 }
 
 #huf-enhanced-chat-widget .huf-chat-msg.user .huf-chat-bubble {
@@ -529,6 +631,7 @@
 
 #huf-enhanced-chat-widget .huf-chat-content p {
   margin: 0 0 9px;
+  text-align: start;
 }
 
 #huf-enhanced-chat-widget .huf-chat-content p:last-child,
@@ -686,6 +789,7 @@
 }
 
 #huf-enhanced-chat-widget .huf-chat-advanced {
+  display: none;
   padding: 9px 14px;
 }
 
@@ -825,6 +929,20 @@
   #huf-enhanced-chat-widget .huf-chat-bubble {
     max-width: 94%;
   }
+
+  #huf-enhanced-chat-widget .huf-chat-session-item {
+    flex-basis: 154px;
+  }
+
+  .huf-chat-agent-strip {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .huf-chat-agent-strip select {
+    flex: 0 0 auto;
+    width: 100%;
+  }
 }
 
 .huf-chat-agent-strip,
@@ -832,10 +950,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 8px 14px;
+  gap: 10px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--huf-chat-border, #d9e2ef);
-  background: rgba(248, 250, 252, 0.92);
+  background: #fbfdff;
 }
 .huf-chat-agent-strip label,
 .huf-page-agent-strip label {
@@ -859,11 +977,11 @@
 .huf-chat-agent-strip select,
 .huf-page-agent-strip select {
   min-width: 0;
-  flex: 0 0 190px;
+  flex: 0 0 176px;
   border: 1px solid var(--huf-chat-border, #d9e2ef);
-  border-radius: 8px;
+  border-radius: 10px;
   background: #fff;
   color: var(--huf-chat-text, #0f172a);
-  padding: 6px 8px;
+  padding: 7px 9px;
   font-size: 13px;
 }

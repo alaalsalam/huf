@@ -29,6 +29,10 @@
     selectedAgent: null,
     showAllSuggestions: false,
     homeShowAllSuggestions: false,
+    sessions: [],
+    sessionsLoaded: false,
+    loadingSessions: false,
+    sessionsOpen: false,
   };
 
   function isDesk() {
@@ -241,6 +245,7 @@
     root.querySelector(".huf-chat-launch")?.setAttribute("aria-expanded", String(open));
     if (open) {
       if (!state.messagesLoaded) loadInitialMessages(root);
+      loadSessions(root);
       setTimeout(() => root.querySelector("[data-composer]")?.focus(), 120);
     }
   }
@@ -248,6 +253,92 @@
   function scrollToBottom(root) {
     const list = root.querySelector("[data-chat-list]");
     if (list) list.scrollTop = list.scrollHeight;
+  }
+
+  function normalizeMessageRole(role) {
+    return ["agent", "assistant"].includes(String(role || "").toLowerCase()) ? "assistant" : "user";
+  }
+
+  function sessionTitle(row) {
+    return row?.title || row?.agent || label("untitled_chat", "محادثة");
+  }
+
+  function formatSessionDate(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value).slice(0, 16);
+    return date.toLocaleString(isArabic(state.config) ? "ar" : undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  function renderSessions(root) {
+    const list = root.querySelector("[data-session-list]");
+    if (!list) return;
+    if (state.loadingSessions) {
+      list.innerHTML = `<div class="huf-chat-session-empty">${escapeHtml(label("loading", "جاري التحميل..."))}</div>`;
+      return;
+    }
+    if (!state.sessions.length) {
+      list.innerHTML = `<div class="huf-chat-session-empty">${escapeHtml(label("no_previous_chats", "لا توجد محادثات سابقة بعد."))}</div>`;
+      return;
+    }
+    list.innerHTML = state.sessions.map((row) => `
+      <button type="button" class="huf-chat-session-item ${row.name === state.sessionId ? "active" : ""}" data-session-id="${escapeAttr(row.name)}">
+        <strong>${escapeHtml(sessionTitle(row))}</strong>
+        <span>${escapeHtml(formatSessionDate(row.last_activity || row.creation))}</span>
+        ${row.total_messages ? `<em>${escapeHtml(String(row.total_messages))}</em>` : ""}
+      </button>
+    `).join("");
+  }
+
+  async function loadSessions(root, force) {
+    if (state.sessionsLoaded && !force) {
+      renderSessions(root);
+      return;
+    }
+    state.loadingSessions = true;
+    renderSessions(root);
+    try {
+      const res = await call("get_sessions", { limit: 12 });
+      state.sessions = Array.isArray(res.sessions) ? res.sessions : [];
+      state.sessionsLoaded = true;
+    } catch (err) {
+      console.error(err);
+      state.sessions = [];
+    } finally {
+      state.loadingSessions = false;
+      renderSessions(root);
+    }
+  }
+
+  async function loadSession(root, sessionId) {
+    if (!sessionId || state.sending) return;
+    const list = root.querySelector("[data-chat-list]");
+    try {
+      state.sessionId = sessionId;
+      state.messagesLoaded = true;
+      if (list) list.innerHTML = `<div class="huf-chat-loading-inline">${escapeHtml(label("loading", "جاري التحميل..."))}</div>`;
+      renderSessions(root);
+      const res = await call("get_messages", { session_id: sessionId, limit: 50 });
+      const messages = Array.isArray(res.messages) ? res.messages : [];
+      if (list) list.innerHTML = "";
+      messages.forEach((msg) => addMessage(root, normalizeMessageRole(msg.role), msg.content || "", {
+        message_id: msg.name,
+        debug_available: res.debug_available || state.config?.debug_available,
+      }));
+      if (!messages.length) ensureEmptyState(root);
+      state.sessionsOpen = false;
+      root.classList.remove("show-sessions");
+      root.querySelector("[data-composer]")?.focus();
+    } catch (err) {
+      console.error(err);
+      if (list) list.innerHTML = "";
+      showError(root);
+    }
   }
 
   function removeEmptyState(root) {
@@ -342,6 +433,7 @@
       root.querySelector("[data-chat-list]").innerHTML = "";
       state.lastAssistantMeta = null;
       ensureEmptyState(root);
+      loadSessions(root, true);
       root.querySelector("[data-composer]")?.focus();
     } catch (err) {
       console.error(err);
@@ -368,6 +460,7 @@
       if (res.requires_confirmation) {
         addMessage(root, "assistant", `يتطلب هذا الطلب تأكيدًا قبل التنفيذ: ${res.confirmation?.summary || "إجراء حساس"}`, res);
       }
+      loadSessions(root, true);
       state.lastFailedText = "";
     } catch (err) {
       console.error(err);
@@ -434,11 +527,21 @@
             </div>
           </div>
           <div class="huf-chat-actions">
+            <button type="button" data-toggle-sessions title="${escapeAttr(label("previous_chats", "المحادثات السابقة"))}" aria-label="${escapeAttr(label("previous_chats", "المحادثات السابقة"))}">☰</button>
             <button type="button" data-new-chat title="${escapeAttr(label("new_chat", "محادثة جديدة"))}">＋</button>
             <a href="/app/huf-chat" title="${escapeAttr(label("expand", "فتح الصفحة الكاملة"))}" aria-label="${escapeAttr(label("expand", "فتح الصفحة الكاملة"))}">↗</a>
             <button type="button" data-close title="${escapeAttr(label("close", "إغلاق"))}">×</button>
           </div>
         </header>
+        <section class="huf-chat-session-dock" data-session-dock>
+          <div class="huf-chat-session-dock-head">
+            <strong>${escapeHtml(label("previous_chats", "المحادثات السابقة"))}</strong>
+            <button type="button" data-new-chat>${escapeHtml(label("new_chat", "محادثة جديدة"))}</button>
+          </div>
+          <div class="huf-chat-session-list" data-session-list>
+            <div class="huf-chat-session-empty">${escapeHtml(label("loading", "جاري التحميل..."))}</div>
+          </div>
+        </section>
         ${config.can_select_agent && Array.isArray(config.agents) && config.agents.length ? `
           <section class="huf-chat-agent-strip">
             <div class="huf-chat-agent-copy">
@@ -487,6 +590,9 @@
         const description = root.querySelector("[data-agent-description]");
         if (description) description.textContent = agentDescription();
         ensureEmptyState(root);
+        state.sessionsOpen = false;
+        root.classList.remove("show-sessions");
+        loadSessions(root, true);
         root.querySelector("[data-composer]")?.focus();
         window.frappe?.show_alert?.({ message: `${label("agent_changed", "تم بدء محادثة جديدة مع")} ${agentSelector.options[agentSelector.selectedIndex]?.text || ""}`, indicator: "blue" }, 4);
       });
@@ -495,7 +601,9 @@
     }
     root.querySelector(".huf-chat-launch").addEventListener("click", () => setOpen(root, !state.open));
     root.querySelector("[data-close]").addEventListener("click", () => setOpen(root, false));
-    root.querySelector("[data-new-chat]").addEventListener("click", () => startNew(root));
+    root.querySelectorAll("[data-new-chat]").forEach((button) => {
+      button.addEventListener("click", () => startNew(root));
+    });
     root.querySelector("[data-send]").addEventListener("click", () => send(root, composer.value));
     composer.addEventListener("input", () => {
       autoGrow(composer);
@@ -508,6 +616,18 @@
       }
     });
     root.addEventListener("click", (event) => {
+      const toggleSessions = event.target.closest("[data-toggle-sessions]");
+      if (toggleSessions) {
+        state.sessionsOpen = !state.sessionsOpen;
+        root.classList.toggle("show-sessions", state.sessionsOpen);
+        if (state.sessionsOpen) loadSessions(root, true);
+        return;
+      }
+      const sessionButton = event.target.closest("[data-session-id]");
+      if (sessionButton) {
+        loadSession(root, sessionButton.dataset.sessionId);
+        return;
+      }
       const editPrompt = event.target.closest("[data-edit-prompt]");
       if (editPrompt) {
         composer.value = editPrompt.dataset.editPrompt || "";
