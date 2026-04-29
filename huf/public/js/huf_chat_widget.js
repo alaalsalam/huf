@@ -557,11 +557,6 @@
           <div class="huf-chat-debug-head">${escapeHtml(label("details", "التفاصيل"))}</div>
           <pre data-debug-output></pre>
         </section>
-        ${config.can_select_agent || config.can_select_model ? `
-          <details class="huf-chat-advanced">
-            <summary>${escapeHtml(label("advanced", "خيارات متقدمة"))}</summary>
-            <p>${escapeHtml(label("advanced_hint", "سيتم استخدام الوكيل والنموذج الافتراضيين ما لم يتم تحديد غير ذلك من الإعدادات."))}</p>
-          </details>` : ""}
         <footer class="huf-chat-composer">
           <div class="huf-chat-composer-row">
             <textarea data-composer rows="1" placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>

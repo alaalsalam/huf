@@ -28,10 +28,10 @@ add_to_apps_screen = [
 
 # include js, css files in header of desk.html
 app_include_css = [
-    "/assets/huf/css/huf_chat_widget.css?v=20260428-native-v03",
+    "/assets/huf/css/huf_chat_widget.css?v=20260429-drawer-v02",
 ]
 app_include_js = [
-    "/assets/huf/js/huf_chat_widget.js?v=20260428-native-v03",
+    "/assets/huf/js/huf_chat_widget.js?v=20260429-drawer-v02",
 ]
 
 # include js, css files in header of web template
