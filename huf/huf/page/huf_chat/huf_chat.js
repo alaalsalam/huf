@@ -1,7 +1,7 @@
 frappe.pages["huf-chat"].on_page_load = function (wrapper) {
   const page = frappe.ui.make_app_page({
     parent: wrapper,
-    title: "HUF Assistant",
+    title: "Trilogy Assistant",
     single_column: true,
   });
 
@@ -317,7 +317,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
       renderSessions();
     } catch (err) {
       console.error(err);
-      frappe.show_alert({ message: __("Unable to load HUF sessions"), indicator: "red" });
+      frappe.show_alert({ message: __("Unable to load Trilogy sessions"), indicator: "red" });
     }
   }
 
@@ -341,7 +341,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
 
   async function newSession() {
     try {
-      const res = await call("new_session", { title: state.config?.default_title || "HUF Assistant", ...selectedAgentArg() });
+      const res = await call("new_session", { title: state.config?.default_title || "Trilogy Assistant", ...selectedAgentArg() });
       state.sessionId = res.session_id || res.name;
       $root.find("[data-message-list]").empty();
       ensureEmptyState();
@@ -438,7 +438,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
 
   function render() {
     const rtl = state.config?.rtl || String(state.config?.language || frappe.boot.lang || "").startsWith("ar");
-    page.set_title(label("title", "مساعد HUF الذكي"));
+    page.set_title(label("title", "مساعد Trilogy الذكي"));
     $root.html(`
       <div class="huf-page-shell" dir="${rtl ? "rtl" : "ltr"}">
         <aside class="huf-page-sidebar">
@@ -451,7 +451,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
         <main class="huf-page-main">
           <header class="huf-page-header">
             <div>
-              <strong>${escapeHtml(label("title", "مساعد HUF الذكي"))}</strong>
+              <strong>${escapeHtml(label("title", "مساعد Trilogy الذكي"))}</strong>
               <span>${escapeHtml(label("subtitle", "اسأل عن المبيعات، المخزون، الفواتير، أو المهام"))}</span>
             </div>
             <div class="huf-page-header-actions">
@@ -473,7 +473,7 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
           <section class="huf-page-message-list" data-message-list></section>
           <footer class="huf-page-composer">
             <div class="huf-page-composer-row">
-              <textarea rows="1" data-composer placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>
+              <textarea rows="1" data-composer placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask Trilogy Assistant…"))}"></textarea>
               <button type="button" data-send disabled>${escapeHtml(label("send", "إرسال"))}</button>
             </div>
             <div class="huf-page-composer-hint">${escapeHtml(label("composer_hint", "مثال: اعرض مبيعات هذا الشهر أو لخص حالة المخزون"))}</div>
@@ -550,8 +550,8 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
   function injectStyles() {
     if (document.getElementById("huf-chat-page-polish-style")) return;
     $("<style id='huf-chat-page-polish-style'>").text(`
-      .huf-chat-workspace-page{--huf-chat-bg:#f6f8fb;--huf-chat-surface:#fff;--huf-chat-border:#dce4ef;--huf-chat-text:#172033;--huf-chat-muted:#66758c;--huf-chat-primary:#1f6feb;--huf-chat-primary-soft:#eaf2ff;--huf-chat-radius:14px;--huf-chat-shadow:0 20px 60px rgba(21,32,52,.14);color:var(--huf-chat-text)}
-      .huf-page-shell{display:grid;grid-template-columns:280px minmax(0,1fr) 340px;gap:14px;height:calc(100vh - 134px);min-height:560px}
+      .huf-chat-workspace-page{font-family:inherit;--huf-chat-bg:#f6f8fb;--huf-chat-surface:#fff;--huf-chat-border:#dce4ef;--huf-chat-text:#172033;--huf-chat-muted:#66758c;--huf-chat-primary:#1f6feb;--huf-chat-primary-soft:#eaf2ff;--huf-chat-radius:14px;--huf-chat-shadow:0 20px 60px rgba(21,32,52,.14);color:var(--huf-chat-text)}
+      .huf-chat-workspace-page *,.huf-chat-workspace-page button,.huf-chat-workspace-page input,.huf-chat-workspace-page textarea,.huf-chat-workspace-page select{font-family:inherit!important}.huf-page-shell{display:grid;grid-template-columns:280px minmax(0,1fr) 340px;gap:14px;height:calc(100vh - 134px);min-height:560px}
       .huf-page-sidebar,.huf-page-main,.huf-page-debug{overflow:hidden;border:1px solid var(--huf-chat-border);border-radius:var(--huf-chat-radius);background:var(--huf-chat-surface);box-shadow:0 1px 2px rgba(16,24,40,.03)}
       .huf-page-sidebar{display:flex;flex-direction:column;padding:12px}.huf-page-new{height:38px;border:0;border-radius:10px;background:var(--huf-chat-primary);color:#fff;font-weight:800}.huf-page-search{margin:10px 0}.huf-page-search input{width:100%;height:36px;border:1px solid var(--huf-chat-border);border-radius:10px;padding:0 10px}
       .huf-page-session-list{overflow:auto}.huf-page-session{display:block;width:100%;margin:0 0 8px;border:1px solid var(--huf-chat-border);border-radius:11px;background:#fff;padding:10px;text-align:inherit;cursor:pointer}.huf-page-session.active{border-color:#aac5fa;background:var(--huf-chat-primary-soft)}.huf-page-session strong,.huf-page-session span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.huf-page-session strong{font-size:13px}.huf-page-session span,.huf-page-sidebar-empty{margin-top:4px;color:var(--huf-chat-muted);font-size:11px}
@@ -580,6 +580,10 @@ frappe.pages["huf-chat"].on_page_load = function (wrapper) {
         suggested_prompts: DEFAULT_PROMPTS,
       };
       state.selectedAgent = null;
+    }
+    if (!state.config?.enabled && !state.config?.enable_chat_widget) {
+      $root.empty();
+      return;
     }
     render();
     bind();

@@ -428,7 +428,7 @@
 
   async function startNew(root) {
     try {
-      const res = await call("new_session", { title: state.config?.default_title || "HUF Assistant", ...selectedAgentArg() });
+      const res = await call("new_session", { title: state.config?.default_title || "Trilogy Assistant", ...selectedAgentArg() });
       state.sessionId = res.session_id || res.name || null;
       root.querySelector("[data-chat-list]").innerHTML = "";
       state.lastAssistantMeta = null;
@@ -511,18 +511,18 @@
     const root = document.createElement("div");
     root.id = WIDGET_ID;
     root.dir = rtl ? "rtl" : "ltr";
-    const launchLabel = rtl ? "مساعد HUF" : "HUF Assistant";
+    const launchLabel = rtl ? "مساعد Trilogy" : "Trilogy Assistant";
     root.innerHTML = `
       <button class="huf-chat-launch" type="button" aria-label="${escapeAttr(launchLabel)}" aria-expanded="false" title="${escapeAttr(launchLabel)}">
         <span class="huf-launch-icon" aria-hidden="true">AI</span>
         <span class="huf-launch-tip">${escapeHtml(launchLabel)}</span>
       </button>
-      <aside class="huf-chat-panel" aria-label="${escapeAttr(label("title", "مساعد HUF الذكي"))}">
+      <aside class="huf-chat-panel" aria-label="${escapeAttr(label("title", "مساعد Trilogy الذكي"))}">
         <header class="huf-chat-header">
           <div class="huf-chat-title-wrap">
             <span class="huf-chat-avatar" aria-hidden="true">AI</span>
             <div>
-              <strong>${escapeHtml(label("title", "مساعد HUF الذكي"))}</strong>
+              <strong>${escapeHtml(label("title", "مساعد Trilogy الذكي"))}</strong>
               <small>${escapeHtml(label("subtitle", "اسأل عن المبيعات، المخزون، الفواتير، أو المهام"))}</small>
             </div>
           </div>
@@ -559,7 +559,7 @@
         </section>
         <footer class="huf-chat-composer">
           <div class="huf-chat-composer-row">
-            <textarea data-composer rows="1" placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>
+            <textarea data-composer rows="1" placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask Trilogy Assistant…"))}"></textarea>
             <button type="button" data-send disabled title="${escapeAttr(label("send", "إرسال"))}" aria-label="${escapeAttr(label("send", "إرسال"))}">➤</button>
           </div>
           <div class="huf-chat-composer-hint">${escapeHtml(label("composer_hint", "مثال: اعرض مبيعات هذا الشهر أو لخص حالة المخزون"))}</div>
@@ -678,12 +678,12 @@
       <div class="huf-home-card-head">
         <span class="huf-home-card-icon" aria-hidden="true">AI</span>
         <div>
-          <strong>${escapeHtml(label("title", "مساعد HUF الذكي"))}</strong>
+          <strong>${escapeHtml(label("title", "مساعد Trilogy الذكي"))}</strong>
           <p>${escapeHtml(label("subtitle", "اسأل عن المبيعات، المخزون، الفواتير، العملاء، أو المهام"))}</p>
         </div>
       </div>
       <div class="huf-home-card-composer">
-        <textarea rows="2" data-home-input placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask HUF Assistant…"))}"></textarea>
+        <textarea rows="2" data-home-input placeholder="${escapeAttr(label("placeholder", rtl ? "اكتب سؤالك هنا…" : "Ask Trilogy Assistant…"))}"></textarea>
         <button type="button" data-home-send>${escapeHtml(label("send", "إرسال"))}</button>
       </div>
       ${renderSuggestionArea(state.homeShowAllSuggestions, "data-home-prompt", "data-home-more-prompts")}
@@ -748,7 +748,7 @@
       state.config = await call("get_ui_config", {});
       state.selectedAgent = state.config?.default_agent || null;
     } catch (err) {
-      console.warn("HUF chat config unavailable", err);
+      console.warn("Trilogy chat config unavailable", err);
       return;
     }
     if (!state.config?.enabled && !state.config?.enable_chat_widget) return;

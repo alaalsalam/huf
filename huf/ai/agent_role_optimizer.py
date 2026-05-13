@@ -3,14 +3,14 @@ import frappe
 from huf.ai.safe_erp_tools import SAFE_TOOL_DEFINITIONS, setup_safe_erp_tools
 
 
-SMART_AGENT_NAMES = {"HUF Home Assistant", "HUF Sales Analyst", "HUF Stock Analyst"}
-FAST_AGENT_NAMES = {"HUF Receivables Assistant", "HUF Task Assistant"}
+SMART_AGENT_NAMES = {"Trilogy Home Assistant", "Trilogy Sales Analyst", "Trilogy Stock Analyst"}
+FAST_AGENT_NAMES = {"Trilogy Receivables Assistant", "Trilogy Task Assistant"}
 
 
 SAFE_AGENT_DEFINITIONS = [
     {
-        "name": "HUF Home Assistant",
-        "title": "مساعد HUF",
+        "name": "Trilogy Home Assistant",
+        "title": "مساعد Trilogy",
         "category": "General",
         "description": "مساعد ERP عام آمن للمبيعات والمخزون والفواتير والمهام.",
         "tools": [
@@ -23,28 +23,28 @@ SAFE_AGENT_DEFINITIONS = [
         ],
     },
     {
-        "name": "HUF Sales Analyst",
+        "name": "Trilogy Sales Analyst",
         "title": "محلل المبيعات",
         "category": "Sales",
         "description": "تحليل المبيعات والعملاء والفواتير وأفضل العملاء.",
         "tools": ["huf_sales_summary", "huf_top_customers", "huf_overdue_invoices"],
     },
     {
-        "name": "HUF Stock Analyst",
+        "name": "Trilogy Stock Analyst",
         "title": "محلل المخزون",
         "category": "Stock",
         "description": "تحليل المخزون والمستودعات والأصناف منخفضة الكمية.",
         "tools": ["huf_stock_summary", "huf_low_stock_items"],
     },
     {
-        "name": "HUF Receivables Assistant",
+        "name": "Trilogy Receivables Assistant",
         "title": "مساعد المتأخرات",
         "category": "Finance",
         "description": "متابعة الفواتير المتأخرة والمستحقات واقتراحات التحصيل.",
         "tools": ["huf_overdue_invoices", "huf_top_customers", "huf_create_followup_task_request"],
     },
     {
-        "name": "HUF Task Assistant",
+        "name": "Trilogy Task Assistant",
         "title": "مساعد المهام",
         "category": "Support",
         "description": "تجهيز طلبات مهام المتابعة مع التأكيد قبل أي إنشاء فعلي.",
@@ -54,7 +54,7 @@ SAFE_AGENT_DEFINITIONS = [
 
 
 BASE_PROMPT = """
-أنت {title} داخل Trilogy Ai / HUF على ERPNext.
+أنت {title} داخل Trilogy Ai على ERPNext.
 
 عقد جودة الإجابة:
 - ابدأ بالنتيجة مباشرة. لا تبدأ بعبارات مثل "بالتأكيد" أو "سأقوم الآن".
@@ -129,7 +129,7 @@ def _model_exists(name):
 
 def _pick_provider_models(settings=None):
     provider = frappe.db.exists("AI Provider", "OpenAI") or frappe.db.get_value("AI Provider", {}, "name")
-    current_agent = frappe.db.exists("Agent", "HUF Home Assistant")
+    current_agent = frappe.db.exists("Agent", "Trilogy Home Assistant")
     current_model = frappe.db.get_value("Agent", current_agent, "model") if current_agent else None
     smart = getattr(settings, "preferred_smart_model", None) if settings else None
     fast = getattr(settings, "preferred_fast_model", None) if settings else None
@@ -205,7 +205,7 @@ def sync_default_agent_roles(dry_run=1):
     for definition in SAFE_AGENT_DEFINITIONS:
         report["agents"].append(_upsert_agent(definition, tool_names, provider, _model_for_agent(definition, models, settings), dry_run=dry_run))
     if settings and not dry_run:
-        settings.default_home_agent = "HUF Home Assistant"
+        settings.default_home_agent = "Trilogy Home Assistant"
         if _meta_has("HUF AI Settings", "safe_tool_max_scan_records") and not settings.safe_tool_max_scan_records:
             settings.safe_tool_max_scan_records = 5000
         if _meta_has("HUF AI Settings", "preferred_agent_model") and not settings.preferred_agent_model:

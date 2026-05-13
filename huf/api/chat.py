@@ -24,13 +24,13 @@ SUGGESTED_PROMPT_GROUPS = [
     {"key": "general", "label": "عام", "prompts": ["ماذا أستطيع أن أسأل؟", "ساعدني في تحليل أداء الشركة اليوم"]},
 ]
 SAFE_DEFAULT_AGENT_NAMES = {
-    "HUF Home Assistant",
-    "HUF Sales Analyst",
-    "HUF Stock Analyst",
-    "HUF Receivables Assistant",
-    "HUF Task Assistant",
+    "Trilogy Home Assistant",
+    "Trilogy Sales Analyst",
+    "Trilogy Stock Analyst",
+    "Trilogy Receivables Assistant",
+    "Trilogy Task Assistant",
 }
-SMART_MODEL_AGENT_NAMES = {"HUF Home Assistant", "HUF Sales Analyst", "HUF Stock Analyst"}
+SMART_MODEL_AGENT_NAMES = {"Trilogy Home Assistant", "Trilogy Sales Analyst", "Trilogy Stock Analyst"}
 FRIENDLY_TOOL_ERROR = "لم أتمكن من جلب هذه البيانات الآن بسبب قيود الصلاحيات أو طريقة الاستعلام. يمكنني المحاولة بطريقة أبسط، مثل تحديد الفترة أو المستودع."
 PERMISSION_ERROR_MESSAGE = "لا أملك صلاحية كافية لعرض هذه البيانات حسب صلاحيات حسابك."
 TECHNICAL_ERROR_MARKERS = [
@@ -83,6 +83,28 @@ def _json(value, fallback=None):
         return fallback
 
 
+def _chat_allowed(settings=None):
+    """Allow Desk chat only for administrators / configured AI admin roles."""
+    if frappe.session.user == "Guest":
+        return False
+    if frappe.session.user == "Administrator":
+        return True
+    settings = settings or get_ai_settings()
+    allowed_roles = {"System Manager", "HUF Administrator"}
+    extra_roles = settings.get("chat_allowed_roles") or []
+    if isinstance(extra_roles, str):
+        extra_roles = _json(extra_roles, []) or []
+    allowed_roles.update(str(role) for role in extra_roles if role)
+    user_roles = set(frappe.get_roles(frappe.session.user))
+    return bool(allowed_roles.intersection(user_roles))
+
+
+def _require_chat_access(settings=None):
+    _require_login()
+    if not _chat_allowed(settings):
+        frappe.throw(_("Not permitted"), frappe.PermissionError)
+
+
 def _is_admin_or_debug(settings=None):
     settings = settings or get_ai_settings()
     roles = set(settings.get("debug_roles") or ["System Manager", "HUF Administrator"])
@@ -110,8 +132,8 @@ def _get_default_agent(settings=None):
     for key in ("default_home_agent", "default_agent"):
         if settings.get(key) and frappe.db.exists("Agent", settings.get(key)):
             return settings.get(key)
-    if frappe.db.exists("Agent", "HUF Home Assistant"):
-        return "HUF Home Assistant"
+    if frappe.db.exists("Agent", "Trilogy Home Assistant"):
+        return "Trilogy Home Assistant"
     filters = {}
     try:
         if frappe.get_meta("Agent").has_field("is_active"):
@@ -122,7 +144,7 @@ def _get_default_agent(settings=None):
     if not rows and filters:
         rows = frappe.get_list("Agent", fields=["name"], order_by="modified desc", limit_page_length=1)
     if not rows:
-        frappe.throw(_("No HUF Agent is configured"))
+        frappe.throw(_("No Trilogy Agent is configured"))
     return rows[0].name
 
 
@@ -175,11 +197,11 @@ def _select_agent(agent=None, settings=None):
 
 def _agent_category(agent_doc):
     exact = {
-        "HUF Home Assistant": "General",
-        "HUF Sales Analyst": "Sales",
-        "HUF Stock Analyst": "Stock",
-        "HUF Receivables Assistant": "Finance",
-        "HUF Task Assistant": "Support",
+        "Trilogy Home Assistant": "General",
+        "Trilogy Sales Analyst": "Sales",
+        "Trilogy Stock Analyst": "Stock",
+        "Trilogy Receivables Assistant": "Finance",
+        "Trilogy Task Assistant": "Support",
     }
     if agent_doc.name in exact:
         return exact[agent_doc.name]
@@ -199,18 +221,18 @@ def _agent_category(agent_doc):
 
 def _agent_title(agent_doc):
     titles = {
-        "HUF Home Assistant": "مساعد HUF",
-        "HUF Sales Analyst": "محلل المبيعات",
-        "HUF Stock Analyst": "محلل المخزون",
-        "HUF Receivables Assistant": "مساعد المتأخرات",
-        "HUF Task Assistant": "مساعد المهام",
+        "Trilogy Home Assistant": "مساعد Trilogy",
+        "Trilogy Sales Analyst": "محلل المبيعات",
+        "Trilogy Stock Analyst": "محلل المخزون",
+        "Trilogy Receivables Assistant": "مساعد المتأخرات",
+        "Trilogy Task Assistant": "مساعد المهام",
     }
     return titles.get(agent_doc.name) or titles.get(agent_doc.agent_name) or agent_doc.agent_name or agent_doc.name
 
 
 @frappe.whitelist()
 def get_available_agents():
-    _require_login()
+    _require_chat_access(get_ai_settings())
     settings = get_ai_settings()
     default_agent = _get_default_agent(settings)
     # Agent names/descriptions are UI configuration, not ERP business data.
@@ -248,7 +270,7 @@ def get_available_agents():
 
 @frappe.whitelist()
 def optimize_agent_roles(dry_run=1):
-    _require_login()
+    _require_chat_access(get_ai_settings())
     if not _is_admin_or_debug(get_ai_settings()):
         frappe.throw(_("Not permitted"), frappe.PermissionError)
     from huf.ai.agent_role_optimizer import sync_default_agent_roles
@@ -361,9 +383,9 @@ def _format_prompt(message, ctx, settings=None):
     advanced_note = ""
     if mode != "Advanced ERP Query":
         advanced_note = """
-لا تستخدم SQL خام ولا تطلب من أي أداة توليد SQL. استخدم أدوات HUF الأصلية الآمنة فقط إن كانت متاحة، وإن لم تتوفر البيانات فاطلب تحديد الفترة أو المستودع أو نوع المستند.
+لا تستخدم SQL خام ولا تطلب من أي أداة توليد SQL. استخدم أدوات Trilogy الآمنة فقط إن كانت متاحة، وإن لم تتوفر البيانات فاطلب تحديد الفترة أو المستودع أو نوع المستند.
 """
-    return f"""أجب كمسؤول ERP ذكي ومختصر. إذا كان سؤال المستخدم عربياً فأجب بعربية أعمال طبيعية. لا تخترع أرقاماً أو سجلات. استخدم مسار HUF Agent الأصلي وأدواته الآمنة فقط عند الحاجة.
+    return f"""أجب كمسؤول ERP ذكي ومختصر. إذا كان سؤال المستخدم عربياً فأجب بعربية أعمال طبيعية. لا تخترع أرقاماً أو سجلات. استخدم مسار Trilogy Agent الأصلي وأدواته الآمنة فقط عند الحاجة.
 وضع التنفيذ الحالي: {mode}.
 مستوى التفصيل المطلوب افتراضياً: {verbosity}.
 {advanced_note}
@@ -445,7 +467,7 @@ def _looks_model_error(content):
 
 @frappe.whitelist()
 def new_session(agent=None, model=None, title=None):
-    _require_login()
+    _require_chat_access(get_ai_settings())
     agent_doc = _select_agent(agent, get_ai_settings())
     cm = ConversationManager(agent_name=agent_doc.name, channel="Desk Chat", external_id=frappe.session.user)
     conv = cm.create_new_conversation(title=title or "Trilogy Ai Chat")
@@ -460,7 +482,7 @@ def get_ui_config():
     language = getattr(frappe.local, "lang", None) or "en"
     rtl = str(language).startswith("ar")
     labels = {
-        "title": "مساعد HUF الذكي" if rtl else "HUF Assistant",
+        "title": "مساعد Trilogy الذكي" if rtl else "Trilogy Assistant",
         "subtitle": "اسأل عن المبيعات، المخزون، الفواتير، أو المهام" if rtl else "Ask about sales, stock, invoices, or tasks",
         "empty_title": "كيف أستطيع مساعدتك؟" if rtl else "How can I help?",
         "empty_text": "اسألني عن بيانات ERPNext أو اطلب تلخيصًا أو إجراءً آمنًا." if rtl else "Ask about ERPNext data, summaries, or safe actions.",
@@ -471,14 +493,14 @@ def get_ui_config():
         "expand": "فتح الصفحة الكاملة" if rtl else "Open full page",
         "advanced": "خيارات متقدمة" if rtl else "Advanced Options",
         "agent": "الوكيل" if rtl else "Agent",
-        "default_agent_label": "مساعد HUF" if rtl else "HUF Assistant",
+        "default_agent_label": "مساعد Trilogy" if rtl else "Trilogy Assistant",
         "advanced_hint": "سيتم استخدام الوكيل والنموذج الافتراضيين ما لم يتم تحديد غير ذلك من الإعدادات." if rtl else "The default agent and model will be used unless configured otherwise.",
         "show_details": "إظهار التفاصيل" if rtl else "Show Details",
         "hide_details": "إخفاء التفاصيل" if rtl else "Hide Details",
         "details": "التفاصيل" if rtl else "Details",
         "thinking": "جاري التفكير..." if rtl else "Thinking...",
         "feedback_saved": "تم تسجيل ملاحظتك" if rtl else "Feedback saved",
-        "placeholder": "اكتب سؤالك هنا…" if rtl else "Ask HUF Assistant…",
+        "placeholder": "اكتب سؤالك هنا…" if rtl else "Ask Trilogy Assistant…",
         "composer_hint": "مثال: اعرض مبيعات هذا الشهر أو لخص حالة المخزون" if rtl else "Example: show this month's sales or summarize inventory",
         "more_prompts": "عرض المزيد" if rtl else "Show more",
         "less_prompts": "عرض أقل" if rtl else "Show less",
@@ -517,6 +539,23 @@ def get_ui_config():
             "labels": labels,
         }
     settings = get_ai_settings()
+    if not _chat_allowed(settings):
+        return {
+            "enabled": False,
+            "enable_chat_widget": False,
+            "show_home_chat": False,
+            "debug_available": False,
+            "rtl": rtl,
+            "language": language,
+            "suggested_prompts": [],
+            "suggested_prompt_groups": [],
+            "can_select_agent": False,
+            "can_select_model": False,
+            "default_agent": None,
+            "agents": [],
+            "default_title": labels["title"],
+            "labels": labels,
+        }
     admin_or_debug = _is_admin_or_debug(settings)
     available_agents = get_available_agents()
     return {
@@ -540,7 +579,7 @@ def get_ui_config():
 
 @frappe.whitelist()
 def get_sessions(limit=20):
-    _require_login()
+    _require_chat_access(get_ai_settings())
     filters = {"channel": ["in", ["Desk Chat", "huf_chat"]]}
     if not _is_admin_or_debug(get_ai_settings()):
         filters["external_id"] = frappe.session.user
@@ -550,7 +589,7 @@ def get_sessions(limit=20):
 
 @frappe.whitelist()
 def get_messages(session_id, limit=50):
-    _require_login()
+    _require_chat_access(get_ai_settings())
     if not _owns_conversation(session_id):
         frappe.throw(_("Not permitted"), frappe.PermissionError)
     rows = frappe.get_list("Agent Message", filters={"conversation": session_id}, fields=["name", "role", "content", "kind", "creation", "agent_run", "user"], order_by="conversation_index asc, creation asc", limit_page_length=min(max(int(limit or 50), 1), 200))
@@ -559,7 +598,7 @@ def get_messages(session_id, limit=50):
 
 @frappe.whitelist()
 def delete_session(session_id):
-    _require_login()
+    _require_chat_access(get_ai_settings())
     if not _owns_conversation(session_id):
         frappe.throw(_("Not permitted"), frappe.PermissionError)
     frappe.db.set_value("Agent Conversation", session_id, "is_active", 0)
@@ -569,9 +608,9 @@ def delete_session(session_id):
 
 @frappe.whitelist()
 def send_message(message, session_id=None, agent=None, model=None, doctype=None, docname=None, metadata=None, confirm_action_id=None):
-    _require_login()
     start = time.time()
     settings = get_ai_settings()
+    _require_chat_access(settings)
     metadata = _json(metadata, {}) or {}
     if confirm_action_id:
         confirmation = confirm_pending_action(confirm_action_id)
@@ -640,7 +679,7 @@ def send_message(message, session_id=None, agent=None, model=None, doctype=None,
 
 @frappe.whitelist()
 def get_debug_trace(session_id=None, message_id=None, run_id=None):
-    _require_login()
+    _require_chat_access(get_ai_settings())
     if not _debug_allowed(get_ai_settings()):
         frappe.throw(_("Debug trace is not available for this user"), frappe.PermissionError)
     filters = {}
@@ -656,7 +695,7 @@ def get_debug_trace(session_id=None, message_id=None, run_id=None):
 
 @frappe.whitelist()
 def submit_feedback(message_id, rating, comment=None):
-    _require_login()
+    _require_chat_access(get_ai_settings())
     if not message_id or not frappe.db.exists("Agent Message", message_id):
         frappe.throw(_("Message not found"))
     msg = frappe.get_doc("Agent Message", message_id)

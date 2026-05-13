@@ -203,12 +203,12 @@ def has_capability(user: str | None, capability: str) -> bool:
 
 def check_app_permission() -> bool:
 	"""
-	Frappe hook: controls whether the Huf tile appears in the Apps page.
+	Frappe hook: controls whether the TrilogyAi tile appears in the Apps page.
 
-	Allows access if the user:
+	Allows access only if the user:
 	  - is Administrator, OR
 	  - has System Manager role, OR
-	  - has an active Huf User Role record.
+	  - has HUF Administrator role.
 	"""
 	user = frappe.session.user
 
@@ -218,7 +218,7 @@ def check_app_permission() -> bool:
 	if _is_system_manager(user):
 		return True
 
-	return bool(get_user_huf_role(user))
+	return "HUF Administrator" in frappe.get_roles(user)
 
 
 # ---------------------------------------------------------------------------

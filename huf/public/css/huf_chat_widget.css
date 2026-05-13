@@ -9,7 +9,16 @@
   --huf-chat-radius: 16px;
   --huf-chat-shadow: 0 24px 70px rgba(21, 32, 52, 0.22);
   color: var(--huf-chat-text);
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-family: inherit;
+}
+
+#huf-enhanced-chat-widget,
+#huf-enhanced-chat-widget *,
+#huf-enhanced-chat-widget button,
+#huf-enhanced-chat-widget input,
+#huf-enhanced-chat-widget textarea,
+#huf-enhanced-chat-widget select {
+  font-family: inherit !important;
 }
 
 #huf-enhanced-chat-widget * {
@@ -53,7 +62,16 @@
   box-shadow: 0 14px 34px rgba(16, 24, 40, 0.08);
   color: var(--huf-chat-text);
   padding: 16px;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-family: inherit;
+}
+
+#huf-home-chat-card,
+#huf-home-chat-card *,
+#huf-home-chat-card button,
+#huf-home-chat-card input,
+#huf-home-chat-card textarea,
+#huf-home-chat-card select {
+  font-family: inherit !important;
 }
 
 #huf-home-chat-card * {
