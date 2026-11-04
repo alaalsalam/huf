@@ -1,0 +1,19 @@
+WARN filelock==3.32.7 needs to be downloaded from a registry
+WARN filelock needs to be downloaded from a registry
+WARN filelock==3.32.6 needs to be downloaded from a registry
+WARN filelock needs to be downloaded from a registry
+trim trailing whitespace.......................................(no files to check)Skipped
+check for merge conflicts..........................................................Passed
+check python ast...................................................................Passed
+check json.....................................................(no files to check)Skipped
+check toml.....................................................(no files to check)Skipped
+check yaml.....................................................(no files to check)Skipped
+debug statements (python)..........................................................Passed
+Run ruff import sorter.............................................................Passed
+Run ruff linter....................................................................Passed
+Run ruff formatter.................................................................Passed
+prettier...........................................................................Passed
+eslint.............................................................................Passed
+Check for explicit frappe.db.commit()..........................(no files to check)Skipped
+Keep workspace/agent working files out of the repo.................................Passed
+Standards guards (file size, UI drift, API calls, whitelist).......................Passed
