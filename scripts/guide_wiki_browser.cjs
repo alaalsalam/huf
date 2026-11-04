@@ -43,6 +43,13 @@ function assert(v, m) {
   if (!v) throw Error(m);
 }
 async function check(name, fn) {
+  if (
+    process.env.GUIDE_SOURCE_FOCUS === "1" &&
+    !name.startsWith("Real Wiki source") &&
+    !name.startsWith("AR mobile") &&
+    !name.startsWith("employee_ar screen")
+  )
+    return;
   try {
     await fn();
     result.cases.push({ name, pass: true });
@@ -80,6 +87,8 @@ async function main() {
       args: ["--no-sandbox"],
     });
     for (const u of users) {
+      if (process.env.GUIDE_SOURCE_FOCUS === "1" && u.persona !== "employee_ar")
+        continue;
       const ctx = await browser.newContext({
         viewport: { width: 1440, height: 1000 },
         locale: u.language,
@@ -213,6 +222,14 @@ async function main() {
         await check(
           "Real Wiki source opens while Desk stays on Customer",
           async () => {
+            await page
+              .locator(".huf-guide-card .huf-guide-source")
+              .first()
+              .waitFor();
+            const before = await page.evaluate(() => ({
+              path: location.pathname,
+              route: frappe.get_route(),
+            }));
             const opened = page.waitForEvent("popup");
             await page
               .locator(".huf-guide-card")
@@ -231,8 +248,14 @@ async function main() {
               ),
               "Wiki reader not rendered"
             );
+            const after = await page.evaluate(() => ({
+              path: location.pathname,
+              route: frappe.get_route(),
+            }));
+            result.source_desk_context = { before, after };
             assert(
-              new URL(page.url()).pathname === "/desk/customer",
+              JSON.stringify(before) === JSON.stringify(after) &&
+                after.route.includes("Customer"),
               "Desk context lost"
             );
             await reader.screenshot({

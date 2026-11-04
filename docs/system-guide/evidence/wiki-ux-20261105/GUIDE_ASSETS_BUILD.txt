@@ -1,0 +1,15 @@
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+File                                                        Size
+
+huf/dist/js/
+└─ huf_guide.bundle.O7F3JEUO.js                             21.11 Kb
+
+huf/dist/css/
+└─ huf_guide.bundle.ZTAHUS52.css                            3.58 Kb
+
+huf/dist/css-rtl/
+└─ huf_guide.bundle.XZURBBTL.css                            3.58 Kb
+
+ DONE  Total Build Time: 599.198ms

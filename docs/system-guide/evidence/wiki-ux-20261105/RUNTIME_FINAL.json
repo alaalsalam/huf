@@ -1,0 +1,27 @@
+{
+  "checked_utc": "2026-11-04T21:47:15.276907+00:00",
+  "site": "dev.mwe-mis.maward.org",
+  "frappe": "16.52.0",
+  "huf": "1.0.0b4",
+  "wiki": "3.2.1",
+  "compendium": "16.2.0",
+  "mode": "guide_only",
+  "search_source": "Wiki",
+  "wiki_spaces": [
+    "crms",
+    "ams"
+  ],
+  "record_checks_enabled": 0,
+  "bindings": 71,
+  "wiki_bindings": 70,
+  "compendium_pages_preserved": 64,
+  "repeat_pending": 0,
+  "owned_users": 0,
+  "owned_contacts": 0,
+  "model_rows": {
+    "AI Provider": 0,
+    "AI Model": 0,
+    "Agent": 0,
+    "Agent Run": 0
+  }
+}

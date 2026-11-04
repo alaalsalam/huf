@@ -1,0 +1,79 @@
+{
+  "started_utc": "2026-11-04T21:45:53.235Z",
+  "site": "dev.mwe-mis.maward.org",
+  "cases": [
+    {
+      "name": "employee_ar screen manual opens automatically and keeps actions",
+      "pass": true
+    },
+    {
+      "name": "Real Wiki source opens while Desk stays on Customer",
+      "pass": true
+    },
+    {
+      "name": "AR mobile panel has no horizontal overflow",
+      "pass": true
+    }
+  ],
+  "external_attempts": [],
+  "asset_errors": [],
+  "page_errors": [],
+  "creation": {
+    "action": "create",
+    "owned_counts": {
+      "User": 3,
+      "Has Role": 3,
+      "DocShare": 3,
+      "Contact Email": 0,
+      "__Auth": 3,
+      "DefaultValue": 3,
+      "__UserSettings": 0
+    },
+    "existing_roles_only": true
+  },
+  "source_desk_context": {
+    "before": {
+      "path": "/desk/selling/customer",
+      "route": [
+        "List",
+        "Customer",
+        "List"
+      ]
+    },
+    "after": {
+      "path": "/desk/selling/customer",
+      "route": [
+        "List",
+        "Customer",
+        "List"
+      ]
+    }
+  },
+  "cleanup": {
+    "action": "cleanup",
+    "owned_counts": {
+      "User": 0,
+      "Has Role": 0,
+      "DocShare": 0,
+      "Contact Email": 0,
+      "__Auth": 0,
+      "DefaultValue": 0,
+      "__UserSettings": 0
+    },
+    "existing_roles_only": true
+  },
+  "cleanup_final": {
+    "action": "cleanup",
+    "owned_counts": {
+      "User": 0,
+      "Has Role": 0,
+      "DocShare": 0,
+      "Contact Email": 0,
+      "__Auth": 0,
+      "DefaultValue": 0,
+      "__UserSettings": 0
+    },
+    "existing_roles_only": true
+  },
+  "finished_utc": "2026-11-04T21:46:48.210Z"
+}

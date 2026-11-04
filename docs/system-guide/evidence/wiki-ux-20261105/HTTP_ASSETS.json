@@ -1,0 +1,16 @@
+[
+  {
+    "asset": "/assets/huf/dist/js/huf_guide.bundle.O7F3JEUO.js",
+    "status": 200,
+    "bytes": 21114,
+    "sha256": "c813dc1d32127afa1665b533317a0a94176ba207bab55ab2702beffa6aa682b9",
+    "matches_disk": true
+  },
+  {
+    "asset": "/assets/huf/dist/css/huf_guide.bundle.ZTAHUS52.css",
+    "status": 200,
+    "bytes": 3578,
+    "sha256": "47ad91700ce4acdc96ebc1ccd458797ccb6eaf79f43055619a5bc5875be2f9d1",
+    "matches_disk": true
+  }
+]

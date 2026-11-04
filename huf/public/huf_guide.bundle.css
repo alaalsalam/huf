@@ -24,6 +24,9 @@
 #huf-guide-panel .huf-guide-article img { max-width: 100%; height: auto; }
 #huf-guide-panel .huf-guide-article table { display: block; max-width: 100%; overflow-x: auto; }
 #huf-guide-panel .huf-guide-article pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+#huf-guide-panel .huf-guide-article h1 { font-size: 20px; line-height: 1.45; }
+#huf-guide-panel .huf-guide-article h2 { font-size: 18px; line-height: 1.45; margin-block: 16px 8px; }
+#huf-guide-panel .huf-guide-article h3 { font-size: 16px; line-height: 1.45; }
 @media (max-width: 600px) {
  #huf-guide-panel { top: 0; bottom: 0; inset-inline: 0; width: 100%; border-radius: 0; padding: 16px; z-index: 1040; }
  #huf-guide-launcher { inset-inline-end: 12px; bottom: 12px; }

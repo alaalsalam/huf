@@ -1,0 +1,591 @@
+{
+  "site": "dev.mwe-mis.maward.org",
+  "applied": {
+    "site": "dev.mwe-mis.maward.org",
+    "source": "Wiki",
+    "apply": true,
+    "updated": 70,
+    "bindings": 70,
+    "articles_copied": 0,
+    "roles_changed": 0,
+    "mapping": [
+      {
+        "binding": "crms-guide-list-subscriber-screen",
+        "screen_type": "List",
+        "screen": "Customer",
+        "wiki_document": "ptfmklpu95",
+        "route": "crms/subscriber-list-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-subscriber-screen",
+        "screen_type": "Form",
+        "screen": "Customer",
+        "wiki_document": "ptlgiggdmd",
+        "route": "crms/subscriber-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-contact-screen",
+        "screen_type": "List",
+        "screen": "Contact",
+        "wiki_document": "ptnr25d4fn",
+        "route": "crms/contact-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-contact-screen",
+        "screen_type": "Form",
+        "screen": "Contact",
+        "wiki_document": "ptnr25d4fn",
+        "route": "crms/contact-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-address-screen",
+        "screen_type": "List",
+        "screen": "Address",
+        "wiki_document": "ptpcrmnihp",
+        "route": "crms/address-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-address-screen",
+        "screen_type": "Form",
+        "screen": "Address",
+        "wiki_document": "ptpcrmnihp",
+        "route": "crms/address-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-duplicate-review-case",
+        "screen_type": "List",
+        "screen": "CRMS Duplicate Review Case",
+        "wiki_document": "ptsrdsel5v",
+        "route": "crms/duplicate-review-case",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-duplicate-review-case",
+        "screen_type": "Form",
+        "screen": "CRMS Duplicate Review Case",
+        "wiki_document": "ptsrdsel5v",
+        "route": "crms/duplicate-review-case",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-customer-relationship-screen",
+        "screen_type": "List",
+        "screen": "CRMS Customer Relationship",
+        "wiki_document": "tuq4l19nmi",
+        "route": "crms/customer-relationship-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-customer-relationship-screen",
+        "screen_type": "Form",
+        "screen": "CRMS Customer Relationship",
+        "wiki_document": "tuq4l19nmi",
+        "route": "crms/customer-relationship-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-utility-customer-account",
+        "screen_type": "List",
+        "screen": "Utility Customer Account",
+        "wiki_document": "rf7dh7hkqg",
+        "route": "crms/utility-customer-account",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-utility-customer-account",
+        "screen_type": "Form",
+        "screen": "Utility Customer Account",
+        "wiki_document": "rf7dh7hkqg",
+        "route": "crms/utility-customer-account",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-service-point-screen",
+        "screen_type": "List",
+        "screen": "Service Point",
+        "wiki_document": "rfcf1l93n7",
+        "route": "crms/service-point-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-service-point-screen",
+        "screen_type": "Form",
+        "screen": "Service Point",
+        "wiki_document": "rfcf1l93n7",
+        "route": "crms/service-point-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-service-subscription",
+        "screen_type": "List",
+        "screen": "Utility Service Subscription",
+        "wiki_document": "rfis00f9fr",
+        "route": "crms/service-subscription",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-service-subscription",
+        "screen_type": "Form",
+        "screen": "Utility Service Subscription",
+        "wiki_document": "rfis00f9fr",
+        "route": "crms/service-subscription",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-service-template-screen",
+        "screen_type": "List",
+        "screen": "Utility Service Template",
+        "wiki_document": "jrou07tpkl",
+        "route": "crms/service-template-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-service-template-screen",
+        "screen_type": "Form",
+        "screen": "Utility Service Template",
+        "wiki_document": "jrou07tpkl",
+        "route": "crms/service-template-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-service-offering-screen",
+        "screen_type": "List",
+        "screen": "Utility Service Offering",
+        "wiki_document": "tushdsvros",
+        "route": "crms/service-offering-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-service-offering-screen",
+        "screen_type": "Form",
+        "screen": "Utility Service Offering",
+        "wiki_document": "tushdsvros",
+        "route": "crms/service-offering-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-service-version-screen",
+        "screen_type": "List",
+        "screen": "Utility Service Version",
+        "wiki_document": "tut6p5gc8h",
+        "route": "crms/service-version-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-service-version-screen",
+        "screen_type": "Form",
+        "screen": "Utility Service Version",
+        "wiki_document": "tut6p5gc8h",
+        "route": "crms/service-version-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-service-availability-screen",
+        "screen_type": "List",
+        "screen": "Utility Service Availability",
+        "wiki_document": "tuvnpofe97",
+        "route": "crms/service-availability-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-service-availability-screen",
+        "screen_type": "Form",
+        "screen": "Utility Service Availability",
+        "wiki_document": "tuvnpofe97",
+        "route": "crms/service-availability-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-fulfillment-plan",
+        "screen_type": "List",
+        "screen": "Service Fulfillment Plan",
+        "wiki_document": "rf31cv6q0o",
+        "route": "crms/fulfillment-plan",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-fulfillment-plan",
+        "screen_type": "Form",
+        "screen": "Service Fulfillment Plan",
+        "wiki_document": "rf31cv6q0o",
+        "route": "crms/fulfillment-plan",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-service-request",
+        "screen_type": "List",
+        "screen": "Utility Service Request",
+        "wiki_document": "reu72msnb4",
+        "route": "crms/service-request",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-service-request",
+        "screen_type": "Form",
+        "screen": "Utility Service Request",
+        "wiki_document": "reu72msnb4",
+        "route": "crms/service-request",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-approved-reading-snapshot",
+        "screen_type": "List",
+        "screen": "CRMS Approved Reading Snapshot",
+        "wiki_document": "rfjbpfcg31",
+        "route": "crms/approved-reading-snapshot",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-approved-reading-snapshot",
+        "screen_type": "Form",
+        "screen": "CRMS Approved Reading Snapshot",
+        "wiki_document": "rfjbpfcg31",
+        "route": "crms/approved-reading-snapshot",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-meter-evidence-reference",
+        "screen_type": "List",
+        "screen": "CRMS Meter Evidence Reference",
+        "wiki_document": "rflarq43bb",
+        "route": "crms/meter-evidence-reference",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-meter-evidence-reference",
+        "screen_type": "Form",
+        "screen": "CRMS Meter Evidence Reference",
+        "wiki_document": "rflarq43bb",
+        "route": "crms/meter-evidence-reference",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-offline-sync-envelope",
+        "screen_type": "List",
+        "screen": "CRMS Offline Sync Envelope",
+        "wiki_document": "rfvlgote40",
+        "route": "crms/offline-sync-envelope",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-offline-sync-envelope",
+        "screen_type": "Form",
+        "screen": "CRMS Offline Sync Envelope",
+        "wiki_document": "rfvlgote40",
+        "route": "crms/offline-sync-envelope",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-reading-exception-dispute",
+        "screen_type": "List",
+        "screen": "CRMS Reading Exception Dispute",
+        "wiki_document": "rg300opook",
+        "route": "crms/reading-exception-dispute",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-reading-exception-dispute",
+        "screen_type": "Form",
+        "screen": "CRMS Reading Exception Dispute",
+        "wiki_document": "rg300opook",
+        "route": "crms/reading-exception-dispute",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-utility-tariff-screen",
+        "screen_type": "List",
+        "screen": "Utility Tariff",
+        "wiki_document": "rg535h9s2e",
+        "route": "crms/utility-tariff-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-utility-tariff-screen",
+        "screen_type": "Form",
+        "screen": "Utility Tariff",
+        "wiki_document": "rg535h9s2e",
+        "route": "crms/utility-tariff-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-billing-run-screen",
+        "screen_type": "List",
+        "screen": "Billing Run",
+        "wiki_document": "rg6uidrd6a",
+        "route": "crms/billing-run-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-billing-run-screen",
+        "screen_type": "Form",
+        "screen": "Billing Run",
+        "wiki_document": "rg6uidrd6a",
+        "route": "crms/billing-run-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-billing-result-screen",
+        "screen_type": "List",
+        "screen": "Billing Result",
+        "wiki_document": "rglst1bhib",
+        "route": "crms/billing-result-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-billing-result-screen",
+        "screen_type": "Form",
+        "screen": "Billing Result",
+        "wiki_document": "rglst1bhib",
+        "route": "crms/billing-result-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-collection-request-screen",
+        "screen_type": "List",
+        "screen": "CRMS Collection Request",
+        "wiki_document": "rh8c6afn9p",
+        "route": "crms/collection-request-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-collection-request-screen",
+        "screen_type": "Form",
+        "screen": "CRMS Collection Request",
+        "wiki_document": "rh8c6afn9p",
+        "route": "crms/collection-request-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-collection-event-screen",
+        "screen_type": "List",
+        "screen": "CRMS Collection Event",
+        "wiki_document": "rhot2jsb2l",
+        "route": "crms/collection-event-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-collection-event-screen",
+        "screen_type": "Form",
+        "screen": "CRMS Collection Event",
+        "wiki_document": "rhot2jsb2l",
+        "route": "crms/collection-event-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-arrears-case-screen",
+        "screen_type": "List",
+        "screen": "CRMS Arrears Case",
+        "wiki_document": "rhbrvvvaln",
+        "route": "crms/arrears-case-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-arrears-case-screen",
+        "screen_type": "Form",
+        "screen": "CRMS Arrears Case",
+        "wiki_document": "rhbrvvvaln",
+        "route": "crms/arrears-case-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-external-record-reference-screen",
+        "screen_type": "List",
+        "screen": "CRMS External Record Reference",
+        "wiki_document": "rhqe75nvra",
+        "route": "crms/external-record-reference-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-external-record-reference-screen",
+        "screen_type": "Form",
+        "screen": "CRMS External Record Reference",
+        "wiki_document": "rhqe75nvra",
+        "route": "crms/external-record-reference-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-migration-batch-screen",
+        "screen_type": "List",
+        "screen": "CRMS Migration Batch",
+        "wiki_document": "ri7d7dh380",
+        "route": "crms/migration-batch-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-migration-batch-screen",
+        "screen_type": "Form",
+        "screen": "CRMS Migration Batch",
+        "wiki_document": "ri7d7dh380",
+        "route": "crms/migration-batch-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-integration-event-screen",
+        "screen_type": "List",
+        "screen": "CRMS Integration Event",
+        "wiki_document": "ri4cnbtf7o",
+        "route": "crms/integration-event-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-integration-event-screen",
+        "screen_type": "Form",
+        "screen": "CRMS Integration Event",
+        "wiki_document": "ri4cnbtf7o",
+        "route": "crms/integration-event-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-d08-certificates",
+        "screen_type": "List",
+        "screen": "CRMS Certified Customer Document",
+        "wiki_document": "vvl3rr2vt8",
+        "route": "crms/d08-certificates",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-d08-certificates",
+        "screen_type": "Form",
+        "screen": "CRMS Certified Customer Document",
+        "wiki_document": "vvl3rr2vt8",
+        "route": "crms/d08-certificates",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-d08-installments",
+        "screen_type": "List",
+        "screen": "CRMS Installment Agreement",
+        "wiki_document": "nnde7uco4h",
+        "route": "crms/d08-installments",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-d08-installments",
+        "screen_type": "Form",
+        "screen": "CRMS Installment Agreement",
+        "wiki_document": "nnde7uco4h",
+        "route": "crms/d08-installments",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-list-d08-billing-disputes",
+        "screen_type": "List",
+        "screen": "Billing Adjustment Request",
+        "wiki_document": "nn5skfvr51",
+        "route": "crms/d08-billing-disputes",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-form-d08-billing-disputes",
+        "screen_type": "Form",
+        "screen": "Billing Adjustment Request",
+        "wiki_document": "nn5skfvr51",
+        "route": "crms/d08-billing-disputes",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-workspace-crms-control-center",
+        "screen_type": "Workspace",
+        "screen": "CRMS Control Center",
+        "wiki_document": "989i8hvcmv",
+        "route": "crms/guide-home",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-workspace-subscriber-management",
+        "screen_type": "Workspace",
+        "screen": "Subscriber Management",
+        "wiki_document": "98ccoasuvn",
+        "route": "crms/subscriber-identity",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-workspace-service-catalogue",
+        "screen_type": "Workspace",
+        "screen": "Service Catalogue",
+        "wiki_document": "1ue112g2o4",
+        "route": "crms/service-catalogue-workspace",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-workspace-billing-and-collection",
+        "screen_type": "Workspace",
+        "screen": "Billing and Collection",
+        "wiki_document": "2pphg9o9iv",
+        "route": "crms/billing-screens",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-workspace-crms-technical-administration",
+        "screen_type": "Workspace",
+        "screen": "CRMS Technical Administration",
+        "wiki_document": "ri4cnbtf7o",
+        "route": "crms/integration-event-screen",
+        "priority": 100
+      },
+      {
+        "binding": "crms-guide-extra-register-new-subscriber",
+        "screen_type": "List",
+        "screen": "Customer",
+        "wiki_document": "vh07u5t0sk",
+        "route": "crms/d01-s01-new-customer-registration",
+        "priority": 5
+      },
+      {
+        "binding": "crms-guide-extra-customer-360-screen",
+        "screen_type": "Form",
+        "screen": "Customer",
+        "wiki_document": "pttrcnq667",
+        "route": "crms/customer-360-screen",
+        "priority": 5
+      },
+      {
+        "binding": "crms-guide-extra-d08-account-lifecycle",
+        "screen_type": "Form",
+        "screen": "Utility Service Request",
+        "wiki_document": "nn1rotibev",
+        "route": "crms/d08-account-lifecycle",
+        "priority": 2
+      },
+      {
+        "binding": "crms-guide-extra-new-connection-screens",
+        "screen_type": "Form",
+        "screen": "Utility Service Request",
+        "wiki_document": "2pn7a49ioh",
+        "route": "crms/new-connection-screens",
+        "priority": 3
+      },
+      {
+        "binding": "crms-guide-extra-publish-service-version",
+        "screen_type": "Form",
+        "screen": "Utility Service Version",
+        "wiki_document": "1uafj57v10",
+        "route": "crms/publish-service-version",
+        "priority": 5
+      }
+    ]
+  },
+  "repeat_pending": 0,
+  "settings_preserved": [
+    "enabled",
+    "mode",
+    "record_checks_enabled",
+    "default_language",
+    "support_channel",
+    "guide_only_install"
+  ],
+  "mode": "guide_only",
+  "record_checks_enabled": 0,
+  "wiki_spaces": [
+    "crms",
+    "ams"
+  ],
+  "articles_copied": 0,
+  "roles_changed": 0
+}

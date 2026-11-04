@@ -1,0 +1,25 @@
+WARN filelock==3.32.7 needs to be downloaded from a registry
+WARN filelock needs to be downloaded from a registry
+WARN filelock==3.32.6 needs to be downloaded from a registry
+WARN filelock needs to be downloaded from a registry
+trim trailing whitespace...........................................................Passed
+check for merge conflicts..........................................................Passed
+check python ast...............................................(no files to check)Skipped
+check json.....................................................(no files to check)Skipped
+check toml.....................................................(no files to check)Skipped
+check yaml.....................................................(no files to check)Skipped
+debug statements (python)......................................(no files to check)Skipped
+Run ruff import sorter.........................................(no files to check)Skipped
+Run ruff linter................................................(no files to check)Skipped
+Run ruff formatter.............................................(no files to check)Skipped
+prettier...........................................................................Failed
+- hook id: prettier
+- files were modified by this hook
+
+huf/public/js/guide/panel.js
+scripts/guide_wiki_browser.cjs
+
+eslint.............................................................................Passed
+Check for explicit frappe.db.commit()..........................(no files to check)Skipped
+Keep workspace/agent working files out of the repo.................................Passed
+Standards guards (file size, UI drift, API calls, whitelist).......................Passed

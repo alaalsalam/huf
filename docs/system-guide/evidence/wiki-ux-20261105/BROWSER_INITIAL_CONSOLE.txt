@@ -1,0 +1,12 @@
+employee_ar loaded Wiki revision and guide-only: PASS
+employee_ar screen manual opens automatically and keeps actions: PASS
+Real Wiki source opens while Desk stays on Customer: FAIL Desk context lost
+Native Customer list Form Tour starts: PASS
+Arabic Wiki search returns live original source: PASS
+AR mobile panel has no horizontal overflow: PASS
+Route change clears previous manual and prioritizes general request instructions: PASS
+employee_en loaded Wiki revision and guide-only: PASS
+employee_en screen manual opens automatically and keeps actions: PASS
+EN UI keeps original Arabic manual and supports AMS Wiki discovery: PASS
+limited loaded Wiki revision and guide-only: PASS
+Limited reader: direct Wiki article, native reader, search and screen binding denied: PASS

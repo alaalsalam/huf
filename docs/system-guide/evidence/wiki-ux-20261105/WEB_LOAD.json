@@ -1,0 +1,26 @@
+{
+  "operation": "owner-approved Gunicorn master HUP; web only",
+  "master_pid": 745951,
+  "workers_before": [
+    751950,
+    751952,
+    751953,
+    751956,
+    751957
+  ],
+  "workers_after_5s": [
+    755809,
+    755810,
+    755811,
+    755812,
+    755813
+  ],
+  "master_preserved": true,
+  "shared_domains": [
+    "dev.mwe-mis.maward.org",
+    "dev.maward.org",
+    "test.maward.org"
+  ],
+  "supervisor_control_unavailable": "socket permission denied; no privilege change or access bypass",
+  "mechanism": "Gunicorn supported HUP signal to verified current-user-owned master"
+}

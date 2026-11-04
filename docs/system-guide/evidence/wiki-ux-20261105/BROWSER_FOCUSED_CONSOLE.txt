@@ -1,0 +1,3 @@
+employee_ar screen manual opens automatically and keeps actions: PASS
+Real Wiki source opens while Desk stays on Customer: PASS
+AR mobile panel has no horizontal overflow: PASS

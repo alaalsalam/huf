@@ -347,6 +347,8 @@
 					// Keep passive third-party resources out of the guide, including tracking images.
 					const template = document.createElement("template");
 					template.innerHTML = page.content;
+					const heading = template.content.querySelector("h1");
+					if (heading?.textContent.trim() === page.title.trim()) heading.remove();
 					template.content
 						.querySelectorAll("iframe,object,embed,script,link,style")
 						.forEach((node) => node.remove());

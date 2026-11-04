@@ -1,0 +1,97 @@
+{
+  "unique_cases": 12,
+  "passed": 12,
+  "failed": 0,
+  "initial": {
+    "cases": 12,
+    "passed": 11
+  },
+  "focused": {
+    "cases": 3,
+    "passed": 3
+  },
+  "cases": [
+    {
+      "name": "employee_ar loaded Wiki revision and guide-only",
+      "pass": true
+    },
+    {
+      "name": "employee_ar screen manual opens automatically and keeps actions",
+      "pass": true
+    },
+    {
+      "name": "Real Wiki source opens while Desk stays on Customer",
+      "pass": true
+    },
+    {
+      "name": "Native Customer list Form Tour starts",
+      "pass": true
+    },
+    {
+      "name": "Arabic Wiki search returns live original source",
+      "pass": true
+    },
+    {
+      "name": "AR mobile panel has no horizontal overflow",
+      "pass": true
+    },
+    {
+      "name": "Route change clears previous manual and prioritizes general request instructions",
+      "pass": true
+    },
+    {
+      "name": "employee_en loaded Wiki revision and guide-only",
+      "pass": true
+    },
+    {
+      "name": "employee_en screen manual opens automatically and keeps actions",
+      "pass": true
+    },
+    {
+      "name": "EN UI keeps original Arabic manual and supports AMS Wiki discovery",
+      "pass": true
+    },
+    {
+      "name": "limited loaded Wiki revision and guide-only",
+      "pass": true
+    },
+    {
+      "name": "Limited reader: direct Wiki article, native reader, search and screen binding denied",
+      "pass": true
+    }
+  ],
+  "source_desk_context": {
+    "before": {
+      "path": "/desk/selling/customer",
+      "route": [
+        "List",
+        "Customer",
+        "List"
+      ]
+    },
+    "after": {
+      "path": "/desk/selling/customer",
+      "route": [
+        "List",
+        "Customer",
+        "List"
+      ]
+    }
+  },
+  "cleanup": {
+    "action": "cleanup",
+    "owned_counts": {
+      "User": 0,
+      "Has Role": 0,
+      "DocShare": 0,
+      "Contact Email": 0,
+      "__Auth": 0,
+      "DefaultValue": 0,
+      "__UserSettings": 0
+    },
+    "existing_roles_only": true
+  },
+  "page_errors": [],
+  "asset_errors": [],
+  "external_attempts": []
+}
