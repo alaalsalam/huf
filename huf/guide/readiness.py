@@ -9,19 +9,31 @@ from huf.guide import checks, context, knowledge
 
 
 def inspect_services():
-	installed = "compendium" in frappe.get_installed_apps()
-	compatible = installed and version("compendium").split(".")[0] == frappe.__version__.split(".")[0]
+	settings = frappe.get_single("HUF Guide Settings")
+	source = settings.get("search_source") or "Compendium"
+	installed = source.lower() in frappe.get_installed_apps()
+	compatible = installed and (
+		source == "Wiki" or version("compendium").split(".")[0] == frappe.__version__.split(".")[0]
+	)
+	search_ready = compatible
+	if source == "Wiki" and installed:
+		from wiki.frappe_wiki.doctype.wiki_document.wiki_sqlite_search import WikiSQLiteSearch
+
+		from huf.guide.wiki_source import spaces
+
+		search_ready = bool(spaces()) and WikiSQLiteSearch().index_exists()
 	services = []
 	for row in frappe.get_list("HUF Guide Binding", fields=["name"], limit_page_length=500):
 		binding = frappe.get_doc("HUF Guide Binding", row.name)
 		issues = []
-		if not installed or not compatible:
-			issues.append(_("Install a compatible Compendium version before enabling the guide."))
-		else:
-			try:
-				knowledge.read(binding.article_path)
-			except (frappe.PermissionError, frappe.ValidationError):
-				issues.append(_("Publish an accessible article at the configured path in Compendium."))
+		try:
+			knowledge.read(binding.article_path)
+		except (frappe.PermissionError, frappe.ValidationError, ImportError):
+			issues.append(
+				_(
+					"Publish a permitted article at this path in its native source and check the selected Wiki spaces."
+				)
+			)
 		if not context.screen_allowed(
 			{"screen_type": binding.screen_type, "screen_name": binding.screen_name}
 		):
@@ -59,9 +71,10 @@ def inspect_services():
 			}
 		)
 	return {
-		"source": "Compendium",
+		"source": source,
 		"installed": installed,
 		"compatible": compatible,
+		"search_ready": search_ready,
 		"services": services,
 		"record_checks_enabled": bool(
 			frappe.db.get_single_value("HUF Guide Settings", "record_checks_enabled")

@@ -58,7 +58,7 @@ def resolve(context):
 			page = knowledge.read(binding.article_path)
 		except frappe.PermissionError:
 			continue
-		item = {key: page[key] for key in ("path", "title", "url", "language")}
+		item = {key: page[key] for key in ("path", "title", "url", "language", "source")}
 		item["binding"] = binding.name
 		item["error_key"] = binding.error_key or ""
 		item["tour"] = permitted_tour(binding)

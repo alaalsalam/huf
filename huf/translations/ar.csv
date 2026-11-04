@@ -129,3 +129,20 @@ Documentation,دليل النظام
 User language,لغة المستخدم
 Arabic,العربية
 English,الإنجليزية
+Guide Search Source,مصدر البحث في الدليل
+Wiki User Manual Spaces,مساحات دليل المستخدم في ويكي
+Search the selected native knowledge app. Existing article bindings keep their explicit source; articles are never copied.,ابحث في مصدر المعرفة المحدد. تبقى روابط المقالات القائمة على مصدرها الصريح، ولا تنسخ المقالات.
+"One existing Wiki Space route per line. Include user manuals only, not test or maintenance areas. Empty disables Wiki access in the guide. Native Wiki reader permissions still apply.",مسار مساحة ويكي قائمة في كل سطر. اختر أدلة المستخدم فقط دون الاختبارات أو الصيانة. تركها فارغة يمنع قراءة ويكي عبر المرشد. تبقى صلاحيات قارئ ويكي مطبقة.
+Wiki page: wiki:space/page. Compendium page: guide/search. Use an existing published manual; no file paths or external URLs.,صفحة ويكي: wiki:space/page. صفحة Compendium: guide/search. اختر دليلًا قائمًا منشورًا، دون مسارات ملفات أو روابط خارجية.
+Install Wiki before selecting it as the guide source.,ثبّت ويكي قبل اختياره مصدرًا للدليل.
+Select existing Wiki Space routes for the user manuals.,اختر مسارات مساحات ويكي القائمة لأدلة المستخدم.
+Wiki User Manuals,أدلة المستخدم في ويكي
+Wiki Articles,مقالات ويكي
+Compendium Articles,مقالات Compendium
+Guide source ready: {0},مصدر الدليل جاهز: {0}
+"Check the selected guide source, published manual spaces and native search index.",تحقق من مصدر الدليل المحدد، ومساحات الأدلة المنشورة، وفهرس البحث الأصلي.
+Publish a permitted article at this path in its native source and check the selected Wiki spaces.,انشر مقالًا مسموحًا في هذا المسار بمصدره الأصلي، وتحقق من مساحات ويكي المحددة.
+Wiki search is not ready. Ask the site administrator to check its native index.,بحث ويكي غير جاهز. اطلب من مسؤول الموقع التحقق من فهرسه الأصلي.
+Install HUF and a supported guide source first.,ثبّت HUF ومصدر دليل مدعومًا أولًا.
+"Service or screen name, for example service request",اسم الخدمة أو الشاشة، مثل طلب خدمة
+Other documented procedures,إجراءات أخرى موثقة

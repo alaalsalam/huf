@@ -63,6 +63,7 @@ class TestGuide(unittest.TestCase):
 		).insert()
 		frappe.db.set_single_value("HUF Guide Settings", "enabled", 1)
 		frappe.db.set_single_value("HUF Guide Settings", "mode", "guide_only")
+		frappe.db.set_single_value("HUF Guide Settings", "search_source", "Compendium")
 
 	@classmethod
 	def tearDownClass(cls):

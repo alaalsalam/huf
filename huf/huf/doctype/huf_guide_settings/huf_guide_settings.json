@@ -17,6 +17,8 @@
   "allow_translation_fallback",
   "fallback_language",
   "services_section",
+  "search_source",
+  "wiki_spaces",
   "resources",
   "privacy_section",
   "record_checks_enabled",
@@ -97,6 +99,21 @@
    "fieldname": "services_section",
    "fieldtype": "Section Break",
    "label": "Guides and Services"
+  },
+  {
+   "fieldname": "search_source",
+   "fieldtype": "Select",
+   "label": "Guide Search Source",
+   "options": "Compendium\nWiki",
+   "default": "Compendium",
+   "description": "Search the selected native knowledge app. Existing article bindings keep their explicit source; articles are never copied."
+  },
+  {
+   "fieldname": "wiki_spaces",
+   "fieldtype": "Small Text",
+   "label": "Wiki User Manual Spaces",
+   "depends_on": "eval:doc.search_source === 'Wiki'",
+   "description": "One existing Wiki Space route per line. Include user manuals only, not test or maintenance areas. Empty disables Wiki access in the guide. Native Wiki reader permissions still apply."
   },
   {
    "fieldname": "resources",

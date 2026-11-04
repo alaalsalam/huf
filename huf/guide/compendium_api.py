@@ -12,6 +12,14 @@ from frappe import _
 
 def _read(call, **kwargs):
 	try:
+		# Explicitly retain Compendium's own canonical-page role ceiling before
+		# invoking its reader/asset/editor entrypoints. No guide enablement grant.
+		page = docs.get_page_record(
+			docs.normalize_path(kwargs.get("path", kwargs.get("page_path", ""))),
+			locale=docs.normalize_locale(kwargs.get("locale")),
+		)
+		if not docs.is_permitted(page):
+			frappe.throw(_("Guide unavailable or not permitted."), frappe.PermissionError)
 		return call(**kwargs)
 	except (frappe.PermissionError, frappe.DoesNotExistError):
 		raise frappe.PermissionError(_("Guide unavailable or not permitted.")) from None

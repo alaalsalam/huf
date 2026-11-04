@@ -17,7 +17,8 @@ def bootstrap(context=None):
 	return {
 		"enabled": True,
 		"mode": "guide_only",
-		"api_revision": "system-guide-ux-v2",
+		"api_revision": "system-guide-wiki-v3",
+		"source": settings.get("search_source") or "Compendium",
 		"support": settings.support_channel or "",
 		"screen_label": frappe._(label),
 	}
@@ -54,6 +55,7 @@ def get_tour(binding, context=None):
 
 @frappe.whitelist()
 def check_record(binding, document_name, context=None):
+	policy.require_access(guide_context.normalize(context))
 	return checks.run(binding, document_name, guide_context.normalize(context))
 
 

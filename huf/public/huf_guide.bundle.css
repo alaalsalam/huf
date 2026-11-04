@@ -19,6 +19,11 @@
 #huf-guide-panel .huf-guide-card button { margin-block: 4px; margin-inline-end: 8px; }
 #huf-guide-panel .huf-guide-check { border: 1px solid var(--border-color); border-inline-start: 4px solid var(--primary); padding: 12px; margin-block: 8px; }
 #huf-guide-panel details { margin-block: 8px; }
+#huf-guide-panel .huf-guide-other { border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; }
+#huf-guide-panel .huf-guide-other summary { cursor: pointer; font-weight: 600; }
+#huf-guide-panel .huf-guide-article img { max-width: 100%; height: auto; }
+#huf-guide-panel .huf-guide-article table { display: block; max-width: 100%; overflow-x: auto; }
+#huf-guide-panel .huf-guide-article pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 @media (max-width: 600px) {
  #huf-guide-panel { top: 0; bottom: 0; inset-inline: 0; width: 100%; border-radius: 0; padding: 16px; z-index: 1040; }
  #huf-guide-launcher { inset-inline-end: 12px; bottom: 12px; }

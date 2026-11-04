@@ -70,7 +70,7 @@
    "fieldtype": "Data",
    "label": "Guide Path",
    "reqd": 1,
-   "description": "Logical Compendium path, for example guide/search. No file paths or external URLs."
+   "description": "Wiki page: wiki:space/page. Compendium page: guide/search. Use an existing published manual; no file paths or external URLs."
   },
   {
    "fieldname": "form_tour",

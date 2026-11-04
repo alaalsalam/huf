@@ -11,10 +11,20 @@ def run():
 	from huf.guide.tests.test_guide import TestGuide
 	from huf.guide.tests.test_skill_namespace import TestSkillNamespace
 	from huf.guide.tests.test_ux import TestGuideUX
+	from huf.guide.tests.test_wiki import TestGuideWiki
 
 	before = {
 		dt: frappe.db.count(dt)
-		for dt in ("User", "Contact", "Compendium Page", "HUF Guide Binding", "Form Tour")
+		for dt in (
+			"User",
+			"Contact",
+			"Compendium Page",
+			"HUF Guide Binding",
+			"Form Tour",
+			"Wiki Space",
+			"Wiki Document",
+			"Wiki Revision",
+		)
 	}
 	stream = io.StringIO()
 	result = unittest.TextTestRunner(stream=stream, verbosity=2).run(
@@ -23,6 +33,7 @@ def run():
 				unittest.defaultTestLoader.loadTestsFromTestCase(TestGuide),
 				unittest.defaultTestLoader.loadTestsFromTestCase(TestSkillNamespace),
 				unittest.defaultTestLoader.loadTestsFromTestCase(TestGuideUX),
+				unittest.defaultTestLoader.loadTestsFromTestCase(TestGuideWiki),
 			]
 		)
 	)

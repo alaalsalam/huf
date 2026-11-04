@@ -1,0 +1,35 @@
+{
+  "site": "dev.mwe-mis.maward.org",
+  "settings": {
+    "name": "HUF Guide Settings",
+    "owner": "Administrator",
+    "creation": "None",
+    "modified": "2026-11-04 22:15:37.609225",
+    "modified_by": "Administrator",
+    "docstatus": 0,
+    "idx": "0",
+    "enabled": 1,
+    "mode": "guide_only",
+    "included_screens": null,
+    "excluded_screens": null,
+    "default_language": "user",
+    "allow_translation_fallback": 1,
+    "fallback_language": "en",
+    "record_checks_enabled": 0,
+    "guide_only_install": 1,
+    "support_channel": null,
+    "doctype": "HUF Guide Settings",
+    "allowed_roles": [],
+    "denied_roles": []
+  },
+  "counts": {
+    "Wiki Space": 5,
+    "Wiki Document": 273,
+    "Compendium Page": 64,
+    "HUF Guide Binding": 71,
+    "Form Tour": 7,
+    "User": 152,
+    "Has Role": 2910,
+    "DocShare": 163
+  }
+}
