@@ -61,7 +61,9 @@ def main():
 					"path": path,
 					"language": "en",
 					"published": 1,
-					"content": "Confidential sentinel " + token,
+					"content": "Confidential sentinel "
+					+ token
+					+ "\n\n![remote](https://tracking.invalid/guide.png)",
 					"roles": [{"role": "Compendium Contributor"}],
 				}
 			).insert()

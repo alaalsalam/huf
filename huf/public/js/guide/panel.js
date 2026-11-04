@@ -149,7 +149,20 @@
 				this.article.replaceChildren(el("h3", {}, page.title));
 				const body = el("div", { class: "from-markdown" });
 				// HTML is rendered/sanitised by Compendium after its publication/role check.
-				body.innerHTML = page.content; this.article.append(body);
+				// Keep passive third-party resources out of the guide, including tracking images.
+				const template = document.createElement("template");
+				template.innerHTML = page.content;
+				template.content.querySelectorAll("iframe,object,embed,script,link,style").forEach((node) => node.remove());
+				for (const node of template.content.querySelectorAll("*")) {
+					node.removeAttribute("srcset");
+					if (/url\s*\(|@import/i.test(node.getAttribute("style") || "")) node.removeAttribute("style");
+					for (const attr of ["src", "poster", "xlink:href", ...(node.tagName.toLowerCase() !== "a" ? ["href"] : [])]) {
+						if (!node.hasAttribute(attr)) continue;
+						try { const url = new URL(node.getAttribute(attr), location.origin); if (url.origin !== location.origin) node.removeAttribute(attr); }
+						catch { node.removeAttribute(attr); }
+					}
+				}
+				body.append(template.content); this.article.append(body);
 			});
 		}
 		async startTour() {
@@ -172,7 +185,9 @@
 					tour.driver = new frappe.Driver({ className: "frappe-driver", allowClose: true,
 						keyboardControl: true, padding: 10, opacity: 0.5,
 						nextBtnText: t("Next"), prevBtnText: t("Previous"), doneBtnText: t("Done"), closeBtnText: t("Close") });
-					tour.driver_steps = doc.steps.map((step) => tour.get_step(step, () => {})).filter((step) => step.element);
+					tour.driver_steps = doc.steps.map((step) => tour.get_step({ ...step,
+						title: t(step.title), description: t(step.description),
+						ondemand_description: t(step.ondemand_description || "") }, () => {})).filter((step) => step.element);
 					tour.update_driver_steps(); tour.start();
 				} else if (window.cur_frm?.doctype === this.context.screen_name) {
 					this.tour = new frappe.ui.form.FormTour({ frm: cur_frm });
