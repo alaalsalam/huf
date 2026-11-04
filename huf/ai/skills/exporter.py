@@ -20,7 +20,7 @@ import yaml
 from frappe import _
 from frappe.exceptions import ValidationError
 
-SKILL_DOCTYPE = "Skill"
+SKILL_DOCTYPE = "HUF Skill"
 TOOL_DOCTYPE = "Agent Tool Function"
 KNOWLEDGE_DOCTYPE = "Knowledge Source"
 PROMPT_DOCTYPE = "Agent Prompt"

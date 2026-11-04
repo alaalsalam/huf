@@ -202,7 +202,7 @@ def _attached_server_skill_names(agent) -> set:
     names = set()
     try:
         for row in agent.get("agent_skill", []) or []:
-            skill_name, status = frappe.db.get_value("Skill", row.skill, ["skill_name", "status"]) or (None, None)
+            skill_name, status = frappe.db.get_value("HUF Skill", row.skill, ["skill_name", "status"]) or (None, None)
             if skill_name and (status or "Active") == "Active":
                 names.add(normalize_catalog_name(skill_name))
     except Exception as e:

@@ -104,13 +104,13 @@ class TestSkillLinkResolution(IntegrationTestCase):
 class TestSkillImportAndExport(IntegrationTestCase):
 	def setUp(self):
 		self.skill_name = "test-export-import-skill"
-		if frappe.db.exists("Skill", {"skill_name": self.skill_name}):
-			name = frappe.db.get_value("Skill", {"skill_name": self.skill_name}, "name")
-			frappe.delete_doc("Skill", name, force=True)
+		if frappe.db.exists("HUF Skill", {"skill_name": self.skill_name}):
+			name = frappe.db.get_value("HUF Skill", {"skill_name": self.skill_name}, "name")
+			frappe.delete_doc("HUF Skill", name, force=True)
 
 		doc = frappe.get_doc(
 			{
-				"doctype": "Skill",
+				"doctype": "HUF Skill",
 				"skill_name": self.skill_name,
 				"title": "Test Export Import Skill",
 				"description": "A skill for testing export/import roundtrip.",
@@ -123,15 +123,15 @@ class TestSkillImportAndExport(IntegrationTestCase):
 		doc.insert(ignore_permissions=True)
 
 	def tearDown(self):
-		if frappe.db.exists("Skill", {"skill_name": self.skill_name}):
-			name = frappe.db.get_value("Skill", {"skill_name": self.skill_name}, "name")
-			frappe.delete_doc("Skill", name, force=True)
+		if frappe.db.exists("HUF Skill", {"skill_name": self.skill_name}):
+			name = frappe.db.get_value("HUF Skill", {"skill_name": self.skill_name}, "name")
+			frappe.delete_doc("HUF Skill", name, force=True)
 		# test_huf_export_import_roundtrip commits mid-test, so the deletion
 		# must be committed too or the re-imported skill leaks into the site DB.
 		frappe.db.commit()
 
 	def test_build_skill_md(self):
-		skill_doc = frappe.get_doc("Skill", {"skill_name": self.skill_name})
+		skill_doc = frappe.get_doc("HUF Skill", {"skill_name": self.skill_name})
 		content = build_skill_md(skill_doc)
 		self.assertIn("name: test-export-import-skill", content)
 		self.assertIn("title: Test Export Import Skill", content)
@@ -152,8 +152,8 @@ class TestSkillImportAndExport(IntegrationTestCase):
 				f.write(archive_bytes)
 
 			# Delete the original skill so re-import is not just an update
-			name = frappe.db.get_value("Skill", {"skill_name": self.skill_name}, "name")
-			frappe.delete_doc("Skill", name, force=True)
+			name = frappe.db.get_value("HUF Skill", {"skill_name": self.skill_name}, "name")
+			frappe.delete_doc("HUF Skill", name, force=True)
 			frappe.db.commit()
 
 			# Create a File doc for the uploaded archive
@@ -170,7 +170,7 @@ class TestSkillImportAndExport(IntegrationTestCase):
 
 			result = import_skill_from_huf(file_doc.file_url)
 			self.assertEqual(result["skill"], self.skill_name)
-			self.assertTrue(frappe.db.exists("Skill", {"skill_name": self.skill_name}))
+			self.assertTrue(frappe.db.exists("HUF Skill", {"skill_name": self.skill_name}))
 		finally:
 			shutil.rmtree(temp_dir, ignore_errors=True)
 			if file_doc and frappe.db.exists("File", file_doc.name):
@@ -216,13 +216,13 @@ class TestSkillPromptRuntime(IntegrationTestCase):
 		)
 		prompt_doc.insert(ignore_permissions=True)
 
-		if frappe.db.exists("Skill", {"skill_name": self.skill_name}):
-			name = frappe.db.get_value("Skill", {"skill_name": self.skill_name}, "name")
-			frappe.delete_doc("Skill", name, force=True)
+		if frappe.db.exists("HUF Skill", {"skill_name": self.skill_name}):
+			name = frappe.db.get_value("HUF Skill", {"skill_name": self.skill_name}, "name")
+			frappe.delete_doc("HUF Skill", name, force=True)
 
 		skill_doc = frappe.get_doc(
 			{
-				"doctype": "Skill",
+				"doctype": "HUF Skill",
 				"skill_name": self.skill_name,
 				"title": "Test Prompt Skill",
 				"status": "Active",
@@ -249,9 +249,9 @@ class TestSkillPromptRuntime(IntegrationTestCase):
 	def tearDown(self):
 		if frappe.db.exists("Agent", self.agent_name):
 			frappe.delete_doc("Agent", self.agent_name, force=True)
-		if frappe.db.exists("Skill", {"skill_name": self.skill_name}):
-			name = frappe.db.get_value("Skill", {"skill_name": self.skill_name}, "name")
-			frappe.delete_doc("Skill", name, force=True)
+		if frappe.db.exists("HUF Skill", {"skill_name": self.skill_name}):
+			name = frappe.db.get_value("HUF Skill", {"skill_name": self.skill_name}, "name")
+			frappe.delete_doc("HUF Skill", name, force=True)
 		if frappe.db.exists("Agent Prompt", self.prompt_name):
 			frappe.delete_doc("Agent Prompt", self.prompt_name, force=True)
 

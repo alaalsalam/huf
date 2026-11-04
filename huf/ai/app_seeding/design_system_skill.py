@@ -119,8 +119,8 @@ def create_design_system_skill() -> bool:
 	"""
 	created = False
 
-	if frappe.db.exists("Skill", SKILL_NAME):
-		skill = frappe.get_doc("Skill", SKILL_NAME)
+	if frappe.db.exists("HUF Skill", SKILL_NAME):
+		skill = frappe.get_doc("HUF Skill", SKILL_NAME)
 		skill.title = SKILL_NAME
 		skill.description = SKILL_DESCRIPTION
 		skill.instructions = SKILL_INSTRUCTIONS
@@ -133,7 +133,7 @@ def create_design_system_skill() -> bool:
 	else:
 		skill = frappe.get_doc(
 			{
-				"doctype": "Skill",
+				"doctype": "HUF Skill",
 				"skill_name": SKILL_NAME,
 				"title": SKILL_NAME,
 				"description": SKILL_DESCRIPTION,

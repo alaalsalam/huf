@@ -189,11 +189,11 @@ def _ensure_knowledge_source(section_key, cfg):
 
 def _ensure_skill(section_key, cfg):
 	skill_name = cfg["skill_name"]
-	if frappe.db.exists("Skill", skill_name):
+	if frappe.db.exists("HUF Skill", skill_name):
 		return
 	try:
 		frappe.get_doc({
-			"doctype": "Skill",
+			"doctype": "HUF Skill",
 			"skill_name": skill_name,
 			"title": cfg["title"],
 			"skill_category": SKILL_CATEGORY_LABEL,

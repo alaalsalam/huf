@@ -20,7 +20,7 @@ function SkillFormPageWrapper() {
         })
         .catch((error) => {
           console.error('Error loading skill:', error);
-          setSkillTitle('Skill');
+          setSkillTitle('HUF Skill');
         });
     } else {
       setSkillTitle('New Skill');

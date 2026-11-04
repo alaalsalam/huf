@@ -17,8 +17,8 @@
    "fieldname": "skill",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Skill",
-   "options": "Skill",
+   "label": "HUF Skill",
+   "options": "HUF Skill",
    "reqd": 1
   },
   {

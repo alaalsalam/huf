@@ -188,7 +188,7 @@ class TestSearchSkillsAndAgents(RemoteBase):
 		for status in ("Active", "Draft", "Error", "Disabled"):
 			frappe.get_doc(
 				{
-					"doctype": "Skill",
+					"doctype": "HUF Skill",
 					"skill_name": f"{self.tag}-{status.lower()}",
 					"title": f"{self.tag} {status}",
 					"description": f"{self.tag} skill",
@@ -196,7 +196,7 @@ class TestSearchSkillsAndAgents(RemoteBase):
 					"source_type": "Local",
 				}
 			).insert(ignore_permissions=True)
-			self.made.append(("Skill", f"{self.tag}-{status.lower()}"))
+			self.made.append(("HUF Skill", f"{self.tag}-{status.lower()}"))
 		frappe.db.commit()
 
 	def search(self, user=None, **kw):

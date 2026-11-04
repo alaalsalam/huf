@@ -30,7 +30,7 @@ import yaml
 from frappe import _
 from frappe.exceptions import ValidationError
 
-SKILL_DOCTYPE = "Skill"
+SKILL_DOCTYPE = "HUF Skill"
 CATEGORY_DOCTYPE = "Skill Category"
 IMPORT_LOG_DOCTYPE = "Skill Import Log"
 TOOL_DOCTYPE = "Agent Tool Function"

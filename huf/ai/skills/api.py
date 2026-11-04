@@ -75,11 +75,11 @@ def get_skill_options() -> list[dict[str, Any]]:
 
 	Used by link/multi-select fields that need a simple options list.
 	"""
-	if not frappe.db.exists("DocType", "Skill"):
+	if not frappe.db.exists("DocType", "HUF Skill"):
 		return []
 
 	skills = frappe.get_all(
-		"Skill",
+		"HUF Skill",
 		filters={"status": "Active"},
 		fields=["skill_name", "title", "description", "skill_icon"],
 		order_by="title asc",

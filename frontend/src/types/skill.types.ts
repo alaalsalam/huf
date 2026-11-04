@@ -42,7 +42,7 @@ export interface SkillDoc {
   modified_by: string;
   docstatus: number;
   idx: number;
-  doctype: 'Skill';
+  doctype: 'HUF Skill';
 
   skill_name: string;
   title: string;

@@ -129,7 +129,7 @@ def search_skills_and_agents(query=None, kind="all", limit=50):
 			)
 	if kind in ("all", "skill"):
 		for s in frappe.get_all(
-			"Skill",
+			"HUF Skill",
 			filters={"status": "Active"},
 			fields=["name", "skill_name", "title", "description", "source_type"],
 			order_by="modified desc",

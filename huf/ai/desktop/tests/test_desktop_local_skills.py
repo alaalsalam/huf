@@ -696,7 +696,7 @@ class TestExposure(LocalSkillsBase):
 
 	def tearDown(self):
 		frappe.set_user("Administrator")
-		for doctype, names in (("Agent", self._agents), ("Skill", self._skills)):
+		for doctype, names in (("Agent", self._agents), ("HUF Skill", self._skills)):
 			for name in names:
 				try:
 					frappe.delete_doc(doctype, name, ignore_permissions=True, force=True)
@@ -726,7 +726,7 @@ class TestExposure(LocalSkillsBase):
 		frappe.set_user("Administrator")
 		doc = frappe.get_doc(
 			{
-				"doctype": "Skill",
+				"doctype": "HUF Skill",
 				"skill_name": skill_name,
 				"title": skill_name,
 				"status": "Active",

@@ -43,7 +43,7 @@ export const doctype = {
   "Memory Policy": "Memory Policy",
   "Network Access Policy": "Network Access Policy",
   "Network Access Policy Rule": "Network Access Policy Rule",
-  Skill: "Skill",
+  Skill: "HUF Skill",
   "Skill Category": "Skill Category",
   "Agent Skill": "Agent Skill",
   "Huf Data Table": "Huf Data Table",

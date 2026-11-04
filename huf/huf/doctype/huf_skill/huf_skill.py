@@ -6,7 +6,7 @@ from frappe import _
 from frappe.model.document import Document
 
 
-class Skill(Document):
+class HUFSkill(Document):
 	def validate(self):
 		if self.source_type == "App Provided" and not self.provider_app:
 			frappe.throw(_("Provider App is required for App Provided skills."))

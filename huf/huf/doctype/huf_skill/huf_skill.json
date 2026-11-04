@@ -205,7 +205,7 @@
  "modified": "2026-06-12 09:17:14.000000",
  "modified_by": "Administrator",
  "module": "Huf",
- "name": "Skill",
+ "name": "HUF Skill",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [

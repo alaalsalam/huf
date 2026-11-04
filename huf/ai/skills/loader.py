@@ -44,7 +44,7 @@ _STANDARD_TOOL_PATHS = {
 def _skill_doctypes_exist() -> bool:
     """Return True if the Skill DocTypes have been installed."""
     try:
-        return frappe.db.exists("DocType", "Skill") and frappe.db.exists("DocType", "Agent Skill")
+        return frappe.db.exists("DocType", "HUF Skill") and frappe.db.exists("DocType", "Agent Skill")
     except Exception:
         return False
 
@@ -67,7 +67,7 @@ def get_agent_skills(agent_name: str, mode: Optional[str] = None):
         if mode and getattr(row, "mode", None) != mode:
             continue
         try:
-            skill = frappe.get_doc("Skill", row.skill)
+            skill = frappe.get_doc("HUF Skill", row.skill)
             if getattr(skill, "status", "Active") != "Active":
                 continue
             skills.append(skill)
