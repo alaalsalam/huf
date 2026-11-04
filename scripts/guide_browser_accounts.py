@@ -26,6 +26,7 @@ def main():
 	role = "Guide UI Reader " + token
 	path = "guide/private-" + token
 	service_path = "guide/service-" + token
+	record_path = "guide/record-" + token
 	binding_name = "guide-ui-service-" + token
 	tour_name = "Guide UI Tour " + token
 	frappe.init(site=args.site)
@@ -74,6 +75,19 @@ def main():
 				}
 			).insert()
 			if data.get("ux"):
+				# Keep the passive-resource sentinel in the guide article. The native
+				# Markdown editor is outside the guide; use a separate saved fixture.
+				page = frappe.get_doc(
+					{
+						"doctype": "Compendium Page",
+						"title": "Synthetic saved record",
+						"language": "en",
+						"path": record_path,
+						"published": 0,
+						"content": "Synthetic saved form only",
+						"roles": [{"role": "Compendium Contributor"}],
+					}
+				).insert()
 				for language, title, content in (
 					(
 						"en",
@@ -154,15 +168,17 @@ def main():
 			)
 		elif data["action"] == "cleanup":
 			if data.get("ux"):
-				if frappe.db.exists("HUF Guide Binding", binding_name):
-					frappe.delete_doc("HUF Guide Binding", binding_name)
+				for owned in frappe.get_all(
+					"HUF Guide Binding", filters={"article_path": service_path}, pluck="name"
+				):
+					frappe.delete_doc("HUF Guide Binding", owned)
 				if frappe.db.exists("Form Tour", tour_name):
 					frappe.delete_doc("Form Tour", tour_name)
 				frappe.db.set_single_value(
 					"HUF Guide Settings", "record_checks_enabled", data["original_checks"]
 				)
 			for name in frappe.get_all(
-				"Compendium Page", filters={"path": ["in", [path, service_path]]}, pluck="name"
+				"Compendium Page", filters={"path": ["in", [path, service_path, record_path]]}, pluck="name"
 			):
 				frappe.delete_doc("Compendium Page", name)
 			for user in users:
@@ -207,12 +223,13 @@ def main():
 		):
 			page_name = frappe.db.get_value("Compendium Page", {"path": path}, "name")
 			require(page_name)
+			record_name = frappe.db.get_value("Compendium Page", {"path": record_path}, "name")
 			if data["action"] == "enable_checks":
 				frappe.db.set_single_value("HUF Guide Settings", "record_checks_enabled", 1)
 			elif data["action"] == "make_incomplete":
-				frappe.db.set_value("Compendium Page", page_name, "title", "")
+				frappe.db.set_value("Compendium Page", record_name, "title", "")
 			elif data["action"] == "make_complete":
-				frappe.db.set_value("Compendium Page", page_name, "title", "Restricted " + token)
+				frappe.db.set_value("Compendium Page", record_name, "title", "Synthetic saved record")
 			elif data["action"] == "unknown_instruction":
 				frappe.db.set_value("HUF Guide Binding", binding_name, "complete_instruction", "")
 			elif data["action"] == "withdraw_role":

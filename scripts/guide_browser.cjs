@@ -20,6 +20,7 @@ async function main(){let browser,created=false;try{
  result.creation=fixture('create');created=true;
  browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH,headless:true,args:['--no-sandbox']});
  for(const user of users){
+  if(process.env.GUIDE_TEST_PERSONAS&&!process.env.GUIDE_TEST_PERSONAS.split(',').includes(user.persona))continue;
   const ctx=await browser.newContext({viewport:{width:1440,height:1000},locale:user.language});
   await ctx.route('**/*',async(route)=>{const url=new URL(route.request().url());if(!['data:','blob:'].includes(url.protocol)&&url.origin!==origin){result.external_attempts.push(url.origin);return route.abort();}return route.continue();});
   const login=await ctx.request.post(origin+'/api/method/login',{form:{usr:user.email,pwd:user.password}});assert(login.status()===200,'Fixture login failed');
@@ -32,7 +33,39 @@ async function main(){let browser,created=false;try{
     await page.locator('.guide-readiness-result').waitFor();
     assert((await api(page,'readiness')).status===200,'Manager readiness');
     for(const field of ['allowed_roles','denied_roles','included_screens','excluded_screens','default_language','record_checks_enabled'])assert(await page.locator('[data-fieldname="'+field+'"]').count()>0,'Settings missing '+field);
-    await page.locator('.form-layout').screenshot({path:path.join(OUT,'guide-settings-ar.png')});
+    const section=page.locator('[data-fieldname="support_section"]');await section.screenshot({path:path.join(OUT,'guide-settings-ar.png')});
+   });
+   await check('Administrator adds a second static service from settings',async()=>{
+    try{
+    result.admin_save_responses=[];
+    result.admin_console_errors=[];page.on('console',m=>{if(m.type()==='error')result.admin_console_errors.push(m.text().slice(0,500));});
+    page.on('response',async r=>{if(r.url().includes('frappe.desk.form.save.savedocs')){const d=await r.json().catch(()=>({}));result.admin_save_responses.push({status:r.status(),exception:d.exception,messages:d._server_messages});}});
+    result.admin_ui_stage='open service list';
+    await page.getByRole('button',{name:'روابط الخدمات',exact:true}).click();
+    await page.waitForFunction(()=>frappe.get_route()[0]==='List'&&frappe.get_route()[1]==='HUF Guide Binding');
+    result.admin_ui_stage='open new binding';
+    await page.evaluate(()=>frappe.new_doc('HUF Guide Binding'));
+    await page.waitForFunction(()=>window.cur_frm?.doctype==='HUF Guide Binding'&&cur_frm.is_new());
+    result.admin_ui_stage='fill binding';
+    const control=name=>page.locator('.frappe-control[data-fieldname="'+name+'"]');
+    await control('screen_type').locator('select').selectOption('Page');
+    for(const [field,value] of Object.entries({screen_name:'docs',article_path:'guide/service-'+token,error_key:'UI_SECOND_'+token,form_tour:'HUF Guide Search',target_name:'docs'})){
+     await control(field).locator('input').fill(value);await control(field).locator('input').press('Tab');
+    }
+    await control('target_type').locator('select').selectOption('Page');
+    await control('next_instruction').locator('textarea').fill('دليل خدمة ثانية للاختبار الصناعي فقط.');
+    await control('next_instruction').locator('textarea').press('Tab');
+    await page.waitForFunction(()=>!frappe.ajax_count);
+    result.admin_ui_stage='save binding';
+    result.admin_button_before=await page.evaluate(()=>({label:cur_frm.page.btn_primary.text(),busy:cur_frm.page.btn_primary.attr('aria-busy'),disabled:cur_frm.page.btn_primary.prop('disabled')}));
+    const saved=page.waitForResponse(r=>r.url().includes('frappe.desk.form.save.savedocs'),{timeout:20000});
+    await page.getByRole('button',{name:'حفظ',exact:true}).click();
+    assert((await saved).status()===200,'Native Save failed');
+    await page.waitForFunction(()=>window.cur_frm?.doctype==='HUF Guide Binding'&&!cur_frm.is_new()&&!cur_frm.is_dirty());
+    result.admin_created_binding=await page.evaluate(()=>cur_frm.doc.name);
+    const report=(await api(page,'readiness')).message;
+    assert(report.services.some(s=>s.binding===result.admin_created_binding&&s.ready),'Second service not ready');
+    }finally{result.admin_ui=await page.evaluate(()=>({route:frappe.get_route(),doctype:window.cur_frm?.doctype,is_new:window.cur_frm?.is_new(),dirty:window.cur_frm?.is_dirty(),message:document.querySelector('.msgprint')?.textContent?.slice(0,500),values:window.cur_frm?.doctype==='HUF Guide Binding'?Object.fromEntries(['screen_type','screen_name','article_path','form_tour','target_type','target_name'].map(k=>[k,cur_frm.doc[k]])):null}));}
    });
    await ctx.close();continue;
   }

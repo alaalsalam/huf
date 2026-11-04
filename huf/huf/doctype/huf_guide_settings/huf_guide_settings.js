@@ -1,5 +1,8 @@
 frappe.ui.form.on("HUF Guide Settings", {
 	refresh(frm) {
+		const languages = [{ value: "ar", label: __("Arabic") }, { value: "en", label: __("English") }];
+		frm.set_df_property("default_language", "options", [{ value: "user", label: __("User language") }, ...languages]);
+		frm.set_df_property("fallback_language", "options", languages);
 		const area = frm.fields_dict.resources.$wrapper.empty();
 		for (const [label, doctype] of [[__("Articles"), "Compendium Page"], [__("Service Bindings"), "HUF Guide Binding"], [__("Form Tours"), "Form Tour"]]) {
 			if (!frappe.model.can_read(doctype)) continue;

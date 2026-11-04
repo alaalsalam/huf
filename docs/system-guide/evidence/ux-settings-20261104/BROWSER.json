@@ -1,0 +1,352 @@
+{
+  "scope": "Synthetic fixtures only. No owner messages or real business records.",
+  "source_backend_at_reload": "ccc4f52c6a81b2741393fd8a33b01039ed3ca56c",
+  "covered_case_count": 22,
+  "passing_covered_cases": 22,
+  "cases": [
+    {
+      "name": "allowed launcher",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "allowed article ACL",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "English panel",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "allowed disabled record API",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Documented next step and correct field",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Complete saved request and native form tour",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Dirty draft is not checked",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Incomplete saved request is separate from guide",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Unknown finding has no guessed action",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Article role withdrawal applies to HTTP",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Unpublished article absent from search",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "limited launcher",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "limited article ACL",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Arabic full journey",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Arabic mobile and keyboard",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Navigation keeps one panel",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Late search cannot replace screen guide",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Unknown error is explicit",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "limited disabled record API",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Limited saved-record API denied",
+      "pass": true,
+      "attempt": "full_corrected"
+    },
+    {
+      "name": "Administrator settings and readiness",
+      "pass": true,
+      "attempt": "admin_final_strict_mouse_save"
+    },
+    {
+      "name": "Administrator adds a second static service from settings",
+      "pass": true,
+      "attempt": "admin_final_strict_mouse_save"
+    }
+  ],
+  "full_run": {
+    "exit_status": 0,
+    "case_count": 21,
+    "result": {
+      "cases": [
+        {
+          "name": "allowed launcher",
+          "pass": true
+        },
+        {
+          "name": "allowed article ACL",
+          "pass": true
+        },
+        {
+          "name": "English panel",
+          "pass": true
+        },
+        {
+          "name": "allowed disabled record API",
+          "pass": true
+        },
+        {
+          "name": "Documented next step and correct field",
+          "pass": true
+        },
+        {
+          "name": "Complete saved request and native form tour",
+          "pass": true
+        },
+        {
+          "name": "Dirty draft is not checked",
+          "pass": true
+        },
+        {
+          "name": "Incomplete saved request is separate from guide",
+          "pass": true
+        },
+        {
+          "name": "Unknown finding has no guessed action",
+          "pass": true
+        },
+        {
+          "name": "Article role withdrawal applies to HTTP",
+          "pass": true
+        },
+        {
+          "name": "Unpublished article absent from search",
+          "pass": true
+        },
+        {
+          "name": "limited launcher",
+          "pass": true
+        },
+        {
+          "name": "limited article ACL",
+          "pass": true
+        },
+        {
+          "name": "Arabic full journey",
+          "pass": true
+        },
+        {
+          "name": "Arabic mobile and keyboard",
+          "pass": true
+        },
+        {
+          "name": "Navigation keeps one panel",
+          "pass": true
+        },
+        {
+          "name": "Late search cannot replace screen guide",
+          "pass": true
+        },
+        {
+          "name": "Unknown error is explicit",
+          "pass": true
+        },
+        {
+          "name": "limited disabled record API",
+          "pass": true
+        },
+        {
+          "name": "Limited saved-record API denied",
+          "pass": true
+        },
+        {
+          "name": "Administrator settings and readiness",
+          "pass": true
+        }
+      ],
+      "asset_errors": [],
+      "external_attempts": [],
+      "page_errors": [],
+      "creation": {
+        "created_users": 3,
+        "non_admin": true,
+        "document": "7un4psif02",
+        "binding": "guide-ui-service-c3ff96811b21",
+        "original_checks": 0
+      },
+      "journey_user_roles": [
+        "Guide UI Reader c3ff96811b21",
+        "Wiki User",
+        "All",
+        "Guest",
+        "Desk User"
+      ],
+      "api_revision": "system-guide-ux-v2",
+      "cleanup": {
+        "remaining_fixture_rows": {
+          "User": 0,
+          "Has Role": 0,
+          "DocShare": 0,
+          "Contact Email": 0,
+          "__Auth": 0,
+          "DefaultValue": 0,
+          "__UserSettings": 0
+        }
+      }
+    }
+  },
+  "admin_final": {
+    "exit_status": 0,
+    "case_count": 2,
+    "result": {
+      "cases": [
+        {
+          "name": "Administrator settings and readiness",
+          "pass": true
+        },
+        {
+          "name": "Administrator adds a second static service from settings",
+          "pass": true
+        }
+      ],
+      "asset_errors": [],
+      "external_attempts": [],
+      "page_errors": [],
+      "creation": {
+        "created_users": 3,
+        "non_admin": true,
+        "document": "ir55gdg2ii",
+        "binding": "guide-ui-service-3bafad402ba7",
+        "original_checks": 0
+      },
+      "admin_save_responses": [
+        {
+          "status": 200,
+          "messages": "[\"{\\\"message\\\":\\\"حفظ\\\",\\\"as_table\\\":false,\\\"title\\\":\\\"رسالة\\\",\\\"indicator\\\":\\\"green\\\",\\\"alert\\\":1}\"]"
+        }
+      ],
+      "admin_console_errors": [],
+      "admin_ui_stage": "save binding",
+      "admin_button_before": {
+        "label": "إنقاذ...حفظ",
+        "disabled": false
+      },
+      "admin_created_binding": "iuct7l97s6",
+      "admin_ui": {
+        "route": [
+          "Form",
+          "HUF Guide Binding",
+          "iuct7l97s6"
+        ],
+        "doctype": "HUF Guide Binding",
+        "dirty": false,
+        "values": {
+          "screen_type": "Page",
+          "screen_name": "docs",
+          "article_path": "guide/service-3bafad402ba7",
+          "form_tour": "HUF Guide Search",
+          "target_type": "Page",
+          "target_name": "docs"
+        }
+      },
+      "cleanup": {
+        "remaining_fixture_rows": {
+          "User": 0,
+          "Has Role": 0,
+          "DocShare": 0,
+          "Contact Email": 0,
+          "__Auth": 0,
+          "DefaultValue": 0,
+          "__UserSettings": 0
+        }
+      }
+    }
+  },
+  "prior_attempts": [
+    {
+      "id": "first_full",
+      "exit_status": 1,
+      "passing_assertions": 21,
+      "failed_global_check": "Two tracking.invalid requests from native Markdown editor fixture; browser blocked them. Kept sentinel in guide article and created a separate saved-form fixture."
+    },
+    {
+      "id": "admin_ui_initial",
+      "exit_status": 1,
+      "passed": 1,
+      "failed": 1,
+      "reason": "Save did not dispatch using old selector/field timing; no server request. Corrected blur/settling and accessible Save selector."
+    },
+    {
+      "id": "admin_ui_diagnostic",
+      "exit_status": 1,
+      "passed": 1,
+      "failed": 1,
+      "reason": "Same unsent Save condition; no product permission expansion."
+    },
+    {
+      "id": "admin_save_diagnostic",
+      "exit_status": 1,
+      "passed": 1,
+      "failed": 1,
+      "reason": "Captured correct fixture values and no savedocs request."
+    },
+    {
+      "id": "admin_keyboard_interrupted",
+      "exit_status": null,
+      "reason": "Interrupted before report; no owned process remained. Three identified fixture identities were scoped-cleaned before retry."
+    },
+    {
+      "id": "admin_keyboard_retry",
+      "exit_status": 0,
+      "passed": 2,
+      "note": "Keyboard save proved native save validity; final strict proof uses actual Save button without fallback."
+    },
+    {
+      "id": "admin_mouse_confirmed",
+      "exit_status": 0,
+      "passed": 2,
+      "note": "Passed with no keyboard fallback; repeated once with strict HTTP save response wait."
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "recorded_at_utc": "2026-11-04T16:47:21.312440+00:00",
+  "target_site": "dev.mwe-mis.maward.org",
+  "site_mapping_evidence": "Nginx server_name matches host; X-Frappe-Site-Name passes host; matching existing Frappe site root verified before writing.",
+  "repository": "alaalsalam/huf",
+  "branch": "feature/system-guide",
+  "baseline": "bc2a01dae01db07562d96a77b207f9a5b1f3a620",
+  "published_backend_revision": "ccc4f52c6a81b2741393fd8a33b01039ed3ca56c",
+  "final_followup": "UI copy, form settings labels, source documentation and strict browser fixtures; no Python product changes after reload.",
+  "frappe_version": "16.52.0",
+  "compendium_version": "16.2.0",
+  "backup": {
+    "exit_status": 0,
+    "artifacts": [
+      {
+        "name": "20261104_203026-dev_mwe-mis_maward_org-database.sql.gz",
+        "bytes": 59990440,
+        "contents_read": false
+      },
+      {
+        "name": "20261104_203026-dev_mwe-mis_maward_org-files.tar",
+        "bytes": 3205120,
+        "contents_read": false
+      },
+      {
+        "name": "20261104_203026-dev_mwe-mis_maward_org-private-files.tar",
+        "bytes": 52316160,
+        "contents_read": false
+      },
+      {
+        "name": "20261104_203026-dev_mwe-mis_maward_org-site_config_backup.json",
+        "bytes": 1421,
+        "contents_read": false
+      }
+    ]
+  },
+  "schema": {
+    "settings_preserved": true,
+    "duplicate_rows": 0,
+    "record_checks_enabled": 0,
+    "mode": "guide_only",
+    "fixture_users": 0,
+    "fixture_pages": 0,
+    "fixture_todos": 0,
+    "active_huf_jobs": 0
+  },
+  "web_reload": {
+    "utc": "2026-11-04T15:26:38.947893+00:00",
+    "authorization": "Owner explicitly approved HUP for UX settings batch",
+    "source": "ccc4f52c6a81b2741393fd8a33b01039ed3ca56c",
+    "master": 549714,
+    "workers_before": [
+      581411,
+      581412,
+      581413,
+      581414,
+      581415
+    ],
+    "supervisor_status": "read-only status access denied; no Supervisor privilege escalation",
+    "mechanism": "native Gunicorn SIGHUP to verified frappe-owned master",
+    "workers_after": [
+      603156,
+      603157,
+      603158,
+      603159,
+      603160
+    ],
+    "old_workers_remaining": [],
+    "master_survived": true
+  },
+  "assets": {
+    "utc": "2026-11-04T15:25:35.349447+00:00",
+    "assets": [
+      {
+        "name": "huf_guide.bundle.js",
+        "path": "/assets/huf/dist/js/huf_guide.bundle.OHUN4VDM.js",
+        "status": 200,
+        "sha256": "65a149628930a3aa6595965a2f5a7602411419901ec572a5280358849774244e",
+        "matches_built_file": true
+      },
+      {
+        "name": "huf_guide.bundle.css",
+        "path": "/assets/huf/dist/css/huf_guide.bundle.7VRNDM2K.css",
+        "status": 200,
+        "sha256": "9fa59b72cf96a3dd19f6763680e7427f1b527957ea3c490792af048bcac3da3b",
+        "matches_built_file": true
+      }
+    ]
+  },
+  "final_runtime": {
+    "utc": "2026-11-04T16:47:20.495992+00:00",
+    "mode": "guide_only",
+    "enabled": 1,
+    "record_checks_enabled": 0,
+    "cleanup": {
+      "User": 0,
+      "Role": 0,
+      "Contact": 0,
+      "Compendium Page": 0,
+      "HUF Guide Binding": 0,
+      "Form Tour": 0
+    },
+    "other_fixture_article_rows": 0,
+    "source_article_updated": true
+  },
+  "source_sha256": {
+    "huf/guide/api.py": "c7bef89340ef196c2f3255fa30ec9a914ed260a2d19c77c46ce2eedbc001813b",
+    "huf/guide/policy.py": "1ed297163873d418a64a9f32e1d347820ac18969c7a77317917ab365a8818eff",
+    "huf/guide/checks.py": "2faa4cce7f8c9654da8187c258cf32096af8f79bce05f45ee996a4e0eedc22a6",
+    "huf/guide/context.py": "1d5d275bc2e941e9c52390aaacf0157601aa4e269f4124a5929d101b274b9786",
+    "huf/guide/knowledge.py": "2bf9be0cc9dc253a62aca646b1474725bfceec866c2f56eb770b45bde1b3c550",
+    "huf/guide/readiness.py": "0d35da2a25a5a5d7c798afa042716000202aa31bdc991df272470451a3143384",
+    "huf/guide/install.py": "df329c3741f14f2e963e3e41427839ff8b4d8bf3604d9c6c0efaf1ef1594af3a",
+    "huf/public/js/guide/panel.js": "85e37658f56031f7a4ddc94bc25f3828f515e1b7113226bb91974608a521b291",
+    "huf/public/huf_guide.bundle.css": "d7b25b5c7b0a4bfb28a3ef00e5142ed141fb0fe5d0aa4c3e410aa6d71d232a26",
+    "huf/translations/ar.csv": "37fe22b79a3b903d4331d0bb569a5decc1443119fbc2218c2687ca0f3cf38bdd",
+    "huf/huf/doctype/huf_guide_settings/huf_guide_settings.js": "e0fc1b80a8f752e2d190b794bb3247e4728964e78b1c5c4a04197451ca56374e",
+    "huf/docs/ar/guide/search.md": "cb46a17ce2b2ac35f20737b4166a87fa0d90b2b63ca99c49623b959e556eec2c",
+    "huf/docs/en/guide/search.md": "0751c59bb8792a4e2732a02fc51c6ce1b01c9410b0013e05133cec7678886907"
+  },
+  "not_tested": [
+    "Real approved business service and Owner UAT",
+    "Two-site synthetic isolation",
+    "English mobile",
+    "Separate real protected-field browser persona",
+    "Production",
+    "Legacy data migration/full old HUF suites"
+  ],
+  "unchanged_owners": [
+    "Compendium source",
+    "Wiki",
+    "Jarvis",
+    "AMS",
+    "canonical project memory"
+  ],
+  "secrets_or_private_session_stores_read": false
+}

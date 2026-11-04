@@ -125,3 +125,7 @@ native_required_fields checks only unconditional mandatory fields. Other checks 
 One internal field per line. Only explicitly allowed fields reach the registered read-only check.,اسم حقل داخلي في كل سطر؛ تصل الحقول المسموحة صراحةً فقط للفحص المسجّل للقراءة.
 This does not certify completion of the business procedure.,لا يثبت هذا اكتمال إجراء الأعمال.
 Contact your site administrator if no guidance is available.,تواصل مع مسؤول الموقع إن لم تتوفر إرشادات.
+Documentation,دليل النظام
+User language,لغة المستخدم
+Arabic,العربية
+English,الإنجليزية
