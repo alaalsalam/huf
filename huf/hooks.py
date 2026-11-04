@@ -36,8 +36,8 @@ add_to_apps_screen = [
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/huf/css/huf.css"
-# app_include_js = "/assets/huf/js/huf.js"
+app_include_css = ["huf_guide.bundle.css"]
+app_include_js = ["huf_guide.bundle.js"]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/huf/css/huf.css"
@@ -135,18 +135,10 @@ page_renderer = [
 # ------------
 
 # before_install = "huf.install.before_install"
-after_install = "huf.install.after_install"
-after_app_install = [
-    "huf.install.setup_desktop_icon_as_workspace",
-    "huf.ai.app_seeding.seeder.on_app_installed",
-    "huf.ai.skills.hooks.sync_app_skills",
-]
-after_migrate = [
-    "huf.install.after_migrate",
-    "huf.ai.skills.hooks.sync_app_skills",
-    "huf.install.seed_voice_engines",
-    "huf.ai.channels.run_as.ensure_all_audit_fields",
-]
+after_install = "huf.guide.install.after_install"
+after_app_install = "huf.guide.install.after_app_install"
+after_migrate = "huf.guide.install.after_migrate"
+after_sync = "huf.guide.install.after_sync"
 
 # Uninstallation
 # ------------
@@ -187,6 +179,7 @@ after_app_uninstall = "huf.ai.app_seeding.apps_loader.on_app_uninstalled"
 # 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
 # }
 permission_query_conditions = {
+    "HUF Guide Binding": "huf.guide.permissions.binding_query",
     "Agent": "huf.huf.doctype.agent.agent.get_permission_query_conditions",
     "Agent Conversation": "huf.ai.agent.integration.get_conversation_permission_conditions",
     "Agent Message": "huf.ai.agent.integration.get_message_permission_conditions",
@@ -215,6 +208,7 @@ permission_query_conditions = {
 }
 
 has_permission = {
+    "HUF Guide Binding": "huf.guide.permissions.binding_allowed",
 	"Agent Run": "huf.ai.hooks.has_permission_agent_run",
 	"Agent Message": "huf.ai.hooks.has_permission_agent_message",
 	"Agent Conversation": "huf.ai.hooks.has_permission_agent_conversation",
@@ -496,3 +490,10 @@ huf_decision_backends.update({
     "classifier": "huf.ai.decision.backends.classifier.ClassifierBackend",
     "similarity": "huf.ai.decision.backends.similarity.SimilarityBackend",
 })
+
+# Keep Compendium's native ACL while redacting titles from denied RPC errors.
+override_whitelisted_methods = {
+    "compendium.docs.get_page": "huf.guide.compendium_api.get_page",
+    "compendium.docs.get_asset": "huf.guide.compendium_api.get_asset",
+    "compendium.docs.make_override": "huf.guide.compendium_api.make_override",
+}

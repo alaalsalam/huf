@@ -1,0 +1,13 @@
+{
+ "doctype": "DocType", "name": "HUF Guide Settings", "module": "Huf", "issingle": 1,
+ "engine": "InnoDB", "track_changes": 1,
+ "field_order": ["enabled", "mode", "support_channel", "guide_only_install"],
+ "fields": [
+  {"fieldname": "enabled", "fieldtype": "Check", "label": "Enable System Guide", "default": "0", "description": "Show the guide in Desk. Disabling also blocks its server APIs."},
+  {"fieldname": "mode", "fieldtype": "Select", "label": "Guide Mode", "options": "guide_only\nguide_ai", "default": "guide_only", "reqd": 1, "description": "Local documentation and tours. AI guidance is reserved for a later release."},
+  {"fieldname": "support_channel", "fieldtype": "Small Text", "label": "Support Channel", "description": "Approved contact instructions. Nothing is sent automatically."},
+  {"fieldname": "guide_only_install", "fieldtype": "Check", "label": "Guide-only Installation", "default": "0", "read_only": 1, "description": "Installation profile: do not seed agents, grant HUF roles or alter shared scheduler settings."}
+ ],
+ "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1}],
+ "sort_field": "modified", "sort_order": "DESC", "states": [], "links": [], "actions": []
+}

@@ -180,6 +180,10 @@ def ensure_default_huf_roles(
 	rows are written directly so this can run from the User's own on_update without re-saving it; with
 	``user_doc`` they are also added to that doc, so a later save of the same form keeps them.
 	"""
+	from huf.guide.policy import guide_installation
+
+	if guide_installation():
+		return False
 	if user == "Guest":
 		return False
 	# Test fixtures build users with exact roles (often deliberately without Huf access); tests that cover

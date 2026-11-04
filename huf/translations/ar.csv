@@ -1,0 +1,42 @@
+System Guide,مرشد النظام
+Guide for this screen,دليل هذه الشاشة
+Search the guide,ابحث في الدليل
+Guide me step by step,أرشدني خطوة بخطوة
+Explain a known error,فسّر خطأ معروفًا
+Known error code,رمز الخطأ المعروف
+Open source,المصدر
+"Find instructions and their sources. Search results are documentation, not AI answers.",اعثر على التعليمات ومصادرها. نتائج البحث مقالات من الدليل وليست إجابات ذكاء اصطناعي.
+No published guide is linked to this screen.,لا يوجد دليل منشور مرتبط بهذه الشاشة.
+No permitted results. Try fewer words.,لا توجد نتائج متاحة لك. جرّب كلمات أقل.
+This error is not documented. Use the approved support channel if available.,هذا الخطأ غير موثّق. استخدم قناة الدعم المعتمدة إن كانت متاحة.
+No tour is available for this screen.,لا توجد جولة متاحة لهذه الشاشة.
+Guide unavailable or not permitted.,الدليل غير متاح أو لا تملك صلاحيته.
+System Guide is unavailable.,مرشد النظام غير متاح.
+AI guidance is not enabled.,الإرشاد بالذكاء الاصطناعي غير مفعّل.
+Open the guide from any Desk screen.,افتح المرشد من أي شاشة في النظام.
+Enter a few words to find documentation you may read.,اكتب كلمات قليلة للعثور على المقالات المتاحة لك.
+Open the full article and check its steps before proceeding.,افتح المقال الكامل وراجع خطواته قبل المتابعة.
+Enable System Guide,تفعيل مرشد النظام
+Guide Mode,وضع المرشد
+Support Channel,قناة الدعم
+Guide-only Installation,تثبيت الدليل فقط
+HUF Guide Settings,إعدادات مرشد النظام
+HUF Guide Binding,ربط مرشد النظام
+Screen Type,نوع الشاشة
+Screen Name,اسم الشاشة
+Field Name,اسم الحقل
+Known Error Code,رمز الخطأ المعروف
+Guide Path,مسار الدليل
+Form Tour,جولة إرشادية
+Priority,الأولوية
+Show the guide in Desk. Disabling also blocks its server APIs.,إظهار المرشد في شاشات النظام. التعطيل يمنع طلباته في الخادم أيضًا.
+Local documentation and tours. AI guidance is reserved for a later release.,دليل وجولات محلية. الإرشاد بالذكاء الاصطناعي مخصص لإصدار لاحق.
+Approved contact instructions. Nothing is sent automatically.,تعليمات التواصل المعتمدة. لا يُرسل شيء تلقائيًا.
+"Installation profile: do not seed agents, grant HUF roles or alter shared scheduler settings.",مسار تثبيت لا ينشئ وكلاء أو يمنح أدوار HUF أو يغيّر الجدولة المشتركة.
+Use the actual Desk screen type.,اختر نوع الشاشة الفعلي.
+"Page or Workspace name, or the DocType of a Form or List.",اسم الصفحة أو مساحة العمل أو نوع المستند للنموذج أو القائمة.
+Optional internal field name. Never a field value.,اسم الحقل الداخلي اختياريًا، وليس قيمة الحقل.
+"An approved stable error code, never an exception body or business data.",رمز خطأ ثابت ومعتمد، دون نص الاستثناء أو بيانات العمل.
+"Logical Compendium path, for example guide/search. No file paths or external URLs.",مسار الدليل المنطقي مثل guide/search، دون مسارات ملفات أو روابط خارجية.
+An existing native Frappe tour for the same screen.,جولة Frappe موجودة للشاشة نفسها.
+"Higher numbers first, after exact error and field matches.",الأرقام الأعلى أولًا، بعد تطابق رمز الخطأ والحقل.

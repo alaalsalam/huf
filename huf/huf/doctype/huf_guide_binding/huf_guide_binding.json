@@ -1,0 +1,19 @@
+{
+ "doctype": "DocType", "name": "HUF Guide Binding", "module": "Huf", "autoname": "hash", "engine": "InnoDB", "track_changes": 1,
+ "field_order": ["enabled", "screen_type", "screen_name", "fieldname", "error_key", "article_path", "form_tour", "priority"],
+ "fields": [
+  {"fieldname": "enabled", "fieldtype": "Check", "label": "Enabled", "default": "1", "in_list_view": 1},
+  {"fieldname": "screen_type", "fieldtype": "Select", "label": "Screen Type", "options": "Page\nForm\nList\nWorkspace", "reqd": 1, "in_list_view": 1, "description": "Use the actual Desk screen type."},
+  {"fieldname": "screen_name", "fieldtype": "Data", "label": "Screen Name", "reqd": 1, "in_list_view": 1, "description": "Page or Workspace name, or the DocType of a Form or List."},
+  {"fieldname": "fieldname", "fieldtype": "Data", "label": "Field Name", "description": "Optional internal field name. Never a field value."},
+  {"fieldname": "error_key", "fieldtype": "Data", "label": "Known Error Code", "description": "An approved stable error code, never an exception body or business data."},
+  {"fieldname": "article_path", "fieldtype": "Data", "label": "Guide Path", "reqd": 1, "description": "Logical Compendium path, for example guide/search. No file paths or external URLs."},
+  {"fieldname": "form_tour", "fieldtype": "Link", "label": "Form Tour", "options": "Form Tour", "description": "An existing native Frappe tour for the same screen."},
+  {"fieldname": "priority", "fieldtype": "Int", "label": "Priority", "default": "0", "description": "Higher numbers first, after exact error and field matches."}
+ ],
+ "permissions": [
+  {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1},
+  {"role": "Desk User", "read": 1}
+ ],
+ "sort_field": "modified", "sort_order": "DESC", "states": [], "links": [], "actions": []
+}
