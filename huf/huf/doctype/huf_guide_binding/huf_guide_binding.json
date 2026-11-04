@@ -1,19 +1,185 @@
 {
- "doctype": "DocType", "name": "HUF Guide Binding", "module": "Huf", "autoname": "hash", "engine": "InnoDB", "track_changes": 1,
- "field_order": ["enabled", "screen_type", "screen_name", "fieldname", "error_key", "article_path", "form_tour", "priority"],
+ "doctype": "DocType",
+ "name": "HUF Guide Binding",
+ "module": "Huf",
+ "autoname": "hash",
+ "engine": "InnoDB",
+ "track_changes": 1,
+ "field_order": [
+  "enabled",
+  "screen_type",
+  "screen_name",
+  "fieldname",
+  "error_key",
+  "article_path",
+  "form_tour",
+  "priority",
+  "steps_section",
+  "next_instruction",
+  "known_cause",
+  "target_type",
+  "target_name",
+  "target_field",
+  "checks_section",
+  "record_check_enabled",
+  "record_check",
+  "check_roles",
+  "check_fields",
+  "complete_instruction",
+  "incomplete_instruction"
+ ],
  "fields": [
-  {"fieldname": "enabled", "fieldtype": "Check", "label": "Enabled", "default": "1", "in_list_view": 1},
-  {"fieldname": "screen_type", "fieldtype": "Select", "label": "Screen Type", "options": "Page\nForm\nList\nWorkspace", "reqd": 1, "in_list_view": 1, "description": "Use the actual Desk screen type."},
-  {"fieldname": "screen_name", "fieldtype": "Data", "label": "Screen Name", "reqd": 1, "in_list_view": 1, "description": "Page or Workspace name, or the DocType of a Form or List."},
-  {"fieldname": "fieldname", "fieldtype": "Data", "label": "Field Name", "description": "Optional internal field name. Never a field value."},
-  {"fieldname": "error_key", "fieldtype": "Data", "label": "Known Error Code", "description": "An approved stable error code, never an exception body or business data."},
-  {"fieldname": "article_path", "fieldtype": "Data", "label": "Guide Path", "reqd": 1, "description": "Logical Compendium path, for example guide/search. No file paths or external URLs."},
-  {"fieldname": "form_tour", "fieldtype": "Link", "label": "Form Tour", "options": "Form Tour", "description": "An existing native Frappe tour for the same screen."},
-  {"fieldname": "priority", "fieldtype": "Int", "label": "Priority", "default": "0", "description": "Higher numbers first, after exact error and field matches."}
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "screen_type",
+   "fieldtype": "Select",
+   "label": "Screen Type",
+   "options": "Page\nForm\nList\nWorkspace",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Use the actual Desk screen type."
+  },
+  {
+   "fieldname": "screen_name",
+   "fieldtype": "Data",
+   "label": "Screen Name",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Page or Workspace name, or the DocType of a Form or List."
+  },
+  {
+   "fieldname": "fieldname",
+   "fieldtype": "Data",
+   "label": "Field Name",
+   "description": "Optional internal field name. Never a field value."
+  },
+  {
+   "fieldname": "error_key",
+   "fieldtype": "Data",
+   "label": "Known Error Code",
+   "description": "An approved stable error code, never an exception body or business data."
+  },
+  {
+   "fieldname": "article_path",
+   "fieldtype": "Data",
+   "label": "Guide Path",
+   "reqd": 1,
+   "description": "Logical Compendium path, for example guide/search. No file paths or external URLs."
+  },
+  {
+   "fieldname": "form_tour",
+   "fieldtype": "Link",
+   "label": "Form Tour",
+   "options": "Form Tour",
+   "description": "An existing native Frappe tour for the same screen."
+  },
+  {
+   "fieldname": "priority",
+   "fieldtype": "Int",
+   "label": "Priority",
+   "default": "0",
+   "description": "Higher numbers first, after exact error and field matches."
+  },
+  {
+   "fieldname": "steps_section",
+   "fieldtype": "Section Break",
+   "label": "Documented Next Step"
+  },
+  {
+   "fieldname": "next_instruction",
+   "fieldtype": "Small Text",
+   "label": "Next Instruction",
+   "description": "Approved instructions from the linked published article. This is not a finding about a record."
+  },
+  {
+   "fieldname": "known_cause",
+   "fieldtype": "Small Text",
+   "label": "Documented Cause",
+   "description": "For a known error only. Do not infer a cause from an exception body."
+  },
+  {
+   "fieldname": "target_type",
+   "fieldtype": "Select",
+   "label": "Destination Type",
+   "options": "\nPage\nForm\nList\nWorkspace"
+  },
+  {
+   "fieldname": "target_name",
+   "fieldtype": "Data",
+   "label": "Destination Screen",
+   "description": "Actual screen name. Form destinations are restricted to a field on this same form."
+  },
+  {
+   "fieldname": "target_field",
+   "fieldtype": "Data",
+   "label": "Destination Field",
+   "description": "Internal field name on the same form; never a value or record identifier."
+  },
+  {
+   "fieldname": "checks_section",
+   "fieldtype": "Section Break",
+   "label": "Optional Record Check"
+  },
+  {
+   "fieldname": "record_check_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Service Record Check",
+   "default": "0"
+  },
+  {
+   "fieldname": "record_check",
+   "fieldtype": "Data",
+   "label": "Registered Check",
+   "description": "native_required_fields checks only unconditional mandatory fields. Other checks must be registered by an installed domain app; no executable settings."
+  },
+  {
+   "fieldname": "check_roles",
+   "fieldtype": "Table MultiSelect",
+   "label": "Record Check Roles",
+   "options": "Has Role",
+   "description": "At least one existing role is required. Document, scope and field permissions still apply."
+  },
+  {
+   "fieldname": "check_fields",
+   "fieldtype": "Small Text",
+   "label": "Record Check Fields",
+   "description": "One internal field per line. Only explicitly allowed fields reach the registered read-only check."
+  },
+  {
+   "fieldname": "complete_instruction",
+   "fieldtype": "Small Text",
+   "label": "Instruction When Specified Fields Are Present",
+   "description": "This does not certify completion of the business procedure."
+  },
+  {
+   "fieldname": "incomplete_instruction",
+   "fieldtype": "Small Text",
+   "label": "Instruction When a Check Finds a Gap"
+  }
  ],
  "permissions": [
-  {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1, "report": 1},
-  {"role": "Desk User", "read": 1}
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1
+  },
+  {
+   "role": "Desk User",
+   "read": 1
+  }
  ],
- "sort_field": "modified", "sort_order": "DESC", "states": [], "links": [], "actions": []
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "links": [],
+ "actions": []
 }

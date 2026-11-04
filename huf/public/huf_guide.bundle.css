@@ -5,7 +5,7 @@
 #huf-guide-panel header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 #huf-guide-panel h2 { font-size: 20px; margin: 0; }
 #huf-guide-panel h3 { font-size: 18px; }
-#huf-guide-panel nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+#huf-guide-panel nav { display: grid; grid-template-columns: 1fr; gap: 8px; margin: 12px 0; }
 #huf-guide-panel button { white-space: normal; text-align: start; }
 #huf-guide-panel form { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; margin-block: 12px; }
 #huf-guide-panel label { grid-column: 1 / -1; margin: 0; }
@@ -14,6 +14,11 @@
 #huf-guide-panel .huf-guide-card p { margin-block: 8px; }
 #huf-guide-panel .huf-guide-intro, #huf-guide-panel .huf-guide-support { font-size: 13px; margin-block: 10px; }
 #huf-guide-panel .huf-guide-article { margin-block: 14px; }
+#huf-guide-panel .huf-guide-screen { font-weight: 600; border-block-end: 1px solid var(--border-color); padding-block: 8px; }
+#huf-guide-panel .huf-guide-badge { display: block; color: var(--text-muted); font-size: 12px; margin-block-end: 8px; }
+#huf-guide-panel .huf-guide-card button { margin-block: 4px; margin-inline-end: 8px; }
+#huf-guide-panel .huf-guide-check { border: 1px solid var(--border-color); border-inline-start: 4px solid var(--primary); padding: 12px; margin-block: 8px; }
+#huf-guide-panel details { margin-block: 8px; }
 @media (max-width: 600px) {
  #huf-guide-panel { top: 0; bottom: 0; inset-inline: 0; width: 100%; border-radius: 0; padding: 16px; z-index: 1040; }
  #huf-guide-launcher { inset-inline-end: 12px; bottom: 12px; }

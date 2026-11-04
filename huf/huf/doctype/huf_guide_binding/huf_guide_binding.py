@@ -2,7 +2,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 
-from huf.guide import knowledge
+from huf.guide import checks, knowledge
 
 
 class HUFGuideBinding(Document):
@@ -37,3 +37,19 @@ class HUFGuideBinding(Document):
 				frappe.throw(_("The tour must belong to the selected screen."))
 			if tour.save_on_complete:
 				frappe.throw(_("Guide tours must not save documents."))
+		if self.target_type:
+			target_dt = {"Page": "Page", "Workspace": "Workspace", "Form": "DocType", "List": "DocType"}.get(
+				self.target_type
+			)
+			if not target_dt or not frappe.db.exists(target_dt, self.target_name):
+				frappe.throw(_("Select an existing, permitted screen."))
+			if self.target_type == "Form" and (
+				self.screen_type != "Form"
+				or self.screen_name != self.target_name
+				or not frappe.get_meta(self.target_name).get_field(self.target_field)
+			):
+				frappe.throw(_("Choose an existing field on this form."))
+		if self.record_check_enabled:
+			checks.definition(self)
+			if not self.check_roles:
+				frappe.throw(_("Select existing roles for the optional record check."))

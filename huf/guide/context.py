@@ -1,7 +1,7 @@
 import frappe
 from frappe import _
 
-from huf.guide import knowledge
+from huf.guide import knowledge, policy
 
 SCREEN_TYPES = ("Page", "Form", "List", "Workspace")
 
@@ -38,7 +38,8 @@ def screen_allowed(context):
 
 def resolve(context):
 	context = normalize(context)
-	if not screen_allowed(context):
+	settings = frappe.get_single(policy.SETTINGS)
+	if not policy.screen_permitted(settings, context) or not screen_allowed(context):
 		return []
 	rows = frappe.get_list(
 		"HUF Guide Binding",
@@ -61,6 +62,16 @@ def resolve(context):
 		item["binding"] = binding.name
 		item["error_key"] = binding.error_key or ""
 		item["tour"] = permitted_tour(binding)
+		item["instruction"] = binding.next_instruction or ""
+		item["cause"] = binding.known_cause or "" if binding.error_key else ""
+		item["action"] = permitted_action(binding, context)
+		item["can_check"] = bool(
+			settings.record_checks_enabled
+			and binding.record_check_enabled
+			and binding.check_roles
+			and policy.roles_allowed(binding.check_roles)
+			and context["screen_type"] == "Form"
+		)
 		results.append(item)
 	return results
 
@@ -69,6 +80,49 @@ def permitted_tour(binding):
 	if not binding.form_tour or not frappe.has_permission("Form Tour", "read", binding.form_tour):
 		return None
 	tour = frappe.get_doc("Form Tour", binding.form_tour)
+	if not tour_matches(binding, tour):
+		return None
 	if tour.save_on_complete or any(step.next_form_tour or step.next_step_condition for step in tour.steps):
 		return None
 	return binding.form_tour
+
+
+def tour_matches(binding, tour):
+	if not tour.ui_tour:
+		return binding.screen_type == "Form" and tour.reference_doctype == binding.screen_name
+	name = (
+		tour.page_name
+		if binding.screen_type == "Page"
+		else tour.workspace_name
+		if binding.screen_type == "Workspace"
+		else tour.reference_doctype
+	)
+	return (
+		tour.view_name == ("Workspaces" if binding.screen_type == "Workspace" else binding.screen_type)
+		and name == binding.screen_name
+	)
+
+
+def permitted_action(binding, context):
+	kind, name = binding.target_type, binding.target_name
+	if not kind or not name:
+		return None
+	target = {"screen_type": kind, "screen_name": name}
+	settings = frappe.get_single(policy.SETTINGS)
+	if not policy.screen_permitted(settings, target) or not screen_allowed(target):
+		return None
+	if kind == "Form":
+		if context.get("screen_type") != "Form" or context.get("screen_name") != name:
+			return None
+		df = frappe.get_meta(name).get_field(binding.target_field)
+		from frappe.model import get_permitted_fields
+
+		if (
+			not df
+			or df.hidden
+			or df.fieldtype in ("Password", "Section Break", "Column Break")
+			or df.fieldname not in get_permitted_fields(name)
+		):
+			return None
+		return {"kind": "field", "screen": name, "field": df.fieldname}
+	return {"kind": "screen", "screen_type": kind, "screen": name}

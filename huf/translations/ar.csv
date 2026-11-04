@@ -40,3 +40,88 @@ Optional internal field name. Never a field value.,اسم الحقل الداخ�
 "Logical Compendium path, for example guide/search. No file paths or external URLs.",مسار الدليل المنطقي مثل guide/search، دون مسارات ملفات أو روابط خارجية.
 An existing native Frappe tour for the same screen.,جولة Frappe موجودة للشاشة نفسها.
 "Higher numbers first, after exact error and field matches.",الأرقام الأعلى أولًا، بعد تطابق رمز الخطأ والحقل.
+What is the next step?,ما الخطوة التالية؟
+Search the service guide,ابحث في دليل الخدمات
+Start tour,ابدأ الجولة
+Go to field,انتقل إلى الحقل
+Open page,افتح الصفحة
+From the guide,تعليمات من الدليل
+Check this request,فحص هذا الطلب
+Check of this saved request,نتيجة فحص هذا الطلب المحفوظ
+Current screen,الشاشة الحالية
+No documented guidance is available for this situation.,لا توجد إرشادات موثقة لهذه الحالة.
+Read the source before proceeding. No next step is documented.,اقرأ المصدر قبل المتابعة؛ لم توثّق خطوة تالية لهذه الشاشة.
+Guidance is unavailable. Try again or use the approved support channel.,الإرشادات غير متاحة؛ أعد المحاولة أو استخدم قناة الدعم المعتمدة.
+Destination unavailable or not permitted.,الوجهة غير متاحة أو غير مسموحة.
+Unsaved draft: save it before requesting a record check. No record was checked.,مسودة غير محفوظة: احفظها قبل طلب الفحص. لم يُفحص أي سجل.
+"This checks the specified saved fields only, not completion of the business procedure.",هذا فحص للحقول المحفوظة المحددة فقط، ولا يثبت اكتمال إجراء الأعمال.
+Record checks are disabled.,فحص السجلات معطّل.
+Record check unavailable or not permitted.,فحص السجل غير متاح أو غير مسموح.
+Record checks require a saved form.,فحص السجل يتطلب نموذجًا محفوظًا.
+Choose explicit fields for this check.,حدّد حقول هذا الفحص صراحةً.
+Choose unconditional native mandatory fields only.,اختر الحقول الإلزامية الأصلية غير المشروطة فقط.
+The domain check is not registered.,فحص تطبيق المجال غير مسجّل.
+The domain check does not match the allowed fields.,فحص تطبيق المجال لا يطابق الحقول المسموحة.
+"Search the guide, open the source and follow its documented steps.",ابحث في الدليل، وافتح المصدر، واتبع خطواته الموثقة.
+Activation and Visibility,التفعيل والظهور
+Allowed Roles,الأدوار المسموحة
+Excluded Roles,الأدوار المستثناة
+Included Screens,الشاشات المشمولة
+Excluded Screens,الشاشات المستثناة
+Guide Language,لغة الدليل
+Allow Translation Fallback,السماح باللغة البديلة عند غياب الترجمة
+Fallback Language,اللغة البديلة
+Guides and Services,الدليل والخدمات
+Knowledge Resources,مصادر الدليل
+Permissions and Privacy,الصلاحيات والخصوصية
+Enable Record Checks,تفعيل فحص السجلات
+Support and Readiness,الدعم وفحص الجاهزية
+Service Readiness,جاهزية الخدمات
+Documented Next Step,الخطوة التالية الموثقة
+Next Instruction,تعليمات الخطوة التالية
+Documented Cause,السبب الموثق
+Destination Type,نوع الوجهة
+Destination Screen,شاشة الوجهة
+Destination Field,حقل الوجهة
+Optional Record Check,فحص السجل الاختياري
+Enable Service Record Check,تفعيل فحص سجل هذه الخدمة
+Registered Check,الفحص المسجّل
+Record Check Roles,أدوار فحص السجل
+Record Check Fields,حقول فحص السجل
+Instruction When Specified Fields Are Present,التعليمات عند استيفاء الحقول المحددة
+Instruction When a Check Finds a Gap,التعليمات عند ثبوت نقص بالفحص
+Articles,المقالات
+Service Bindings,روابط الخدمات
+Form Tours,الجولات الإرشادية
+Check Service Readiness,فحص جاهزية الخدمات
+Save settings before checking readiness.,احفظ الإعدادات قبل فحص الجاهزية.
+Compendium is ready.,مصدر الدليل Compendium جاهز.
+Add a service binding to start.,أضف ربط خدمة للبدء.
+Configuration ready; verify with the employee role.,الإعدادات جاهزة؛ تحقّق بحساب الموظف.
+Readiness check unavailable or not permitted.,فحص الجاهزية غير متاح أو غير مسموح.
+Install a compatible Compendium version before enabling the guide.,ثبّت إصدار Compendium متوافقًا قبل تفعيل المرشد.
+Publish an accessible article at the configured path in Compendium.,انشر مقالًا مسموحًا في Compendium بالمسار المحدد.
+"Select an existing, permitted screen.",اختر شاشة موجودة ومسموحة.
+Choose a read-only Form Tour for this exact screen.,اختر جولة إرشادية لا تحفظ السجل وتخص هذه الشاشة نفسها.
+Create the missing Form Tour or remove its reference.,أنشئ الجولة المفقودة أو أزل مرجعها.
+Correct the destination screen or readable field and review screen exclusions.,صحّح شاشة الوجهة أو الحقل المقروء وراجع استثناءات الشاشات.
+Add the approved next instruction from the source article.,أضف تعليمات الخطوة المعتمدة من المقال المصدر.
+Select existing roles for the optional record check.,اختر أدوارًا قائمة لفحص السجل الاختياري.
+"Register the domain check and match its explicit fields, or disable the service check.",سجّل فحص المجال وطابق حقوله المحددة، أو عطّل فحص الخدمة.
+Use an existing screen in the format Page:docs or Form:ToDo.,استخدم شاشة موجودة بصيغة Page:docs أو Form:ToDo.
+Install HUF and compatible Compendium first.,ثبّت HUF وCompendium المتوافق أولًا.
+Empty allows existing Desk users. This never grants roles.,الفراغ يسمح لمستخدمي المكتب الحاليين. لا تُمنح أدوار من هذا الإعداد.
+Exclusion takes precedence over allowance.,الاستثناء له الأولوية على السماح.
+One actual screen per line: Page:docs or Form:ToDo. Empty includes permitted screens.,شاشة فعلية في كل سطر مثل Page:docs أو Form:ToDo. الفراغ يشمل الشاشات المسموحة.
+Same format. Excluded screens always take precedence.,الصيغة نفسها؛ الاستثناء له الأولوية دائمًا.
+Use the reader language or the selected guide language.,لغة القارئ أو لغة الدليل المختارة.
+"Off by default. Each service also needs an enabled check, allowed roles and explicit fields. Reading a guide does not read a business record.",مغلق افتراضيًا؛ تتطلب كل خدمة تفعيل فحصها وأدوارًا وحقولًا محددة. فتح الدليل لا يقرأ سجل أعمال.
+Approved instructions from the linked published article. This is not a finding about a record.,تعليمات معتمدة من المقال المنشور المرتبط، وليست نتيجة فحص سجل.
+For a known error only. Do not infer a cause from an exception body.,لخطأ معروف فقط؛ لا يُستنتج السبب من نص الاستثناء.
+Actual screen name. Form destinations are restricted to a field on this same form.,اسم الشاشة الفعلي. وجهة النموذج محصورة في حقل بالنموذج نفسه.
+Internal field name on the same form; never a value or record identifier.,اسم حقل داخلي بالنموذج نفسه، دون قيمة أو معرف سجل.
+native_required_fields checks only unconditional mandatory fields. Other checks must be registered by an installed domain app; no executable settings.,native_required_fields يفحص الحقول الإلزامية غير المشروطة فقط. الفحوص الأخرى يسجلها تطبيق المجال المثبت؛ لا إعدادات قابلة للتنفيذ.
+"At least one existing role is required. Document, scope and field permissions still apply.",يلزم دور قائم واحد على الأقل، مع استمرار صلاحيات السجل والنطاق والحقول.
+One internal field per line. Only explicitly allowed fields reach the registered read-only check.,اسم حقل داخلي في كل سطر؛ تصل الحقول المسموحة صراحةً فقط للفحص المسجّل للقراءة.
+This does not certify completion of the business procedure.,لا يثبت هذا اكتمال إجراء الأعمال.
+Contact your site administrator if no guidance is available.,تواصل مع مسؤول الموقع إن لم تتوفر إرشادات.

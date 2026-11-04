@@ -1,6 +1,6 @@
 import frappe
 
-from huf.guide import context, knowledge
+from huf.guide import context, knowledge, policy
 
 
 def binding_allowed(doc, user=None, ptype="read", **kwargs):
@@ -10,6 +10,10 @@ def binding_allowed(doc, user=None, ptype="read", **kwargs):
 		return False
 	if "System Manager" in frappe.get_roles():
 		return True
+	try:
+		policy.require_access({"screen_type": doc.screen_type, "screen_name": doc.screen_name})
+	except frappe.PermissionError:
+		return False
 	if not context.screen_allowed({"screen_type": doc.screen_type, "screen_name": doc.screen_name}):
 		return False
 	try:

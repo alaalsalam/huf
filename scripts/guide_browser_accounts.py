@@ -21,13 +21,13 @@ def main():
 	token = data["token"]
 	require(re.fullmatch("[a-f0-9]{12}", token))
 	users = data["users"]
-	require(len(users) == 2)
-	require(
-		{u["email"] for u in users}
-		== {f"huf.guide.{token}.{p}@example.invalid" for p in ("allowed", "limited")}
-	)
+	personas = {"allowed", "limited", "admin"} if len(users) == 3 else {"allowed", "limited"}
+	require({u["email"] for u in users} == {f"huf.guide.{token}.{p}@example.invalid" for p in personas})
 	role = "Guide UI Reader " + token
 	path = "guide/private-" + token
+	service_path = "guide/service-" + token
+	binding_name = "guide-ui-service-" + token
+	tour_name = "Guide UI Tour " + token
 	frappe.init(site=args.site)
 	frappe.connect()
 	frappe.set_user("Administrator")
@@ -52,9 +52,15 @@ def main():
 				)
 				doc.flags.no_welcome_mail = True
 				doc.insert()
-				roles = [role] + (["Compendium Contributor"] if user["persona"] == "allowed" else [])
+				roles = [role] + (
+					["Compendium Contributor"]
+					if user["persona"] == "allowed"
+					else ["System Manager"]
+					if user["persona"] == "admin"
+					else []
+				)
 				frappe.get_doc("User", user["email"]).add_roles(*roles)
-			frappe.get_doc(
+			page = frappe.get_doc(
 				{
 					"doctype": "Compendium Page",
 					"title": "Restricted " + token,
@@ -67,17 +73,97 @@ def main():
 					"roles": [{"role": "Compendium Contributor"}],
 				}
 			).insert()
+			if data.get("ux"):
+				for language, title, content in (
+					(
+						"en",
+						"Synthetic guide service",
+						"Synthetic test only: enter the mandatory title. This does not approve publication.",
+					),
+					(
+						"ar",
+						"خدمة دليل صناعية",
+						"اختبار صناعي فقط: أدخل العنوان الإلزامي. لا يثبت الفحص اعتماد النشر.",
+					),
+				):
+					frappe.get_doc(
+						{
+							"doctype": "Compendium Page",
+							"title": title,
+							"language": language,
+							"path": service_path,
+							"published": 1,
+							"content": content,
+						}
+					).insert()
+				frappe.get_doc(
+					{
+						"doctype": "Form Tour",
+						"title": tour_name,
+						"ui_tour": 1,
+						"view_name": "Form",
+						"reference_doctype": "Compendium Page",
+						"track_steps": 0,
+						"steps": [
+							{
+								"ui_tour": 1,
+								"title": "Title",
+								"description": "Synthetic test only",
+								"element_selector": ".frappe-control[data-fieldname='title']",
+								"position": "Bottom",
+							}
+						],
+					}
+				).insert()
+				frappe.get_doc(
+					{
+						"doctype": "HUF Guide Binding",
+						"screen_type": "Form",
+						"screen_name": "Compendium Page",
+						"article_path": service_path,
+						"form_tour": tour_name,
+						"next_instruction": "Enter the mandatory title. Synthetic test only.",
+						"target_type": "Form",
+						"target_name": "Compendium Page",
+						"target_field": "title",
+						"record_check_enabled": 1,
+						"record_check": "native_required_fields",
+						"check_roles": [{"role": role}],
+						"check_fields": "title",
+						"complete_instruction": "Specified fields present; this does not approve publication.",
+						"incomplete_instruction": "Enter the mandatory title. Synthetic test only.",
+					}
+				).insert(set_name=binding_name)
 			frappe.db.commit()
 			print(
 				json.dumps(
 					{
-						"created_users": 2,
-						"non_admin": all("System Manager" not in frappe.get_roles(u["email"]) for u in users),
+						"created_users": len(users),
+						"non_admin": all(
+							"System Manager" not in frappe.get_roles(u["email"])
+							for u in users
+							if u["persona"] != "admin"
+						),
+						"document": page.name,
+						"binding": binding_name,
+						"original_checks": frappe.db.get_single_value(
+							"HUF Guide Settings", "record_checks_enabled"
+						),
 					}
 				)
 			)
 		elif data["action"] == "cleanup":
-			for name in frappe.get_all("Compendium Page", filters={"path": path}, pluck="name"):
+			if data.get("ux"):
+				if frappe.db.exists("HUF Guide Binding", binding_name):
+					frappe.delete_doc("HUF Guide Binding", binding_name)
+				if frappe.db.exists("Form Tour", tour_name):
+					frappe.delete_doc("Form Tour", tour_name)
+				frappe.db.set_single_value(
+					"HUF Guide Settings", "record_checks_enabled", data["original_checks"]
+				)
+			for name in frappe.get_all(
+				"Compendium Page", filters={"path": ["in", [path, service_path]]}, pluck="name"
+			):
 				frappe.delete_doc("Compendium Page", name)
 			for user in users:
 				email = user["email"]
@@ -111,6 +197,32 @@ def main():
 			}
 			require(not any(counts.values()))
 			print(json.dumps({"remaining_fixture_rows": counts}))
+		elif data.get("ux") and data["action"] in (
+			"enable_checks",
+			"make_incomplete",
+			"make_complete",
+			"unknown_instruction",
+			"withdraw_role",
+			"unpublish",
+		):
+			page_name = frappe.db.get_value("Compendium Page", {"path": path}, "name")
+			require(page_name)
+			if data["action"] == "enable_checks":
+				frappe.db.set_single_value("HUF Guide Settings", "record_checks_enabled", 1)
+			elif data["action"] == "make_incomplete":
+				frappe.db.set_value("Compendium Page", page_name, "title", "")
+			elif data["action"] == "make_complete":
+				frappe.db.set_value("Compendium Page", page_name, "title", "Restricted " + token)
+			elif data["action"] == "unknown_instruction":
+				frappe.db.set_value("HUF Guide Binding", binding_name, "complete_instruction", "")
+			elif data["action"] == "withdraw_role":
+				frappe.get_doc("User", f"huf.guide.{token}.allowed@example.invalid").remove_roles(
+					"Compendium Contributor"
+				)
+			else:
+				frappe.db.set_value("Compendium Page", page_name, "published", 0)
+			frappe.db.commit()
+			print(json.dumps({"owned_fixture_action": data["action"]}))
 		else:
 			raise ValueError("invalid_action")
 	finally:

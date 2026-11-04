@@ -10,6 +10,7 @@ def run():
 	frappe.only_for("System Manager")
 	from huf.guide.tests.test_guide import TestGuide
 	from huf.guide.tests.test_skill_namespace import TestSkillNamespace
+	from huf.guide.tests.test_ux import TestGuideUX
 
 	before = {
 		dt: frappe.db.count(dt)
@@ -21,6 +22,7 @@ def run():
 			[
 				unittest.defaultTestLoader.loadTestsFromTestCase(TestGuide),
 				unittest.defaultTestLoader.loadTestsFromTestCase(TestSkillNamespace),
+				unittest.defaultTestLoader.loadTestsFromTestCase(TestGuideUX),
 			]
 		)
 	)

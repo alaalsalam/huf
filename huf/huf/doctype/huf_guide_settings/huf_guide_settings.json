@@ -1,13 +1,156 @@
 {
- "doctype": "DocType", "name": "HUF Guide Settings", "module": "Huf", "issingle": 1,
- "engine": "InnoDB", "track_changes": 1,
- "field_order": ["enabled", "mode", "support_channel", "guide_only_install"],
- "fields": [
-  {"fieldname": "enabled", "fieldtype": "Check", "label": "Enable System Guide", "default": "0", "description": "Show the guide in Desk. Disabling also blocks its server APIs."},
-  {"fieldname": "mode", "fieldtype": "Select", "label": "Guide Mode", "options": "guide_only\nguide_ai", "default": "guide_only", "reqd": 1, "description": "Local documentation and tours. AI guidance is reserved for a later release."},
-  {"fieldname": "support_channel", "fieldtype": "Small Text", "label": "Support Channel", "description": "Approved contact instructions. Nothing is sent automatically."},
-  {"fieldname": "guide_only_install", "fieldtype": "Check", "label": "Guide-only Installation", "default": "0", "read_only": 1, "description": "Installation profile: do not seed agents, grant HUF roles or alter shared scheduler settings."}
+ "doctype": "DocType",
+ "name": "HUF Guide Settings",
+ "module": "Huf",
+ "issingle": 1,
+ "engine": "InnoDB",
+ "track_changes": 1,
+ "field_order": [
+  "visibility_section",
+  "enabled",
+  "mode",
+  "allowed_roles",
+  "denied_roles",
+  "included_screens",
+  "excluded_screens",
+  "default_language",
+  "allow_translation_fallback",
+  "fallback_language",
+  "services_section",
+  "resources",
+  "privacy_section",
+  "record_checks_enabled",
+  "guide_only_install",
+  "support_section",
+  "support_channel",
+  "readiness"
  ],
- "permissions": [{"role": "System Manager", "read": 1, "write": 1, "create": 1}],
- "sort_field": "modified", "sort_order": "DESC", "states": [], "links": [], "actions": []
+ "fields": [
+  {
+   "fieldname": "visibility_section",
+   "fieldtype": "Section Break",
+   "label": "Activation and Visibility"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable System Guide",
+   "default": "0",
+   "description": "Show the guide in Desk. Disabling also blocks its server APIs."
+  },
+  {
+   "fieldname": "mode",
+   "fieldtype": "Select",
+   "label": "Guide Mode",
+   "options": "guide_only",
+   "default": "guide_only",
+   "read_only": 1
+  },
+  {
+   "fieldname": "allowed_roles",
+   "fieldtype": "Table MultiSelect",
+   "label": "Allowed Roles",
+   "options": "Has Role",
+   "description": "Empty allows existing Desk users. This never grants roles."
+  },
+  {
+   "fieldname": "denied_roles",
+   "fieldtype": "Table MultiSelect",
+   "label": "Excluded Roles",
+   "options": "Has Role",
+   "description": "Exclusion takes precedence over allowance."
+  },
+  {
+   "fieldname": "included_screens",
+   "fieldtype": "Small Text",
+   "label": "Included Screens",
+   "description": "One actual screen per line: Page:docs or Form:ToDo. Empty includes permitted screens."
+  },
+  {
+   "fieldname": "excluded_screens",
+   "fieldtype": "Small Text",
+   "label": "Excluded Screens",
+   "description": "Same format. Excluded screens always take precedence."
+  },
+  {
+   "fieldname": "default_language",
+   "fieldtype": "Select",
+   "label": "Guide Language",
+   "options": "user\nar\nen",
+   "default": "user",
+   "description": "Use the reader language or the selected guide language."
+  },
+  {
+   "fieldname": "allow_translation_fallback",
+   "fieldtype": "Check",
+   "label": "Allow Translation Fallback",
+   "default": "1"
+  },
+  {
+   "fieldname": "fallback_language",
+   "fieldtype": "Select",
+   "label": "Fallback Language",
+   "options": "en\nar",
+   "default": "en"
+  },
+  {
+   "fieldname": "services_section",
+   "fieldtype": "Section Break",
+   "label": "Guides and Services"
+  },
+  {
+   "fieldname": "resources",
+   "fieldtype": "HTML",
+   "label": "Knowledge Resources"
+  },
+  {
+   "fieldname": "privacy_section",
+   "fieldtype": "Section Break",
+   "label": "Permissions and Privacy"
+  },
+  {
+   "fieldname": "record_checks_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Record Checks",
+   "default": "0",
+   "description": "Off by default. Each service also needs an enabled check, allowed roles and explicit fields. Reading a guide does not read a business record."
+  },
+  {
+   "fieldname": "guide_only_install",
+   "fieldtype": "Check",
+   "label": "Guide-only Installation",
+   "default": "0",
+   "read_only": 1,
+   "description": "Installation profile: do not seed agents, grant HUF roles or alter shared scheduler settings."
+  },
+  {
+   "fieldname": "support_section",
+   "fieldtype": "Section Break",
+   "label": "Support and Readiness"
+  },
+  {
+   "fieldname": "support_channel",
+   "fieldtype": "Small Text",
+   "label": "Support Channel",
+   "description": "Approved contact instructions. Nothing is sent automatically."
+  },
+  {
+   "fieldname": "readiness",
+   "fieldtype": "HTML",
+   "label": "Service Readiness"
+  }
+ ],
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "links": [],
+ "actions": []
 }

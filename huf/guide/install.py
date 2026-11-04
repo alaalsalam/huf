@@ -108,6 +108,44 @@ def seed_example():
 				"article_path": "guide/search",
 				"form_tour": name,
 				"priority": 10,
+				"next_instruction": "Search the guide, open the source and follow its documented steps.",
+				"target_type": "Page",
+				"target_name": "docs",
 			}
 		).insert(set_name="huf-guide-search")
 	return {"article": "guide/search", "tour": name}
+
+
+def prepare():
+	"""One explicit-site command; additive schema sync and missing defaults only."""
+	frappe.only_for("System Manager")
+	if not {"huf", "compendium"}.issubset(frappe.get_installed_apps()):
+		frappe.throw(frappe._("Install HUF and compatible Compendium first."))
+	from importlib.metadata import version
+
+	if version("compendium").split(".")[0] != frappe.__version__.split(".")[0]:
+		frappe.throw(frappe._("Install a compatible Compendium version before enabling the guide."))
+	for name in ("huf_guide_settings", "huf_guide_binding"):
+		frappe.reload_doc("huf", "doctype", name, force=True)
+	for field, value in {
+		"default_language": "user",
+		"allow_translation_fallback": 1,
+		"fallback_language": "en",
+		"record_checks_enabled": 0,
+	}.items():
+		# Check Singles row existence: Frappe converts absent Check values to0,
+		# which must not be confused with a deliberately saved disabled setting.
+		if not frappe.db.sql(
+			"select value from tabSingles where doctype=%s and field=%s", ("HUF Guide Settings", field)
+		):
+			frappe.db.set_single_value("HUF Guide Settings", field, value)
+	seed_example()
+	binding = frappe.get_doc("HUF Guide Binding", "huf-guide-search")
+	if binding.article_path == "guide/search" and not binding.next_instruction:
+		binding.next_instruction = "Search the guide, open the source and follow its documented steps."
+		binding.save()
+	return {
+		"site": frappe.local.site,
+		"mode": frappe.db.get_single_value("HUF Guide Settings", "mode"),
+		"settings_preserved": True,
+	}

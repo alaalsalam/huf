@@ -16,9 +16,17 @@ def logical_path(path):
 
 def read(path):
 	path = logical_path(path)
+	settings = frappe.get_single("HUF Guide Settings")
+	locale = (
+		frappe.local.lang if settings.default_language in (None, "", "user") else settings.default_language
+	)
 	try:
 		# Compendium owns discovery, publication, canonical-language ACL and rendering.
-		page = docs.get_page(path=path, locale=frappe.local.lang)
+		page = docs.get_page(path=path, locale=locale)
+		if page["is_fallback"]:
+			if not settings.allow_translation_fallback:
+				frappe.throw(_("Guide unavailable or not permitted."), frappe.PermissionError)
+			page = docs.get_page(path=path, locale=settings.fallback_language or "en")
 	except (frappe.PermissionError, frappe.DoesNotExistError):
 		# Neither titles nor different error messages disclose a hidden page's existence.
 		raise frappe.PermissionError(_("Guide unavailable or not permitted.")) from None
@@ -39,7 +47,11 @@ def find(query):
 	if not match:
 		return []
 	results = []
-	for path, _title, snippet in search.search(docs.normalize_locale(frappe.local.lang), match):
+	settings = frappe.get_single("HUF Guide Settings")
+	locale = (
+		frappe.local.lang if settings.default_language in (None, "", "user") else settings.default_language
+	)
+	for path, _title, snippet in search.search(docs.normalize_locale(locale), match):
 		try:
 			# Recheck current publication and roles even when the native search index is warm.
 			page = read(path)

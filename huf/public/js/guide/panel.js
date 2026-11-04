@@ -39,15 +39,14 @@
 			const close = el("button", { class: "btn btn-default btn-sm", "aria-label": t("Close") }, "×");
 			close.onclick = () => this.close(); header.append(close);
 			this.panel.append(header, el("p", { class: "huf-guide-intro" }, t("Find instructions and their sources. Search results are documentation, not AI answers.")));
+			this.screenLabel = el("p", { class: "huf-guide-screen" }); this.panel.append(this.screenLabel);
 			const actions = el("nav", { "aria-label": t("System Guide") });
 			for (const [label, fn] of [
 				["Guide for this screen", () => this.loadContext()],
-				["Search the guide", () => this.query.focus()],
-				["Guide me step by step", () => this.startTour()],
-				["Explain a known error", () => { this.errorBox.hidden = false; this.errorInput.focus(); }],
+				["What is the next step?", () => this.loadContext(true)],
+				["Search the service guide", () => this.query.focus()],
 			]) {
 				const button = el("button", { class: "btn btn-default" }, t(label));
-				if (label === "Guide me step by step") { this.tourButton = button; button.disabled = true; }
 				button.onclick = fn; actions.append(button);
 			}
 			this.panel.append(actions);
@@ -56,7 +55,8 @@
 			this.query = el("input", { id: "huf-guide-query", class: "form-control", type: "search", maxlength: "200", autocomplete: "off" });
 			search.append(label, this.query, el("button", { class: "btn btn-primary", type: "submit" }, t("Search")));
 			search.onsubmit = (e) => { e.preventDefault(); this.search(); };
-			this.errorBox = el("form", { hidden: "" });
+			const details = el("details"); details.append(el("summary", {}, t("Explain a known error")));
+			this.errorBox = el("form");
 			this.errorInput = el("input", { id: "huf-guide-error", class: "form-control", maxlength: "140", autocomplete: "off" });
 			this.errorBox.append(el("label", { for: "huf-guide-error" }, t("Known error code")), this.errorInput, el("button", { class: "btn btn-default", type: "submit" }, t("Explain a known error")));
 			this.errorBox.onsubmit = (e) => { e.preventDefault(); this.explain(); };
@@ -64,7 +64,7 @@
 			this.results = el("div", { class: "huf-guide-results" });
 			this.article = el("article", { class: "huf-guide-article" });
 			this.support = el("p", { class: "huf-guide-support" });
-			this.panel.append(search, this.errorBox, this.status, this.results, this.article, this.support);
+			details.append(this.errorBox); this.panel.append(search, details, this.status, this.results, this.article, this.support);
 			this.host.append(this.launcher, this.panel); this.host.hidden = true;
 			document.body.append(this.host);
 		}
@@ -77,14 +77,15 @@
 		async routeChanged() {
 			const revision = ++this.revision; ++this.request;
 			this.tour?.driver?.reset();
-			this.tourButton.disabled = true;
 			this.field = ""; this.context = this.getContext(); this.items = [];
 			this.results.replaceChildren(); this.article.replaceChildren();
+			this.status.textContent = ""; this.errorInput.value = ""; this.query.value = "";
 			try {
-				const settings = await call("bootstrap");
+				const settings = await call("bootstrap", { context: this.context });
 				if (revision !== this.revision) return;
 				this.host.hidden = !settings.enabled;
-				this.support.textContent = settings.support || "";
+				this.support.textContent = settings.support || t("Contact your site administrator if no guidance is available.");
+				this.screenLabel.textContent = settings.screen_label || t("Current screen");
 				if (!settings.enabled) this.close();
 				else if (this.opened) await this.loadContext();
 			} catch { if (revision === this.revision) this.host.hidden = true; }
@@ -100,6 +101,7 @@
 		async run(name, args, apply) {
 			const revision = this.revision, request = ++this.request;
 			this.status.textContent = t("Loading...");
+			this.results.replaceChildren(); this.article.replaceChildren();
 			try {
 				const result = await call(name, args);
 				if (revision !== this.revision || request !== this.request) return;
@@ -107,14 +109,13 @@
 			} catch {
 				if (revision !== this.revision || request !== this.request) return;
 				this.results.replaceChildren(); this.article.replaceChildren();
-				this.status.textContent = t("Guide unavailable or not permitted.");
+				this.status.textContent = t("Guidance is unavailable. Try again or use the approved support channel.");
 			}
 		}
-		async loadContext() {
+		async loadContext(next = false) {
 			this.context = this.getContext();
 			await this.run("resolve_help", { context: this.context }, (items) => {
-				this.items = items; this.renderResults(items);
-				this.tourButton.disabled = !items.some((item) => item.tour);
+				this.items = items; this.renderResults(items, next);
 				if (!items.length) this.status.textContent = t("No published guide is linked to this screen.");
 			});
 		}
@@ -127,26 +128,46 @@
 		explain() {
 			this.run("resolve_help", { context: { ...this.context, error_key: this.errorInput.value.trim() } }, (items) => {
 				const exact = items.filter((item) => item.error_key === this.errorInput.value.trim() && item.error_key);
-				this.renderResults(exact);
-				if (!exact.length) this.status.textContent = t("This error is not documented. Use the approved support channel if available.");
+				this.renderResults(exact, true);
+				if (!exact.length) this.status.textContent = t("No documented guidance is available for this situation.");
 			});
 		}
-		renderResults(items) {
+		renderResults(items, next = false) {
 			this.results.replaceChildren(); this.article.replaceChildren();
 			for (const item of items) {
 				const card = el("div", { class: "huf-guide-card" });
+				card.append(el("span", { class: "huf-guide-badge" }, t("From the guide")));
+				if (next) {
+					if (item.cause) card.append(el("p", {}, t(item.cause)));
+					card.append(el("p", {}, item.instruction ? t(item.instruction) : t("Read the source before proceeding. No next step is documented.")));
+				}
 				const button = el("button", { class: "btn btn-link" }, item.title);
 				button.onclick = () => this.read(item.path);
 				const source = el("a", { href: item.url, class: "huf-guide-source" }, t("Open source"));
 				source.onclick = (e) => { e.preventDefault(); frappe.set_route(item.url.replace(/^\/desk\//, "")); };
 				card.append(button);
 				if (item.snippet) card.append(el("p", {}, item.snippet));
+				if (item.tour) {
+					const tour = el("button", { class: "btn btn-default btn-sm" }, t("Start tour"));
+					tour.onclick = () => this.startTour(item); card.append(tour);
+				}
+				if (item.action && this.actionVisible(item.action)) {
+					const go = el("button", { class: "btn btn-default btn-sm huf-guide-destination" }, t(item.action.kind === "field" ? "Go to field" : "Open page"));
+					go.onclick = () => this.navigate(item); card.append(go);
+				}
+				if (next && item.can_check) {
+					const check = el("button", { class: "btn btn-default btn-sm" }, t("Check this request"));
+					check.onclick = () => this.checkRecord(item); card.append(check);
+				}
 				card.append(source); this.results.append(card);
 			}
 		}
 		read(path) {
-			this.run("get_guide", { path }, (page) => {
+			this.run("get_guide", { path, context: this.context }, (page) => {
 				this.article.replaceChildren(el("h3", {}, page.title));
+				const source = el("a", { href: page.url, class: "huf-guide-source" }, t("Open source"));
+				source.onclick = (e) => { e.preventDefault(); frappe.set_route(page.url.replace(/^\/desk\//, "")); };
+				this.article.append(source);
 				const body = el("div", { class: "from-markdown" });
 				// HTML is rendered/sanitised by Compendium after its publication/role check.
 				// Keep passive third-party resources out of the guide, including tracking images.
@@ -165,8 +186,33 @@
 				body.append(template.content); this.article.append(body);
 			});
 		}
-		async startTour() {
-			const item = this.items.find((entry) => entry.tour);
+		actionVisible(action) {
+			return action.kind !== "field" || (window.cur_frm?.doctype === action.screen && cur_frm.fields_dict[action.field]?.$wrapper?.is(":visible"));
+		}
+		navigate(item) {
+			this.run("resolve_help", { context: this.context }, (items) => {
+				const action = items.find((v) => v.binding === item.binding)?.action;
+				if (!action || !this.actionVisible(action)) { this.status.textContent = t("Destination unavailable or not permitted."); return; }
+				if (action.kind === "field") { this.close(); cur_frm.scroll_to_field(action.field); cur_frm.fields_dict[action.field].set_focus(); }
+				else frappe.set_route(action.screen_type === "Page" ? [action.screen] : [action.screen_type === "Workspace" ? "Workspaces" : action.screen_type, action.screen]);
+			});
+		}
+		checkRecord(item) {
+			if (!window.cur_frm || cur_frm.is_new() || cur_frm.is_dirty()) {
+				this.status.textContent = t("Unsaved draft: save it before requesting a record check. No record was checked."); return;
+			}
+			this.run("check_record", { binding: item.binding, document_name: cur_frm.doc.name, context: this.context }, (result) => {
+				const card = el("div", { class: "huf-guide-check", "data-state": result.state });
+				card.append(el("strong", {}, t("Check of this saved request")), el("p", {}, t(result.instruction)), el("p", {}, t(result.limitation)));
+				const source = el("a", { href: result.source.url }, result.source.title); card.append(source); this.results.append(card);
+				this.support.hidden = result.state !== "unknown" && !this.support.textContent;
+				if (result.action) {
+					const go = el("button", { class: "btn btn-default huf-guide-destination" }, t(result.action.kind === "field" ? "Go to field" : "Open page"));
+					go.onclick = () => this.navigate(item); card.append(go);
+				}
+			});
+		}
+		async startTour(item = this.items.find((entry) => entry.tour)) {
 			if (!item) { this.status.textContent = t("No tour is available for this screen."); return; }
 			const revision = this.revision;
 			try {
