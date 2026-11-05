@@ -1,0 +1,6 @@
+# Python 3.14 / shared Bench16: newer allowed LiteLLM patches pin older SDKs.
+# Keep the validated SDK versions; never use compromised LiteLLM 1.82.7/1.82.8.
+litellm==1.83.0
+openai==2.43.0
+openai-agents==0.17.6
+pydantic==2.12.5

@@ -59,6 +59,8 @@ def build_boot_context() -> dict:
 
 
 def get_context(context):
+	from huf.deployment import assert_private_ui_access
+	assert_private_ui_access()
 	context.update(build_boot_context())
 	return context
 

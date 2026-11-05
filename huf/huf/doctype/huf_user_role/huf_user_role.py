@@ -180,7 +180,8 @@ def ensure_default_huf_roles(
 	rows are written directly so this can run from the User's own on_update without re-saving it; with
 	``user_doc`` they are also added to that doc, so a later save of the same form keeps them.
 	"""
-	if user == "Guest":
+	from huf.deployment import automatic_roles_enabled
+	if not automatic_roles_enabled() or user == "Guest":
 		return False
 	# Test fixtures build users with exact roles (often deliberately without Huf access); tests that cover
 	# the default grant opt in.
@@ -235,5 +236,8 @@ def ensure_default_huf_roles(
 
 def grant_default_roles_to_system_users() -> int:
 	"""Backfill: run ensure_default_huf_roles for every enabled System User. Returns how many changed."""
+	from huf.deployment import automatic_roles_enabled
+	if not automatic_roles_enabled():
+		return 0
 	users = frappe.get_all("User", {"user_type": "System User", "enabled": 1}, pluck="name")
 	return sum(1 for user in users if ensure_default_huf_roles(user, "System User", 1))

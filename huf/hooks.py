@@ -146,6 +146,7 @@ after_migrate = [
     "huf.ai.skills.hooks.sync_app_skills",
     "huf.install.seed_voice_engines",
     "huf.ai.channels.run_as.ensure_all_audit_fields",
+    "huf.deployment.apply_site_policy",
 ]
 
 # Uninstallation

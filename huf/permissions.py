@@ -311,6 +311,9 @@ def check_app_permission() -> bool:
 	  - has System Manager role, OR
 	  - has an active Huf User Role record.
 	"""
+	from huf.deployment import navigation_hidden
+	if navigation_hidden():
+		return False
 	user = frappe.session.user
 
 	if user == "Administrator":

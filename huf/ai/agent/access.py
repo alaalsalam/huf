@@ -39,9 +39,10 @@ def check_agent_access(agent_doc, user, *, for_execution=True) -> bool:
 	- Otherwise, allowed if the user is listed in allowed_users or holds any
 	  role in allowed_roles.
 	"""
-	# for_execution is currently unused: access rules are identical for viewing/
-	# editing and for running the agent. Reserved in case execution ever needs
-	# stricter or looser rules than general document access.
+	# A staged site may expose configuration to administrators while refusing
+	# execution. Agent ACLs below still govern normal installations.
+	if for_execution and not frappe.conf.get("huf_execution_enabled", True):
+		return False
 
 	if user == "Guest":
 		return bool(agent_doc.allow_guest)

@@ -40,6 +40,10 @@ def setup_desktop_icon_as_workspace(app_name):
 	This is cosmetic: any failure here is logged and swallowed rather than
 	aborting `bench install-app huf`.
 	"""
+	from huf.deployment import apply_site_policy, navigation_hidden
+	if app_name == "huf" and navigation_hidden():
+		apply_site_policy()
+		return
 	if not is_frappe_16() or app_name != "huf":
 		return
 
@@ -171,6 +175,9 @@ def ensure_scheduler_tick():
 	An explicit value already in the common config is respected. The running ``bench schedule``
 	process reads the value at start, so it must be restarted once for a change to apply.
 	"""
+	# A private staged install must not rewrite Bench-wide scheduler settings.
+	if not frappe.conf.get("huf_background_enabled", True):
+		return
 	try:
 		import json
 		import os
@@ -401,6 +408,8 @@ def create_hub_orchestrator_agent():
 	Idempotent: seed the "Hub Orchestrator" system agent that powers hub chat.
 	Safe to call on both after_install and after_migrate.
 	"""
+	if frappe.conf.get("huf_skip_demo_seeds"):
+		return
 	from huf.ai.app_seeding.hub_orchestrator import create_hub_orchestrator_agent as _create
 
 	try:
@@ -415,6 +424,8 @@ def create_design_system_skill():
 	render_app_component reference) and attach it to Hub Orchestrator.
 	Safe to call on both after_install and after_migrate.
 	"""
+	if frappe.conf.get("huf_skip_demo_seeds"):
+		return
 	from huf.ai.app_seeding.design_system_skill import create_design_system_skill as _create
 
 	try:
@@ -466,6 +477,8 @@ def create_meeting_summary_agent():
 
 	Safe to call on both after_install and after_migrate.
 	"""
+	if frappe.conf.get("huf_skip_demo_seeds"):
+		return
 	fields = {
 		"agent_name": MEETING_SUMMARY_AGENT_NAME,
 		"description": "Summarizes a finalized Meeting transcript into headline, key points, and action items.",
@@ -527,6 +540,8 @@ def create_meeting_recorder_app():
 	replacing it; "delivery": "desk" only controls which surface renders
 	/huf/apps/meeting-recorder, it does not retire the SPA route.
 	"""
+	if frappe.conf.get("huf_skip_demo_seeds"):
+		return
 	app_id = "meeting-recorder"
 	fields = {
 		"title": "Meeting Recorder",
@@ -574,6 +589,8 @@ def create_whatsapp_app():
 	fields are refreshed so an admin's hand-edit of ``enabled`` survives migrate.
 	Opens the Channels app (/huf/channels/whatsapp). Visibility is decided at request time by ``can_launch_whatsapp_app``.
 	"""
+	if frappe.conf.get("huf_skip_demo_seeds"):
+		return
 	fields = {
 		"title": "WhatsApp",
 		"description": "Set up and automate WhatsApp: AI agents, broadcasts, templates, handoff to Help Desk/CRM",
@@ -1035,12 +1052,16 @@ def create_huf_roles():
 
 	# 4. Ensure Administrator has the Huf Admin role.
 	if not frappe.db.exists("Huf User Role", {"user": "Administrator"}):
-		frappe.get_doc({
+		admin_role = frappe.get_doc({
 			"doctype": "Huf User Role",
 			"user": "Administrator",
 			"huf_role": "Huf Admin",
 			"enabled": 1,
-		}).insert(ignore_permissions=True)
+		})
+		from huf.deployment import automatic_roles_enabled
+		if not automatic_roles_enabled():
+			admin_role.flags.skip_frappe_role_sync = True
+		admin_role.insert(ignore_permissions=True)
 
 	# 5. Migration path: assign existing System Managers to Huf Admin if they
 	#    don't already have a Huf User Role record.
@@ -1059,6 +1080,9 @@ def _migrate_existing_system_managers():
 	One-time migration: give existing System Manager users the Huf Admin
 	role so they keep access after the new check_app_permission goes live.
 	"""
+	from huf.deployment import automatic_roles_enabled
+	if not automatic_roles_enabled():
+		return
 	system_managers = frappe.get_all(
 		"Has Role",
 		filters={"role": "System Manager", "parenttype": "User"},
