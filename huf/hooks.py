@@ -94,9 +94,9 @@ website_route_rules = [
 
 # Register custom page renderer for SSE streaming and docs
 page_renderer = [
-    "huf.ai.agent.stream_renderer.AgentStreamRenderer",
+    "huf.ai.page_renderers.AgentStreamRenderer",
     "huf.ai.app_public_renderer.HufAppPublicRenderer",
-    "huf.api.v1.router.ApiV1Router",
+    "huf.ai.page_renderers.ApiV1Router",
     # Per-app www/ template registry (Phase 2, HufAppDeskPortalDelivery):
     # matches a provider app's declared `route` against the HUF App registry
     # rather than a static website_route_rules entry, so it must be tried
